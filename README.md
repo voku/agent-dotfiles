@@ -1,107 +1,84 @@
 # agent-dotfiles
 
-**Small, non-interactive CLI defaults for coding agents.**
+**Agent-owned Bash/Zsh dotfiles and an exact-evidence CLI for coding agents.**
+Local, explicit, no magic interception. The last release is
+[v0.3.0](https://github.com/voku/agent-dotfiles/releases/tag/v0.3.0);
+the shell-profile work is unreleased.
 
-Based on lessons from [voku/dotfiles](https://github.com/voku/dotfiles) and the navigation boundaries in [voku/agent-loop](https://github.com/voku/agent-loop). Current version: **0.3.0**. It uses Python's standard library and native Git/ripgrep, with explicit optional installation.
+## Quick start
 
-## What works now
+Use a clean, reviewed Git checkout and an **independently approved** full
+40-character commit SHA. Keep installations in separate private prefixes.
 
-- Read-only `doctor` inventory for `rg`, `git`, `jq`, `fd`/`fdfind`, `shellcheck`, `strace`, `hyperfine`.
-- Bounded file discovery, using direct `rg --files --null` by default or explicit `fd`/`fdfind`.
-- Bounded Git status, using `git status --porcelain=v1 -z` with rename/copy paths decoded in order.
-- Bounded text search, using `rg --json` and literal matching by default. Original `rg` match records are preserved, including byte-encoded paths and lines. Explicit `--path` / repeatable `--glob` can narrow a question without truncating original matches.
-- Exact UTF-8 `read` ranges with original whitespace/newlines, EOF metadata and SHA-256 of the whole file. No ellipses.
-- Index-only `tracked` listing (`git ls-files -z`) with correct handling of unusual paths.
-- Exact `git-patch` for one path using Git binary/full-index diff, SHA-256 and an error if output cannot fit; no replacement with diffstat.
-- Stable JSON envelopes and explicit result limits. Search respects `.gitignore` by default; `--hidden` is opt-in.
-- Runtime commands do not install anything, access the network or load shell startup files. A separate, explicit installer supports pinned private prefixes, verification and safe removal.
+```bash
+./install.sh install --revision APPROVED_FULL_COMMIT_SHA \
+  --prefix /private/existing-parent/agent-dotfiles-approved
+./install.sh verify --revision APPROVED_FULL_COMMIT_SHA \
+  --prefix /private/existing-parent/agent-dotfiles-approved
 
-See [pinned installation and rollback](docs/INSTALLATION.md) and the [optional agent-loop consumer contract](docs/AGENT_LOOP.md). Automatic installation and host-policy changes remain outside the CLI contract.
-
-## Requirements
-
-Python 3.10+ on Linux, macOS or WSL, and `rg` for the search commands. `git` is recommended for coding workflows. Everything else is optional. The name `sg` is deliberately not recognized as `ast-grep`, because on Linux it can refer to the unrelated `newgrp` utility. The Python standard library is sufficient; no pip/Composer install is required.
-
-## Usage
-
-From the checkout:
-
-```sh
-./bin/agent-dotfiles doctor
-./bin/agent-dotfiles doctor --strict
-./bin/agent-dotfiles files --root . --limit 50
-./bin/agent-dotfiles git-status --root . --limit 50
-./bin/agent-dotfiles files --engine fd --limit 50 # explicit alternative; different semantics
-./bin/agent-dotfiles search 'function save(' --root . --limit 20
-./bin/agent-dotfiles search '^final class ' --regex --limit 20
-./bin/agent-dotfiles search 'save(' --path src --glob '*.php' --limit 30
-./bin/agent-dotfiles tracked --limit 100
-./bin/agent-dotfiles read src/Service.php --start 80 --end 180
-./bin/agent-dotfiles git-patch src/Service.php --base HEAD~1
+# In a fresh isolated Bash consumer, never ~/.bashrc:
+source /private/existing-parent/agent-dotfiles-approved/shell/.bashrc
+agent_doctor
+agent_files --root . --limit 30
+agent_search 'function save(' --path src --glob '*.php' --limit 20
+agent_read src/Service.php --start 40 --end 120
+agent_patch src/Service.php --base HEAD~1
+agent_history 5
+agent_blame src/Service.php 40 60
 ```
 
-All **successful** commands print one JSON object to stdout. There is no pager or color output.
+Explicitly source `shell/.zshrc` in a fresh Zsh session instead. You may also
+invoke `bin/agent-dotfiles` by absolute path without any shell profile.
+`agent_help` lists the function signatures.
 
-| Exit code | Meaning |
-| --- | --- |
-| 0 | Complete success; doctor reports inventory even when tools are missing unless `--strict` |
-| 1 | Search completed with zero matches |
-| 2 | Explicit error: invalid arguments, missing tool, bad output, timeout, or subprocess failure; doctor `--strict` also uses 2 |
-| 3 | **Truncated**: more records than `--limit`, or output byte cap exceeded. Treat results as incomplete. |
+## Behavior and limitations
 
-Output schemas: `agent-dotfiles.v1.doctor`, `agent-dotfiles.v1.files`, `agent-dotfiles.v1.git-status`, `agent-dotfiles.v1.search`, `agent-dotfiles.v1.tracked`, `agent-dotfiles.v1.read`, `agent-dotfiles.v1.git-patch`, `agent-dotfiles.v1.error`. An exact `read` or `git-patch` command **fails** if the requested content would exceed the cap. It never returns a shortened source or patch. A result with `truncated: true` must **never** be presented as a complete repository search. Limits default to 100, maximum 1000; process output is limited to 2 MiB and wall time to 20 seconds.
+- No user startup edits, PATH updates, global Git config, aliases, hooks,
+  user profile sourcing, remote installers or background daemons.
+- Fully pinned offline installation, integrity verification and fail-closed
+  removal. Rollback means selecting a prior installed prefix in a fresh session.
+- Bounded `files`, `search`, `git-status`, `tracked`; exit 3 marks truncated
+  navigation. No-truncation `read` and `git-patch` preserve exact source/patch
+  bytes and hashes. Errors are explicit.
+- Shell functions `agent_doctor`, `agent_files`, `agent_search`,
+  `agent_status`, `agent_tracked`, `agent_read`, `agent_patch` forward
+  CLI arguments and exit codes unchanged. `agent_history` and `agent_blame`
+  use native Git with complete metadata; they do not compress evidence.
+- Existing namespaced functions and activation of a different pinned version
+  in the same shell are rejected rather than silently overwritten.
+- For PHP symbols/callers, use a fresh `agent-loop map`. When optional tooling
+  is missing, native Git/ripgrep and existing Loop workflows remain available.
 
-### Source of truth
+Requires Python 3.10+, Git, Bash or Zsh and ripgrep for source search. The
+runtime uses Python's standard library; Linux/macOS are the tested platforms.
+Windows installation is not supported.
 
-Use the right tool for the *question*, not the shortest alias:
+## Development and testing
 
-| Task | Preferred tool |
-| --- | --- |
-| Literal text/config/templates | `rg` or bounded `agent-dotfiles search` |
-| File paths | `rg --files -0` or bounded `agent-dotfiles files` |
-| Tracked files | `git ls-files -z` |
-| Worktree changes | `git status --porcelain=v1 -z` |
-| JSON transformation | `jq`, with explicit filters and exit handling |
-| PHP definitions/callers/impact | `agent-loop map` when available and fresh; verify source ranges |
-| Shell static analysis | `shellcheck` where installed |
-| Runtime diagnosis | `strace` only for a scoped Linux investigation |
-| CLI comparison | `hyperfine` only for measured experiments |
-
-See [Context-first policy](docs/CONTEXT_POLICY.md), [Git evidence and opt-in aliases](docs/GIT_CONTEXT.md), [Tool matrix](docs/TOOL_MATRIX.md), [Security](docs/SECURITY.md) and [Agent Loop boundary](docs/AGENT_LOOP.md).
-
-## Why not an output-compression proxy?
-
-This tool does **not** intercept `git diff`, `rg`, PHPStan, tests or shell tools.
-The `snip`-style `git diff` → `--stat` substitution could omit precisely the
-code being reviewed, even though the token count looks attractive. Bounded
-*navigation* is explicit; a selected file or patch is delivered without lossy
-transformation. Optimization is evaluated on correct completed tasks, total
-latency and retries, not savings percentages.
-
-## Tests: Python contracts + Bashunit integration
-
-The Python unittest contracts remain authoritative for internal parsing,
-path safety, byte preservation and failure handling. Bashunit 0.50.1 adds
-**end-to-end shell/CLI tests** for actual executable behavior and exit codes;
-it does not replace the Python tests with lossy snapshots.
-
-```sh
+```bash
 python3 -m compileall -q agent_dotfiles bin tests tools
 python3 -m unittest discover -s tests -v
-# After installing/pinning bashunit 0.50.1 separately:
+bash -n install.sh shell/.bashrc shell/agent-functions.sh
+# If installed:
+zsh -n shell/.zshrc shell/agent-functions.sh
 bashunit test tests/shell --strict
 ```
 
-GitHub CI installs Bashunit via an immutable, SHA-pinned official action with
-checksum verification. Nothing is installed by running `agent-dotfiles`.
+`shell/` owns the opt-in dotfiles; `agent_dotfiles/` owns deterministic
+navigation; `install.sh` and `tools/install.py` own installation.
+Release tarballs, saved traces and mutation databases are historical evidence,
+not live source. [The original v0.3.0 experiment](docs/FULL_CYCLE.md) is
+available through commit-pinned references.
 
+Further reading: [installation](docs/INSTALLATION.md),
+[security](docs/SECURITY.md), [context policy](docs/CONTEXT_POLICY.md),
+[Git provenance](docs/GIT_CONTEXT.md) and
+[agent-loop boundary](docs/AGENT_LOOP.md).
 
-The tests use fake command executables to verify result contracts without depending on system-specific versions, interactive dotfiles, networking, or external package installations.
+## What was actually measured
 
-## GitHub workflow
-
-The repository is now maintained at [voku/agent-dotfiles](https://github.com/voku/agent-dotfiles).
-Development uses reviewable feature branches, tests, and pull requests. Its
-original repository-creation helper has been removed: it is not suitable for
-updating an existing GitHub repository. No command silently publishes changes,
-merges branches or changes the agent's global configuration.
+Four fresh governed agents found a bounded correctness improvement in installed
+file reading (4/6 to 6/6 held-out cases). Overall task productivity was
+**inconclusive**: no model-token telemetry or general speed advantage was
+demonstrated. Native tools remain the default; larger trials belong to
+[issue #12](https://github.com/voku/agent-dotfiles/issues/12).

@@ -1,95 +1,69 @@
-# Pinned, optional installation
+# Explicit, pinned installation and rollback
 
-The source checkout works directly with `./bin/agent-dotfiles doctor`; installation
-is optional. Agent-loop starts and governs tasks without this tool. Use a separate
-prefix for each approved source commit, keeping builder, validator and consumer
-environments separate. Never update the toolset inside the session maintaining it.
+The CLI and namespaced Bash/Zsh profiles are optional. They never modify
+user shell startup files, PATH, global Git config, hooks, prompts or agent-loop.
 
-Requirements: Python 3.10+, Git for installation, and an existing private parent
-directory. Runtime capability requirements are reported by `doctor`; Git and
-ripgrep supply the normal source-search and Git operations. No package manager,
-network installer, shell startup change or global configuration is involved.
-The implementation targets Linux and macOS; platform test coverage is determined
-by the current CI matrix. Windows is not supported by this installation contract.
-On macOS use a canonical parent path (for example `/private/var/...` rather than
-the `/var` symlink). Symlink ancestors are refused on every platform.
+## Install and verify
 
-## Install from an approved checkout
+Use a trusted, clean Git checkout at an **independently approved full
+40-character SHA**. Do not automatically substitute a dynamic HEAD for an
+approved revision. The destination must have an existing private parent,
+be outside the checkout, and be absent or empty. No symlink ancestors, `..`
+path traversal or dirty tracked runtime files are allowed.
 
-Obtain the checkout through your existing trusted Git access, review the desired
-commit and check out that commit yourself. Use its independently approved **full
-40-character commit SHA**, not a branch name or a dynamically resolved HEAD as
-the approval pin. Run this installer from the reviewed checkout:
-
-```sh
-python3 /path/to/agent-dotfiles/tools/install.py install \
-  --source /path/to/agent-dotfiles \
-  --revision APPROVED_FULL_COMMIT_SHA \
-  --prefix /private/existing-parent/agent-dotfiles-APPROVED_FULL_COMMIT_SHA
+```bash
+./install.sh install --revision APPROVED_FULL_COMMIT_SHA \
+  --prefix /private/existing-parent/agent-dotfiles-approved
+./install.sh verify --revision APPROVED_FULL_COMMIT_SHA \
+  --prefix /private/existing-parent/agent-dotfiles-approved
 ```
 
-Replace the capitalized placeholders. The prefix must be absent or empty, outside
-the checkout, and without symlinks or `..` components. All tracked checkout files
-must be clean; untracked and ignored files are excluded. The installer reads the
-pinned Git objects and checks the runtime files against the working copy. It copies
-only tracked Python package files, the original entry point and the license, plus
-a small generated launcher and a versioned installation manifest. It refuses
-tracked runtime symlinks. Installation is staged beside the prefix and renamed
-only after validation, leaving an existing installation untouched on failure.
+The root script always installs from its own checkout and refuses a supplied
+`--source`. For direct use, `python3 tools/install.py install --source
+CHECKOUT --revision SHA --prefix PREFIX` remains available. The installer
+compares tracked runtime files against Git objects, stages beside the prefix,
+and verifies before atomic rename. It installs only the Python package,
+the original executable, the LICENSE, and the three shell profile files,
+plus a generated launcher and a SHA-256/mode manifest. Nothing is downloaded.
 
-The original entry point is retained as `libexec/agent-dotfiles`. The generated
-`bin/agent-dotfiles` imports the isolated package and disables bytecode generation
-before imports, so invoking it does not create unmanaged `__pycache__` files.
-Files use deterministic modes: launcher `0755`, source files `0644`. The manifest
-records the source SHA, SHA-256 file digests and modes; it contains no credentials.
+## Explicit shell activation
 
-## Activate, diagnose and verify
+In a **fresh** Bash consumer session:
 
-Activation is an explicit invocation by absolute path. Do not source interactive
-dotfiles or change PATH, user shells, global Git configuration or agent-loop
-instructions. In a fresh consumer session, invoke the approved version directly:
-
-```sh
-/private/existing-parent/agent-dotfiles-APPROVED_FULL_COMMIT_SHA/bin/agent-dotfiles doctor
-python3 /path/to/agent-dotfiles/tools/install.py verify \
-  --prefix /private/existing-parent/agent-dotfiles-APPROVED_FULL_COMMIT_SHA \
-  --revision APPROVED_FULL_COMMIT_SHA
+```bash
+source /private/existing-parent/agent-dotfiles-approved/shell/.bashrc
+agent_doctor
+agent_files --root . --limit 30
+agent_history 5
+agent_blame src/File.php 10 25
 ```
 
-`doctor` reports the actual executable inventory; `doctor --strict` returns 2
-when required capabilities are missing. Missing optional tools do not affect
-agent-loop startup. See [agent-loop's integration boundary](AGENT_LOOP.md) and
-[context policy](CONTEXT_POLICY.md) for routing and source-evidence contracts.
+In fresh Zsh use the same prefix's `shell/.zshrc`. Do not source it in
+`~/.zshrc` or `~/.bashrc`. Profiles refuse function collisions and a different
+active pin; helpers never override native Git or ripgrep commands.
+`agent_doctor` returns capability inventory, or fails under `--strict`.
+Missing optional capabilities are not grounds for changing Loop policy.
 
-Installer subcommands emit JSON schema `agent-dotfiles.v1.installation`: success
-has `ok: true`, operation, source revision and file count; failure has `ok: false`
-and an error. Exit status 0 means success, 2 means refusal or operational failure.
-Argument syntax errors use standard argparse diagnostics and exit status 2.
-Verification checks every file, mode, symlink, missing entry and unknown file or
-directory. The optional `--revision` asserts the independently recorded pin.
+The JSON installer schema is `agent-dotfiles.v1.installation`. Exit 0 is
+success; exit 2 is an explicit error/refusal. CLI navigation retains its
+documented 0/1/2/3 codes. Source/output and manifest are not a digital
+signature: verify the trusted Git provenance separately.
 
-The manifest is integrity and provenance bookkeeping, **not a digital signature**.
-An attacker who can rewrite the installation and manifest can falsify them.
-Keep the prefix private, use independently approved Git provenance, and retain
-the reviewed source checkout for reinstallation. Installation and removal require
-exclusive access to the prefix: concurrent hostile filesystem modifications are
-outside this contract. The installer does not authenticate remote Git commits.
+## Remove or roll back
 
-## Rollback and uninstall
+Stop consumers before removal. Preserve old approved prefixes. Rollback
+means starting a **new** consumer shell with the old prefix.
 
-Roll back by invoking the previous approved prefix in the next fresh consumer
-session. No global state needs restoration. To remove a version, stop its consumer
-and use the same reviewed installer version:
-
-```sh
-python3 /path/to/agent-dotfiles/tools/install.py uninstall \
-  --prefix /private/existing-parent/agent-dotfiles-APPROVED_FULL_COMMIT_SHA \
-  --revision APPROVED_FULL_COMMIT_SHA
+```bash
+./install.sh uninstall --revision APPROVED_FULL_COMMIT_SHA \
+  --prefix /private/existing-parent/agent-dotfiles-approved
 ```
 
-Removal validates the manifest and complete tree first. Modified files, missing
-files, unknown directories/files and symlinks cause refusal with the entire prefix
-preserved. Inspect the error and recover your local changes yourself; there is no
-force-removal option. An installation from a future manifest/launcher version
-requires its corresponding reviewed installer. This tool installs no third-party
-binaries and removes nothing outside the supplied prefix.
+Removal verifies **all** installed paths and modes, including shell files,
+and refuses modified/extra/missing content or symlink entries. No forced
+removal exists. Use the installer corresponding to that version's manifest.
+Concurrent hostile filesystem mutation and compromised trusted checkouts
+are not covered by this private-prefix threat model.
+
+macOS needs canonical paths (`/private/var`, not symlinked `/var`).
+Windows is outside this installation contract.
