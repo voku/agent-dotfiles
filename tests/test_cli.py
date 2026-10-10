@@ -139,7 +139,7 @@ class AgentDotfilesCliTest(unittest.TestCase):
         self.executable(
             "git",
             "import sys\n"
-            "assert sys.argv[1:] == ['status', '--porcelain=v1', '-z', '--untracked-files=normal']\n"
+            "assert sys.argv[1:] == ['status', '--porcelain=v1', '-z', '--untracked-files=all']\n"
             "sys.stdout.buffer.write(b' M file with space.php\\0?? new\\nname.php\\0R  target.php\\0original.php\\0')",
         )
         code, report = self.cli("git-status")
