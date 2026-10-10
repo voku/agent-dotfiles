@@ -11,6 +11,8 @@ ripgrep supply the normal source-search and Git operations. No package manager,
 network installer, shell startup change or global configuration is involved.
 The implementation targets Linux and macOS; platform test coverage is determined
 by the current CI matrix. Windows is not supported by this installation contract.
+On macOS use a canonical parent path (for example `/private/var/...` rather than
+the `/var` symlink). Symlink ancestors are refused on every platform.
 
 ## Install from an approved checkout
 

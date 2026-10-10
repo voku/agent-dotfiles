@@ -16,7 +16,9 @@ class InstallationTest(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
-        self.root = Path(temporary.name)
+        # macOS /var is a symlink to /private/var. Use the canonical private
+        # fixture parent; production intentionally rejects symlink ancestors.
+        self.root = Path(temporary.name).resolve()
         self.source = self.root / "source"
         self.source.mkdir()
         for name in ("agent_dotfiles", "bin"):
