@@ -31,15 +31,27 @@ class ValidationMutationTest(unittest.TestCase):
     def test_absolute_inside_root_is_normalized(self) -> None:
         self.assertEqual(_relative_path(self.root, str(self.root / "src" / "hello.php")), "src/hello.php")
 
+    def test_path_lexically_smaller_than_dot_is_still_accepted(self) -> None:
+        # "str(relative) <= '.'" would falsely reject this valid path.
+        self.assertEqual(_relative_path(self.root, "!source.php"), "!source.php")
+
     def test_unicode_and_spaces_preserved(self) -> None:
         name = "a b-ü.php"
         (self.root / name).write_text("content", encoding="utf-8")
         self.assertEqual(_relative_path(self.root, name), name)
 
     def test_empty_root_marker_denied(self) -> None:
-        for p in ("", ".", "./", "src/.."):
-            with self.subTest(path=p):
-                self.assert_denied(p, "invalid_file")
+        # Preserve the diagnostic contract as well as the error reason.
+        for p in ("", "."):
+            with self.subTest(path=p), self.assertRaises(CommandFailure) as caught:
+                _relative_path(self.root, p)
+            self.assertEqual(caught.exception.reason, "invalid_file")
+            self.assertEqual(str(caught.exception), "A specific file path is required")
+        for p in ("./", "src/.."):
+            with self.subTest(path=p), self.assertRaises(CommandFailure) as caught:
+                _relative_path(self.root, p)
+            self.assertEqual(caught.exception.reason, "invalid_file")
+            self.assertEqual(str(caught.exception), "Root directory is not a file")
 
     def test_parent_escape_denied(self) -> None:
         for p in ("../private.php", "src/../../outside.php"):
@@ -62,12 +74,14 @@ class ValidationMutationTest(unittest.TestCase):
         self.assertEqual(_relative_path(self.root, "inside/hello.php"), "src/hello.php")
 
     def test_limits_minimum_and_maximum(self) -> None:
+        # A mutated MAX_LIMIT must not change what this test expects.
+        self.assertEqual(MAX_LIMIT, 1000)
         self.assertEqual(_valid_limit("1"), 1)
-        self.assertEqual(_valid_limit(str(MAX_LIMIT)), MAX_LIMIT)
+        self.assertEqual(_valid_limit("1000"), 1000)
         self.assertEqual(_valid_limit("42"), 42)
 
     def test_limits_out_of_range(self) -> None:
-        for p in ("0", "-1", str(MAX_LIMIT + 1), "999999"):
+        for p in ("0", "-1", "1001", "999999"):
             with self.subTest(value=p), self.assertRaisesRegex(argparse.ArgumentTypeError, "between 1 and"):
                 _valid_limit(p)
 
