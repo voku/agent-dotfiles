@@ -1,0 +1,7 @@
+{
+  "commit": "d158e6c821cdae8064ac7b3817a0dd282236f842",
+  "archive_sha256": "9cd55cbbe5f7514667b6fab95bde99f0ecfbb94c51be6a4524597aebcfc91fb4",
+  "two_archives_byte_identical": true,
+  "runtime_files_match_pinned_source": true,
+  "isolated_install_verify_doctor_uninstall_exit": 0
+}
