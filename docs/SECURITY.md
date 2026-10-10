@@ -1,6 +1,6 @@
 # Security and operational contract
 
-- **Read-only** operations: no external installer, network fetch, `sudo`, `chsh`, `eval`, `source`, or changes to shell/git configuration.
+- **Read-only runtime**: no external installer, network fetch, `sudo`, `chsh`, `eval`, implicit `source`, or changes to global shell/Git configuration. Explicitly source only the reviewed installed `shell/.bashrc` or `.zshrc` in a fresh, isolated consumer.
 - Subprocess invocation is always a **list of arguments**, never a concatenated shell command.
 - Patterns beginning with `-` are passed after `--` to `rg`. The default search mode treats user input as literal text; regex must be requested explicitly.
 - Child stdout is bounded to 2 MiB, record output to the caller's `--limit` (1-1000), and time to 20 seconds. On overflow the child process is killed and the response carries `truncated: true` with exit code 3.

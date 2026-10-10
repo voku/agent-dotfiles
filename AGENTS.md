@@ -5,7 +5,7 @@ CLI profile, not an authority source for `agent-loop` workflows.
 
 ## Safe defaults
 
-- Never source interactive Bash/Zsh profiles or `.redpill` plugins.
+- Never load *user* interactive shell profiles or `.redpill` plugins. Only the reviewed installed `shell/.bashrc` or `shell/.zshrc` may be explicitly sourced into a fresh consumer session.
 - Never install binaries, change login shells, alter global Git configuration,
   or launch background daemons from the CLI.
 - Keep filesystem and search commands read-only; invoke external binaries with
@@ -19,7 +19,9 @@ CLI profile, not an authority source for `agent-loop` workflows.
 
 ```sh
 python3 -m unittest discover -s tests -v
-python3 -m compileall -q agent_dotfiles bin tests
+python3 -m compileall -q agent_dotfiles bin tests tools
+bash -n install.sh shell/.bashrc shell/agent-functions.sh
+# If Zsh is available: zsh -n shell/.zshrc shell/agent-functions.sh
 ```
 
 Use `./bin/agent-dotfiles doctor` to report local capabilities. Do not infer

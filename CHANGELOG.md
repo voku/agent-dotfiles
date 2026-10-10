@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Add explicitly sourced Bash/Zsh agent profiles with namespaced helpers and native Git history/blame.
+- Add a simpler root installer, keeping full SHA pinning, safe rollback and installation-manifest verification of shell assets.
+- Remove historical experiment dumps and self-release binaries from active source, preserving exact immutable Git links.
+- Add real shell-consumer tests and collision/refusal contracts.
+
 ## 0.3.0
 
 - Integrate targeted mutation testing with summaries retained on nonzero reports.
