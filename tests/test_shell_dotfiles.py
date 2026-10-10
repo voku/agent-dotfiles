@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -43,7 +44,7 @@ class ShellDotfilesTest(unittest.TestCase):
 
     def run_profile(self, executable: str, profile: str, script: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            [executable, "-c", script, "agent-test", str(self.prefix / "shell" / profile)],
+            [executable, "-c", script, "agent-test", str(self.prefix / "shell" / profile), str(self.source)],
             cwd=self.source, text=True, capture_output=True, timeout=15,
         )
 
@@ -94,6 +95,36 @@ class ShellDotfilesTest(unittest.TestCase):
             'agent_blame LICENSE 2 1 >/dev/null 2>&1 && exit 14; exit 0',
         )
         self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_exact_read_and_truncation_exit_are_forwarded(self) -> None:
+        result = self.run_profile(
+            "bash", ".bashrc",
+            '. "$1" || exit $?; agent_read LICENSE --root "$2" --start 1 --end 2',
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        report = json.loads(result.stdout)
+        license_bytes = (self.source / "LICENSE").read_bytes()
+        self.assertEqual(report["content"], "".join(
+            (self.source / "LICENSE").read_text().splitlines(keepends=True)[:2]
+        ))
+        self.assertEqual(report["sha256"], hashlib.sha256(license_bytes).hexdigest())
+        result = self.run_profile(
+            "bash", ".bashrc",
+            '. "$1" || exit $?; agent_tracked --root "$2" --limit 1',
+        )
+        self.assertEqual(result.returncode, 3, result.stderr)
+        self.assertTrue(json.loads(result.stdout)["truncated"])
+
+    def test_root_installer_rejects_source_override(self) -> None:
+        alternative = self.source / "other"
+        result = subprocess.run(
+            ["bash", str(self.source / "install.sh"), "install",
+             "--revision", self.revision, "--prefix", str(alternative),
+             "--source", str(self.source)],
+            capture_output=True, text=True, timeout=15,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertFalse(alternative.exists())
 
     def test_modified_shell_asset_blocks_uninstall(self) -> None:
         profile = self.prefix / "shell/.bashrc"

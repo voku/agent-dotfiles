@@ -20,6 +20,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Source-tree artifact hygiene
+        run: test -z "$(git ls-files docs/benchmarks docs/releases)"
       - name: Compile
         run: python -m compileall -q agent_dotfiles bin tests tools
       - name: Contract tests

@@ -9,3 +9,7 @@ build/
 mutation.sqlite
 mutation-results.jsonl
 mutation-summary.md
+
+# Historical outputs belong in GitHub Actions/immutable prior commits, not current source.
+docs/benchmarks/
+docs/releases/
