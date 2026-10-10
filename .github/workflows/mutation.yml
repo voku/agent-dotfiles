@@ -37,8 +37,12 @@ jobs:
       - name: Generate evidence and summary
         run: |
           cosmic-ray dump mutation.sqlite > mutation-results.jsonl
-          python tools/mutation_report.py mutation-results.jsonl --markdown mutation-summary.md
-          cat mutation-summary.md >> "$GITHUB_STEP_SUMMARY"
+          report_status=0
+          python tools/mutation_report.py mutation-results.jsonl --markdown mutation-summary.md || report_status=$?
+          if [ -f mutation-summary.md ]; then
+            cat mutation-summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit "$report_status"
       - name: Upload replay evidence
         if: always()
         uses: actions/upload-artifact@v4
