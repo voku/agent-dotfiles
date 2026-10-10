@@ -1,0 +1,1136 @@
+{
+  "frozen_at_utc": "2026-10-10T18:23:11.920841+00:00",
+  "classifications": {
+    "persistent_bounded_quality_fix": "PROVEN",
+    "overall_full_cycle_productivity": "INCONCLUSIVE",
+    "generalized_efficiency_or_token_savings": "NOT DEMONSTRATED"
+  },
+  "basis": "Native oracle frozen before first receipts; held-out bytes/range expectations frozen before A2/B2; independent source/test/boundary checks; runtime-only actual installed-v1/v2 probes outside consumer timing. Candidate implementation never inspected.",
+  "trial1": {
+    "oracle_sha256": "74e6d10163b1a637d6cdbcce08e524523fcb6e8704687fd6687aeeaa76bd8013",
+    "evaluated_at_utc": "2026-10-10T18:17:42.660584+00:00",
+    "baseline_commit": "33003d8dc5f52c77c02d353804db0c04345f6f27",
+    "consumers": {
+      "A1": {
+        "dimensions": {
+          "php": {
+            "status": "pass",
+            "definition_and_callers_equal_oracle": true,
+            "fresh_map_trace_indices": [
+              41,
+              42,
+              43
+            ],
+            "dynamic_uncertainty_present": true,
+            "original_source_verification_trace_indices": [
+              32
+            ]
+          },
+          "references": {
+            "status": "pass",
+            "values_equal_oracle": true,
+            "trace_indices": [
+              5
+            ],
+            "limitation": "Literal source/template link proven; fixture contains no runtime invoice configuration loader."
+          },
+          "patch": {
+            "status": "pass",
+            "declared_format": "native",
+            "text_equal_native_oracle": true,
+            "sha_equal_native_oracle": true,
+            "bytes_equal_native_oracle": true,
+            "single_literal_scope": true,
+            "raw_trace_indices": [
+              16,
+              26
+            ]
+          },
+          "history": {
+            "status": "pass",
+            "commit_and_paths_equal_oracle": true,
+            "original_historical_patch_trace_indices": [
+              9
+            ]
+          },
+          "inventory_source": {
+            "status": "pass",
+            "inventory_selected_root": "/workspace/scratch/dotfiles-mission/A1/src",
+            "emitted_paths": [
+              "Billing/Checkout.php",
+              "Billing/Preview.php",
+              "Billing/PriceCalculator.php",
+              "Legacy/PriceCalculator.php",
+              "note β\nline.txt"
+            ],
+            "source_used_root": "/workspace/scratch/dotfiles-mission/A1/src",
+            "source_used_path": "note β\nline.txt",
+            "native_source_bytes_equal": true,
+            "bytes": 50,
+            "trace_indices": [
+              17
+            ],
+            "coordinate_assessment": "A native Git from src emits src-root-relative paths; B tracked emits repository-root-relative src/* despite selected src root. Both preserve actual emitted paths and use the compatible source root. Root field alone in B output is ambiguous; consumer explicitly reports and handles it."
+          },
+          "worktree": {
+            "status": "pass",
+            "individual_untracked_equal_oracle": true,
+            "ignored_equal_oracle": true,
+            "trace_indices": [
+              12,
+              13,
+              17,
+              22,
+              23
+            ]
+          },
+          "fix": {
+            "status": "pass",
+            "changed_source_files": [
+              "agent_dotfiles/cli.py"
+            ],
+            "minimal_diff": "diff --git a/agent_dotfiles/cli.py b/agent_dotfiles/cli.py\nindex bf362b0..7336a4b 100644\n--- a/agent_dotfiles/cli.py\n+++ b/agent_dotfiles/cli.py\n@@ -250,7 +250,7 @@ def _read_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:\n     lines = [part + \"\\n\" for part in parts[:-1]]\n     if parts[-1]:\n         lines.append(parts[-1])\n-    if args.start > len(lines) and len(lines) != 0:\n+    if args.start > max(1, len(lines)):\n         raise CommandFailure(\"invalid_range\", f\"Start line {args.start} exceeds file length {len(lines)}\")\n     actual_end = min(args.end, len(lines))\n     content = \"\".join(lines[args.start - 1:actual_end])\n",
+            "all_tests_unchanged": true,
+            "consumer_red_suite_index": 6,
+            "consumer_green_suite_index": 19,
+            "independent_full_python_suite": "58 tests, exit 0",
+            "independent_shell_suite": "6 tests/13 assertions, exit 0",
+            "independent_range_probes": "All six pass, including empty initial and starts2/4 rejection; see independent-range-validation JSON.",
+            "consumer_missing_validation": "No consumer Bashunit invocation in trace despite AGENTS requirement; independent evaluator supplied and passed it. A1 also omitted standalone initial-empty CLI probe, though unchanged Python suite and evaluator confirm behavior."
+          },
+          "integrity": {
+            "status": "pass",
+            "trace_byte_and_stdout_hash_errors": [],
+            "initial_receipt_preserved": true,
+            "initial_map_and_lifecycle": "partial: PHP Class Phar unavailable, supported static caller completeness not freshly map-verified; Learning storage not recognized; complete false. Both reported honestly.",
+            "revised_lifecycle_complete": true,
+            "revised_next_action": "none",
+            "lifecycle_final_trace_index": 47
+          }
+        },
+        "context_quality": {
+          "required_evidence_complete_after_repair": true,
+          "missing_context_initial": [
+            "fresh PHP Map static call completeness",
+            "Learning closeout prerequisite"
+          ],
+          "missing_context_revised": [
+            "No runtime invoice wiring evidence in synthetic fixture; neither agent proves runtime behavior"
+          ],
+          "irrelevant_or_excess_context": [
+            "A initial bracket Git pathspec retrieved unrelated config/settings1.ini patch; corrected before final evidence.",
+            "A git log -p included earlier fixture commit beyond current-value commit; useful ancestry but extra.",
+            "Read of Legacy class useful disambiguation, not irrelevant."
+          ],
+          "repeated_retrieval": {
+            "justified": [
+              "RED then GREEN complete suite",
+              "Initial failed Map build then corrected prerequisite rebuild",
+              "Original PHP text and resolved Map coordinates verified independently",
+              "Git literal patch recaptured to bind returned text/hash (A) or native full-index compared with tool patch (B)",
+              "Untracked/ignored explicit provenance checks supplement status/patch outputs"
+            ],
+            "narrower_or_changed_scope": [
+              "A git ls-files src then Git -C src exact inventory follows selected-root requirement",
+              "A broad erroneous bracket pathspec then --literal-pathspecs corrects contamination",
+              "B config history log then specific original commit show narrows historical scope",
+              "B read-command search then 220..280 source and dedicated regression test supplies original logic",
+              "Learning retries changed root/schema, though not context retrieval and not countable as benefit"
+            ],
+            "redundant_identical_retrieval": [],
+            "meaningful_repeated_retrieval_count": 0,
+            "rule": "Strict count covers redundant same purpose/scope evidence retrieval, excludes help, governance commands, repaired prerequisites, RED/GREEN tests and justified independent verification. Command count is a separate metric."
+          }
+        },
+        "metrics": {
+          "trace_record_count": 50,
+          "initial_trace_record_count": 39,
+          "revised_trace_record_count": 11,
+          "all_record_elapsed_sum_seconds": 13.729111132999606,
+          "initial_record_elapsed_sum_seconds": 11.96001176099935,
+          "revised_record_elapsed_sum_seconds": 1.7690993720002552,
+          "nested_wrapper_parent_trace_indices": [],
+          "leaf_record_count": 50,
+          "leaf_elapsed_sum_seconds": 13.729111132999606,
+          "timing_caveat": "All-record sums overlap nested wrapper containers; leaf sums remove those parents but are not session wall time. A Python direct subprocess reads are only recorded through parent, not separate leaf calls. No timestamps to derive phase start.",
+          "spawn_epoch": 1791655733.5377946,
+          "initial_end_epoch": 1791655900.9075718,
+          "revised_end_epoch": 1791656031.00089,
+          "initial_session_wall_seconds_approx": 167.3697772026062,
+          "total_session_wall_seconds_approx": 297.46309542655945,
+          "model_tokens": null,
+          "token_claim": "Unavailable; output byte counts not substituted."
+        },
+        "receipts": {
+          "result_sha256": "53dcdcceac30d0f8cf543cca8a175b652077a0bcef0bf70d78b7eb6d74e2a757",
+          "initial_result_sha256": "bebfb3d38181fd8a21e6a37777656a50b154d4c5c7c50ebb936d2fb9bf78dfab",
+          "trace_sha256": "bbebae0c59bf17cecffc9b2e2807322dce737ffcabd0a128b0ad78d329844381"
+        }
+      },
+      "B1": {
+        "dimensions": {
+          "php": {
+            "status": "pass",
+            "definition_and_callers_equal_oracle": true,
+            "fresh_map_trace_indices": [
+              51,
+              52,
+              53
+            ],
+            "dynamic_uncertainty_present": true,
+            "original_source_verification_trace_indices": [
+              56
+            ]
+          },
+          "references": {
+            "status": "pass",
+            "values_equal_oracle": true,
+            "trace_indices": [
+              15
+            ],
+            "limitation": "Literal source/template link proven; fixture contains no runtime invoice configuration loader."
+          },
+          "patch": {
+            "status": "pass",
+            "declared_format": "full-index",
+            "text_equal_native_oracle": true,
+            "sha_equal_native_oracle": true,
+            "bytes_equal_native_oracle": true,
+            "single_literal_scope": true,
+            "raw_trace_indices": [
+              23,
+              34
+            ]
+          },
+          "history": {
+            "status": "pass",
+            "commit_and_paths_equal_oracle": true,
+            "original_historical_patch_trace_indices": [
+              33
+            ]
+          },
+          "inventory_source": {
+            "status": "pass",
+            "inventory_selected_root": "/workspace/scratch/dotfiles-mission/B1/src",
+            "emitted_paths": [
+              "src/Billing/Checkout.php",
+              "src/Billing/Preview.php",
+              "src/Billing/PriceCalculator.php",
+              "src/Legacy/PriceCalculator.php",
+              "src/note β\nline.txt"
+            ],
+            "source_used_root": "/workspace/scratch/dotfiles-mission/B1",
+            "source_used_path": "src/note β\nline.txt",
+            "native_source_bytes_equal": true,
+            "bytes": 50,
+            "trace_indices": [
+              22,
+              31,
+              32
+            ],
+            "coordinate_assessment": "A native Git from src emits src-root-relative paths; B tracked emits repository-root-relative src/* despite selected src root. Both preserve actual emitted paths and use the compatible source root. Root field alone in B output is ambiguous; consumer explicitly reports and handles it."
+          },
+          "worktree": {
+            "status": "pass",
+            "individual_untracked_equal_oracle": true,
+            "ignored_equal_oracle": true,
+            "trace_indices": [
+              24,
+              25,
+              26,
+              35,
+              36
+            ]
+          },
+          "fix": {
+            "status": "pass",
+            "changed_source_files": [
+              "agent_dotfiles/cli.py"
+            ],
+            "minimal_diff": "diff --git a/agent_dotfiles/cli.py b/agent_dotfiles/cli.py\nindex bf362b0..7336a4b 100644\n--- a/agent_dotfiles/cli.py\n+++ b/agent_dotfiles/cli.py\n@@ -250,7 +250,7 @@ def _read_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:\n     lines = [part + \"\\n\" for part in parts[:-1]]\n     if parts[-1]:\n         lines.append(parts[-1])\n-    if args.start > len(lines) and len(lines) != 0:\n+    if args.start > max(1, len(lines)):\n         raise CommandFailure(\"invalid_range\", f\"Start line {args.start} exceeds file length {len(lines)}\")\n     actual_end = min(args.end, len(lines))\n     content = \"\".join(lines[args.start - 1:actual_end])\n",
+            "all_tests_unchanged": true,
+            "consumer_red_suite_index": 10,
+            "consumer_green_suite_index": 38,
+            "independent_full_python_suite": "58 tests, exit 0",
+            "independent_shell_suite": "6 tests/13 assertions, exit 0",
+            "independent_range_probes": "All six pass, including empty initial and starts2/4 rejection; see independent-range-validation JSON.",
+            "consumer_missing_validation": "No consumer Bashunit invocation in trace despite AGENTS requirement; independent evaluator supplied and passed it. A1 also omitted standalone initial-empty CLI probe, though unchanged Python suite and evaluator confirm behavior."
+          },
+          "integrity": {
+            "status": "pass",
+            "trace_byte_and_stdout_hash_errors": [],
+            "initial_receipt_preserved": true,
+            "initial_map_and_lifecycle": "partial: PHP Class Phar unavailable, supported static caller completeness not freshly map-verified; Learning storage not recognized; complete false. Both reported honestly.",
+            "revised_lifecycle_complete": true,
+            "revised_next_action": "none",
+            "lifecycle_final_trace_index": 62
+          }
+        },
+        "context_quality": {
+          "required_evidence_complete_after_repair": true,
+          "missing_context_initial": [
+            "fresh PHP Map static call completeness",
+            "Learning closeout prerequisite"
+          ],
+          "missing_context_revised": [
+            "No runtime invoice wiring evidence in synthetic fixture; neither agent proves runtime behavior"
+          ],
+          "irrelevant_or_excess_context": [
+            "B initial rg --files emits whole small repository beyond immediate task scope.",
+            "B round|invoice|total search includes unrelated settings modes; narrower references selected correctly.",
+            "Nested wrapper parent receipts repeat child stdout/stderr, so presentation bytes duplicate underlying evidence."
+          ],
+          "repeated_retrieval": {
+            "justified": [
+              "RED then GREEN complete suite",
+              "Initial failed Map build then corrected prerequisite rebuild",
+              "Original PHP text and resolved Map coordinates verified independently",
+              "Git literal patch recaptured to bind returned text/hash (A) or native full-index compared with tool patch (B)",
+              "Untracked/ignored explicit provenance checks supplement status/patch outputs"
+            ],
+            "narrower_or_changed_scope": [
+              "A git ls-files src then Git -C src exact inventory follows selected-root requirement",
+              "A broad erroneous bracket pathspec then --literal-pathspecs corrects contamination",
+              "B config history log then specific original commit show narrows historical scope",
+              "B read-command search then 220..280 source and dedicated regression test supplies original logic",
+              "Learning retries changed root/schema, though not context retrieval and not countable as benefit"
+            ],
+            "redundant_identical_retrieval": [
+              {
+                "trace_indices": [
+                  22,
+                  31
+                ],
+                "purpose": "B same candidate tracked selected-root inventory; second request reused same scope with no source change, although performed to bind returned unusual name to following source read"
+              }
+            ],
+            "meaningful_repeated_retrieval_count": 1,
+            "rule": "Strict count covers redundant same purpose/scope evidence retrieval, excludes help, governance commands, repaired prerequisites, RED/GREEN tests and justified independent verification. Command count is a separate metric."
+          }
+        },
+        "metrics": {
+          "trace_record_count": 64,
+          "initial_trace_record_count": 50,
+          "revised_trace_record_count": 14,
+          "all_record_elapsed_sum_seconds": 21.558825013000842,
+          "initial_record_elapsed_sum_seconds": 18.867464745001598,
+          "revised_record_elapsed_sum_seconds": 2.6913602679992437,
+          "nested_wrapper_parent_trace_indices": [
+            6,
+            11,
+            21,
+            30,
+            37,
+            41,
+            55
+          ],
+          "leaf_record_count": 57,
+          "leaf_elapsed_sum_seconds": 14.967846602999998,
+          "timing_caveat": "All-record sums overlap nested wrapper containers; leaf sums remove those parents but are not session wall time. A Python direct subprocess reads are only recorded through parent, not separate leaf calls. No timestamps to derive phase start.",
+          "spawn_epoch": 1791655733.537796,
+          "initial_end_epoch": 1791655895.4357839,
+          "revised_end_epoch": 1791656042.806401,
+          "initial_session_wall_seconds_approx": 161.89798784255981,
+          "total_session_wall_seconds_approx": 309.2686049938202,
+          "model_tokens": null,
+          "token_claim": "Unavailable; output byte counts not substituted."
+        },
+        "receipts": {
+          "result_sha256": "166423a588824b323d7d349e320b36758509148f5073219505abff1ece35efc6",
+          "initial_result_sha256": "e037d27fcf1f75226b2e16f9d6bd0a90af56017ff95109af49e9813f19fb8cd4",
+          "trace_sha256": "625783cf3661990131e46142702ff20bfeb1bd6ea3d700f55bb86f13ed6cee93"
+        }
+      }
+    },
+    "limits": [
+      "Small synthetic PHP fixtures plus real Python coding regression",
+      "Same host, separate fresh consumers",
+      "No causal speed proof",
+      "Initial shared PHP prerequisite failure and corrected reruns must both be preserved",
+      "Spawn timestamps were recorded just before spawns, approximate session start. Trace subprocess times do not include model deliberation and have no record start/end timestamps. No per-turn or model token metrics available.",
+      "Consumer trace commands are developer-visible evidence; evaluator did not inspect candidate source or alter consumer/product files.",
+      "Independent test tool output retained with runner output truncation; completion/count/exit visible."
+    ]
+  },
+  "trial2": {
+    "A2": {
+      "consumer": "A2",
+      "oracle_sha256": "74e6d10163b1a637d6cdbcce08e524523fcb6e8704687fd6687aeeaa76bd8013",
+      "heldout_oracle_sha256": "124b06d0fa1562f7c05782d3535605002faa51f4e5ae374dad8f9d5918b8671d",
+      "tracked_changes": [
+        "agent_dotfiles/cli.py",
+        "config/settings1.ini",
+        "config/settings[1].ini"
+      ],
+      "mutation_boundary_pass": true,
+      "fixtures": [
+        {
+          "name": "vacant ledger δ\nprobe.txt",
+          "unchanged": true,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "range λ\nledger.txt",
+          "unchanged": true,
+          "sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155"
+        }
+      ],
+      "trace_integrity_errors": [],
+      "heldout": {
+        "context_probes": [
+          {
+            "file": "range λ\nledger.txt",
+            "start": 1,
+            "end": 7,
+            "exit": 0,
+            "matches_oracle": true
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 2,
+            "end": 2,
+            "exit": 0,
+            "matches_oracle": true
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 4,
+            "end": 7,
+            "exit": 2,
+            "matches_oracle": true
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 1,
+            "end": 1,
+            "exit": 0,
+            "matches_oracle": true
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 2,
+            "end": 3,
+            "exit": 2,
+            "matches_oracle": true
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 4,
+            "end": 7,
+            "exit": 2,
+            "matches_oracle": true
+          }
+        ],
+        "local_before_probes": [
+          {
+            "file": "range λ\nledger.txt",
+            "start": 1,
+            "end": 7,
+            "exit": 0,
+            "matches_oracle": true
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 2,
+            "end": 2,
+            "exit": 0,
+            "matches_oracle": true
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 4,
+            "end": 7,
+            "exit": 2,
+            "matches_oracle": true
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 1,
+            "end": 1,
+            "exit": 0,
+            "matches_oracle": true
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 2,
+            "end": 3,
+            "exit": 0,
+            "matches_oracle": false
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 4,
+            "end": 7,
+            "exit": 0,
+            "matches_oracle": false
+          }
+        ],
+        "local_after_probes": [
+          {
+            "file": "range λ\nledger.txt",
+            "start": 1,
+            "end": 7,
+            "exit": 0,
+            "matches_oracle": true
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 2,
+            "end": 2,
+            "exit": 0,
+            "matches_oracle": true
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 4,
+            "end": 7,
+            "exit": 2,
+            "matches_oracle": true
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 1,
+            "end": 1,
+            "exit": 0,
+            "matches_oracle": true
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 2,
+            "end": 3,
+            "exit": 2,
+            "matches_oracle": true
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 4,
+            "end": 7,
+            "exit": 2,
+            "matches_oracle": true
+          }
+        ]
+      },
+      "independent_tests": {
+        "python": {
+          "argv": [
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests",
+            "-v"
+          ],
+          "exit": 0,
+          "stdout": "",
+          "stderr": "test_aliases_are_optional_and_read_only (test_cli.AgentDotfilesCliTest.test_aliases_are_optional_and_read_only) ... ok\ntest_doctor_detects_fdfind_without_fd (test_cli.AgentDotfilesCliTest.test_doctor_detects_fdfind_without_fd) ... ok\ntest_doctor_never_assumes_sg_is_ast_grep (test_cli.AgentDotfilesCliTest.test_doctor_never_assumes_sg_is_ast_grep) ... ok\ntest_doctor_reports_missing_without_installing (test_cli.AgentDotfilesCliTest.test_doctor_reports_missing_without_installing) ... ok\ntest_doctor_strict_missing_required_exits_two (test_cli.AgentDotfilesCliTest.test_doctor_strict_missing_required_exits_two) ... ok\ntest_environment_suppresses_user_ripgrep_config (test_cli.AgentDotfilesCliTest.test_environment_suppresses_user_ripgrep_config) ... ok\ntest_fd_engine_executes_binary_even_when_shell_fd_function_exists (test_cli.AgentDotfilesCliTest.test_fd_engine_executes_binary_even_when_shell_fd_function_exists) ... ok\ntest_files_are_bounded_and_truncation_is_reported (test_cli.AgentDotfilesCliTest.test_files_are_bounded_and_truncation_is_reported) ... ok\ntest_files_missing_tool_is_explicit_error (test_cli.AgentDotfilesCliTest.test_files_missing_tool_is_explicit_error) ... ok\ntest_files_preserves_spaces_and_newlines (test_cli.AgentDotfilesCliTest.test_files_preserves_spaces_and_newlines) ... ok\ntest_git_index_output_is_bounded (test_cli.AgentDotfilesCliTest.test_git_index_output_is_bounded) ... ok\ntest_git_integration_real_repo (test_cli.AgentDotfilesCliTest.test_git_integration_real_repo) ... ok\ntest_git_patch_cap_is_explicit_error_without_partial_patch (test_cli.AgentDotfilesCliTest.test_git_patch_cap_is_explicit_error_without_partial_patch) ... ok\ntest_git_patch_on_tool_error_returns_no_partial_patch (test_cli.AgentDotfilesCliTest.test_git_patch_on_tool_error_returns_no_partial_patch) ... ok\ntest_git_patch_preserves_complete_patch_and_hash (test_cli.AgentDotfilesCliTest.test_git_patch_preserves_complete_patch_and_hash) ... ok\ntest_git_patch_rejects_path_escape (test_cli.AgentDotfilesCliTest.test_git_patch_rejects_path_escape) ... ok\ntest_git_status_parses_rename_and_newline_path (test_cli.AgentDotfilesCliTest.test_git_status_parses_rename_and_newline_path) ... ok\ntest_git_status_rejects_incomplete_rename (test_cli.AgentDotfilesCliTest.test_git_status_rejects_incomplete_rename) ... ok\ntest_git_status_truncated_not_complete (test_cli.AgentDotfilesCliTest.test_git_status_truncated_not_complete) ... ok\ntest_invalid_rg_json_fails_closed (test_cli.AgentDotfilesCliTest.test_invalid_rg_json_fails_closed) ... ok\ntest_limit_validation_rejects_zero (test_cli.AgentDotfilesCliTest.test_limit_validation_rejects_zero) ... ok\ntest_read_fail_closed_on_invalid_bytes (test_cli.AgentDotfilesCliTest.test_read_fail_closed_on_invalid_bytes) ... ok\ntest_read_preserves_complete_selected_lines_and_hash (test_cli.AgentDotfilesCliTest.test_read_preserves_complete_selected_lines_and_hash) ... ok\ntest_read_rejects_oversized_range_before_access (test_cli.AgentDotfilesCliTest.test_read_rejects_oversized_range_before_access) ... ok\ntest_read_rejects_path_traversal_and_symlink_escape (test_cli.AgentDotfilesCliTest.test_read_rejects_path_traversal_and_symlink_escape) ... ok\ntest_read_short_file_reports_eof_instead_of_hidden_truncation (test_cli.AgentDotfilesCliTest.test_read_short_file_reports_eof_instead_of_hidden_truncation) ... ok\ntest_search_emits_only_match_data_and_preserves_provider_byte_fields (test_cli.AgentDotfilesCliTest.test_search_emits_only_match_data_and_preserves_provider_byte_fields) ... ok\ntest_search_explicit_scope_and_glob_no_truncation_flags (test_cli.AgentDotfilesCliTest.test_search_explicit_scope_and_glob_no_truncation_flags) ... ok\ntest_search_never_uses_max_column_preview (test_cli.AgentDotfilesCliTest.test_search_never_uses_max_column_preview) ... ok\ntest_search_no_match_has_distinct_exit_code (test_cli.AgentDotfilesCliTest.test_search_no_match_has_distinct_exit_code) ... ok\ntest_search_scope_symlink_outside_root_denied (test_cli.AgentDotfilesCliTest.test_search_scope_symlink_outside_root_denied) ... ok\ntest_search_truncates_match_count_not_nonmatch_events (test_cli.AgentDotfilesCliTest.test_search_truncates_match_count_not_nonmatch_events) ... ok\ntest_tracked_files_keep_nul_separated_names (test_cli.AgentDotfilesCliTest.test_tracked_files_keep_nul_separated_names) ... ok\ntest_deleted_tracked_file_is_still_visible (test_context_quality.GitPatchEvidenceTest.test_deleted_tracked_file_is_still_visible) ... ok\ntest_existing_directory_is_not_a_file (test_context_quality.GitPatchEvidenceTest.test_existing_directory_is_not_a_file) ... ok\ntest_ignored_file_does_not_look_like_clean_diff (test_context_quality.GitPatchEvidenceTest.test_ignored_file_does_not_look_like_clean_diff) ... ok\ntest_literal_filename_does_not_capture_unrelated_diff (test_context_quality.GitPatchEvidenceTest.test_literal_filename_does_not_capture_unrelated_diff) ... ok\ntest_removed_directory_does_not_expand_to_many_files (test_context_quality.GitPatchEvidenceTest.test_removed_directory_does_not_expand_to_many_files) ... ok\ntest_staged_new_file_is_not_lost (test_context_quality.GitPatchEvidenceTest.test_staged_new_file_is_not_lost) ... ok\ntest_subdirectory_root_preserves_exact_native_patch (test_context_quality.GitPatchEvidenceTest.test_subdirectory_root_preserves_exact_native_patch) ... ok\ntest_unchanged_indexed_file_is_genuinely_empty (test_context_quality.GitPatchEvidenceTest.test_unchanged_indexed_file_is_genuinely_empty) ... ok\ntest_untracked_file_does_not_look_like_clean_diff (test_context_quality.GitPatchEvidenceTest.test_untracked_file_does_not_look_like_clean_diff) ... ok\ntest_empty_file_invalid_noninitial_range (test_empty_range_regression.EmptyRangeRegression.test_empty_file_invalid_noninitial_range) ... ok\ntest_file_granularity_still_reports_bounded_truncation (test_git_status_quality.GitStatusQualityTest.test_file_granularity_still_reports_bounded_truncation) ... ok\ntest_nested_untracked_paths_match_native_file_level_oracle (test_git_status_quality.GitStatusQualityTest.test_nested_untracked_paths_match_native_file_level_oracle) ... ok\ntest_inconclusive_report_is_published_and_preserves_failure (test_mutation_workflow.MutationWorkflowTest.test_inconclusive_report_is_published_and_preserves_failure) ... ok\ntest_absolute_inside_root_is_normalized (test_validation.ValidationMutationTest.test_absolute_inside_root_is_normalized) ... ok\ntest_absolute_outside_denied (test_validation.ValidationMutationTest.test_absolute_outside_denied) ... ok\ntest_empty_root_marker_denied (test_validation.ValidationMutationTest.test_empty_root_marker_denied) ... ok\ntest_limits_minimum_and_maximum (test_validation.ValidationMutationTest.test_limits_minimum_and_maximum) ... ok\ntest_limits_not_numbers (test_validation.ValidationMutationTest.test_limits_not_numbers) ... ok\ntest_limits_out_of_range (test_validation.ValidationMutationTest.test_limits_out_of_range) ... ok\ntest_parent_escape_denied (test_validation.ValidationMutationTest.test_parent_escape_denied) ... ok\ntest_path_lexically_smaller_than_dot_is_still_accepted (test_validation.ValidationMutationTest.test_path_lexically_smaller_than_dot_is_still_accepted) ... ok\ntest_regular_and_nested_paths (test_validation.ValidationMutationTest.test_regular_and_nested_paths) ... ok\ntest_symlink_inside_root_canonicalized (test_validation.ValidationMutationTest.test_symlink_inside_root_canonicalized) ... ok\ntest_symlink_outside_denied (test_validation.ValidationMutationTest.test_symlink_outside_denied) ... ok\ntest_unicode_and_spaces_preserved (test_validation.ValidationMutationTest.test_unicode_and_spaces_preserved) ... ok\n\n----------------------------------------------------------------------\nRan 58 tests in 3.994s\n\nOK\n"
+        },
+        "shell": {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/bashunit/bashunit",
+            "test",
+            "tests/shell",
+            "--strict"
+          ],
+          "exit": 0,
+          "stdout": "bashunit - 0.50.1 | Tests: 6\nRunning tests/shell/cli_test.sh\n✓ Passed: Doctor returns valid json without shell changes                  103ms\n✓ Passed: Missing source is explicit error not empty success               110ms\n✓ Passed: Read returns exact long line and digest                          138ms\n✓ Passed: Real git status preserves newline filename                       112ms\n✓ Passed: Git patch is full patch not diffstat                             128ms\n✓ Passed: Source checkout has no automatic publish or install               24ms\n\nTests:      6 passed, 6 total\nAssertions: 13 passed, 13 total\n\n All tests passed \nTime taken: 718ms\n",
+          "stderr": ""
+        }
+      },
+      "basic_evidence_checks": {
+        "php": true,
+        "rounding": true,
+        "refs_all_required": true,
+        "extra_refs": "config/billing.yaml line1 invoice: is useful parent context, not a wrong rounding coordinate.",
+        "patch_all_fields_exact": true,
+        "history": true,
+        "source": true,
+        "untracked": true,
+        "ignored": true
+      },
+      "lifecycle_final_trace_index": 29,
+      "lifecycle_trace_complete": true,
+      "lifecycle_result": {
+        "task": "BENCH-757",
+        "run_id": "run:BENCH-757:d17fdb402b78d0b3",
+        "state": "complete",
+        "next_action_kind": "none",
+        "next_action": "none",
+        "verification": "passed",
+        "review_sha256": "sha256:4d56988289521e3009bf51f9053daeb017494141ecf5174ab26305abee97dc28",
+        "review_actor": "codex-A2",
+        "learning": "findings_recorded",
+        "finding_id": "finding.2026-10-10.f18284"
+      },
+      "metrics": {
+        "trace_records": 31,
+        "traced_elapsed_sum_seconds": 16.5620521510009,
+        "nested_wrapper_parents": [],
+        "start_epoch": 1791656238.476779,
+        "end_epoch": 1791656387.429213,
+        "session_wall_seconds_approx": 148.95243406295776,
+        "model_tokens": null,
+        "leaf_records": 31,
+        "leaf_elapsed_sum_seconds": 16.5620521510009
+      },
+      "deviations": [
+        "A2 discloses one initial unwrapped prompt read. Trace counts exclude that command; no fabricated timing or output recovery.",
+        "A2 groups native Git reads and local CLI range probes inside traced Python commands, so trace count is not count of underlying subprocesses."
+      ],
+      "interpretation": "Native context6/6; local before4/6 preserves known empty-file regressions; local after6/6. Minimal fix, all tests unchanged, canonical complete.",
+      "inventory_coordinate_verified": true,
+      "literal_patch_single_scope_verified": true,
+      "minimal_source_diff": "diff --git a/agent_dotfiles/cli.py b/agent_dotfiles/cli.py\nindex bf362b0..7336a4b 100644\n--- a/agent_dotfiles/cli.py\n+++ b/agent_dotfiles/cli.py\n@@ -250,7 +250,7 @@ def _read_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:\n     lines = [part + \"\\n\" for part in parts[:-1]]\n     if parts[-1]:\n         lines.append(parts[-1])\n-    if args.start > len(lines) and len(lines) != 0:\n+    if args.start > max(1, len(lines)):\n         raise CommandFailure(\"invalid_range\", f\"Start line {args.start} exceeds file length {len(lines)}\")\n     actual_end = min(args.end, len(lines))\n     content = \"\".join(lines[args.start - 1:actual_end])\n",
+      "receipt_sha256": {
+        "result.json": "c0d3c8d99ca4e6825c831d9c3bb290a75f480f8cd2a8397b22515c9344e07366",
+        "trace.jsonl": "64aabf29afaf9cef7816084e11234c9101960158627df0bfed078bf9f6c9a8e4"
+      },
+      "context_quality": {
+        "missing_required_context_after_completion": [],
+        "unproven_context": [
+          "Dynamic/unsupported PHP dispatch and callers outside src",
+          "Actual runtime config-to-render execution"
+        ],
+        "irrelevant_or_excess_context": [
+          "Broader round|invoice|total src search returns Legacy total and settings modes; Legacy disambiguation is useful, selected refs remain correct.",
+          "Additional config/billing.yaml:1 invoice section label is harmless parent context, not an incorrect rounding line."
+        ],
+        "meaningful_redundant_same_scope_retrieval_count": 0,
+        "repeated_retrieval": [],
+        "justified_followups": [
+          "RED/GREEN complete Python suites",
+          "Local CLI pre/post range checks reflect source mutation, not redundant evidence",
+          "Map output independently compared to original PHP",
+          "Full literal patch/native comparison and source whole hash are independent provenance checks",
+          "History reread with fuller metadata for receipt (A2) preserves commit identity"
+        ]
+      },
+      "validation_adherence": "A2/B2 each invoked required full Python, compileall, and Bashunit in consumer traces; evaluator independently reran Python/Bashunit.",
+      "whole_file_hash_for_selected_range_verified": "32-byte whole file SHA a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155 remains returned for8-byte line2 selection; bytes independently read and hashed."
+    },
+    "B2": {
+      "consumer": "B2",
+      "oracle_sha256": "74e6d10163b1a637d6cdbcce08e524523fcb6e8704687fd6687aeeaa76bd8013",
+      "heldout_oracle_sha256": "124b06d0fa1562f7c05782d3535605002faa51f4e5ae374dad8f9d5918b8671d",
+      "tracked_changes": [
+        "agent_dotfiles/cli.py",
+        "config/settings1.ini",
+        "config/settings[1].ini"
+      ],
+      "mutation_boundary_pass": true,
+      "fixtures": [
+        {
+          "name": "vacant ledger δ\nprobe.txt",
+          "unchanged": true,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "range λ\nledger.txt",
+          "unchanged": true,
+          "sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155"
+        }
+      ],
+      "trace_integrity_errors": [],
+      "heldout": {
+        "context_probes": [
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 1,
+            "end": 1,
+            "exit": 0,
+            "matches_oracle": true,
+            "raw_trace_match_index": 28
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 2,
+            "end": 3,
+            "exit": 2,
+            "matches_oracle": true,
+            "raw_trace_match_index": 29
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 4,
+            "end": 7,
+            "exit": 2,
+            "matches_oracle": true,
+            "raw_trace_match_index": 30
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 1,
+            "end": 7,
+            "exit": 0,
+            "matches_oracle": true,
+            "raw_trace_match_index": 31
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 2,
+            "end": 2,
+            "exit": 0,
+            "matches_oracle": true,
+            "raw_trace_match_index": 32
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 4,
+            "end": 7,
+            "exit": 2,
+            "matches_oracle": true,
+            "raw_trace_match_index": 33
+          }
+        ],
+        "local_before_probes": [
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 1,
+            "end": 1,
+            "exit": 0,
+            "matches_oracle": true,
+            "raw_trace_match_index": 34
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 2,
+            "end": 3,
+            "exit": 0,
+            "matches_oracle": false,
+            "raw_trace_match_index": 35
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 4,
+            "end": 7,
+            "exit": 0,
+            "matches_oracle": false,
+            "raw_trace_match_index": 36
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 1,
+            "end": 7,
+            "exit": 0,
+            "matches_oracle": true,
+            "raw_trace_match_index": 37
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 2,
+            "end": 2,
+            "exit": 0,
+            "matches_oracle": true,
+            "raw_trace_match_index": 38
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 4,
+            "end": 7,
+            "exit": 2,
+            "matches_oracle": true,
+            "raw_trace_match_index": 39
+          }
+        ],
+        "local_after_probes": [
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 1,
+            "end": 1,
+            "exit": 0,
+            "matches_oracle": true,
+            "raw_trace_match_index": 34
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 2,
+            "end": 3,
+            "exit": 2,
+            "matches_oracle": true,
+            "raw_trace_match_index": 43
+          },
+          {
+            "file": "vacant ledger δ\nprobe.txt",
+            "start": 4,
+            "end": 7,
+            "exit": 2,
+            "matches_oracle": true,
+            "raw_trace_match_index": 44
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 1,
+            "end": 7,
+            "exit": 0,
+            "matches_oracle": true,
+            "raw_trace_match_index": 37
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 2,
+            "end": 2,
+            "exit": 0,
+            "matches_oracle": true,
+            "raw_trace_match_index": 38
+          },
+          {
+            "file": "range λ\nledger.txt",
+            "start": 4,
+            "end": 7,
+            "exit": 2,
+            "matches_oracle": true,
+            "raw_trace_match_index": 39
+          }
+        ]
+      },
+      "independent_tests": {
+        "python": {
+          "argv": [
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests",
+            "-v"
+          ],
+          "exit": 0,
+          "stdout": "",
+          "stderr": "test_aliases_are_optional_and_read_only (test_cli.AgentDotfilesCliTest.test_aliases_are_optional_and_read_only) ... ok\ntest_doctor_detects_fdfind_without_fd (test_cli.AgentDotfilesCliTest.test_doctor_detects_fdfind_without_fd) ... ok\ntest_doctor_never_assumes_sg_is_ast_grep (test_cli.AgentDotfilesCliTest.test_doctor_never_assumes_sg_is_ast_grep) ... ok\ntest_doctor_reports_missing_without_installing (test_cli.AgentDotfilesCliTest.test_doctor_reports_missing_without_installing) ... ok\ntest_doctor_strict_missing_required_exits_two (test_cli.AgentDotfilesCliTest.test_doctor_strict_missing_required_exits_two) ... ok\ntest_environment_suppresses_user_ripgrep_config (test_cli.AgentDotfilesCliTest.test_environment_suppresses_user_ripgrep_config) ... ok\ntest_fd_engine_executes_binary_even_when_shell_fd_function_exists (test_cli.AgentDotfilesCliTest.test_fd_engine_executes_binary_even_when_shell_fd_function_exists) ... ok\ntest_files_are_bounded_and_truncation_is_reported (test_cli.AgentDotfilesCliTest.test_files_are_bounded_and_truncation_is_reported) ... ok\ntest_files_missing_tool_is_explicit_error (test_cli.AgentDotfilesCliTest.test_files_missing_tool_is_explicit_error) ... ok\ntest_files_preserves_spaces_and_newlines (test_cli.AgentDotfilesCliTest.test_files_preserves_spaces_and_newlines) ... ok\ntest_git_index_output_is_bounded (test_cli.AgentDotfilesCliTest.test_git_index_output_is_bounded) ... ok\ntest_git_integration_real_repo (test_cli.AgentDotfilesCliTest.test_git_integration_real_repo) ... ok\ntest_git_patch_cap_is_explicit_error_without_partial_patch (test_cli.AgentDotfilesCliTest.test_git_patch_cap_is_explicit_error_without_partial_patch) ... ok\ntest_git_patch_on_tool_error_returns_no_partial_patch (test_cli.AgentDotfilesCliTest.test_git_patch_on_tool_error_returns_no_partial_patch) ... ok\ntest_git_patch_preserves_complete_patch_and_hash (test_cli.AgentDotfilesCliTest.test_git_patch_preserves_complete_patch_and_hash) ... ok\ntest_git_patch_rejects_path_escape (test_cli.AgentDotfilesCliTest.test_git_patch_rejects_path_escape) ... ok\ntest_git_status_parses_rename_and_newline_path (test_cli.AgentDotfilesCliTest.test_git_status_parses_rename_and_newline_path) ... ok\ntest_git_status_rejects_incomplete_rename (test_cli.AgentDotfilesCliTest.test_git_status_rejects_incomplete_rename) ... ok\ntest_git_status_truncated_not_complete (test_cli.AgentDotfilesCliTest.test_git_status_truncated_not_complete) ... ok\ntest_invalid_rg_json_fails_closed (test_cli.AgentDotfilesCliTest.test_invalid_rg_json_fails_closed) ... ok\ntest_limit_validation_rejects_zero (test_cli.AgentDotfilesCliTest.test_limit_validation_rejects_zero) ... ok\ntest_read_fail_closed_on_invalid_bytes (test_cli.AgentDotfilesCliTest.test_read_fail_closed_on_invalid_bytes) ... ok\ntest_read_preserves_complete_selected_lines_and_hash (test_cli.AgentDotfilesCliTest.test_read_preserves_complete_selected_lines_and_hash) ... ok\ntest_read_rejects_oversized_range_before_access (test_cli.AgentDotfilesCliTest.test_read_rejects_oversized_range_before_access) ... ok\ntest_read_rejects_path_traversal_and_symlink_escape (test_cli.AgentDotfilesCliTest.test_read_rejects_path_traversal_and_symlink_escape) ... ok\ntest_read_short_file_reports_eof_instead_of_hidden_truncation (test_cli.AgentDotfilesCliTest.test_read_short_file_reports_eof_instead_of_hidden_truncation) ... ok\ntest_search_emits_only_match_data_and_preserves_provider_byte_fields (test_cli.AgentDotfilesCliTest.test_search_emits_only_match_data_and_preserves_provider_byte_fields) ... ok\ntest_search_explicit_scope_and_glob_no_truncation_flags (test_cli.AgentDotfilesCliTest.test_search_explicit_scope_and_glob_no_truncation_flags) ... ok\ntest_search_never_uses_max_column_preview (test_cli.AgentDotfilesCliTest.test_search_never_uses_max_column_preview) ... ok\ntest_search_no_match_has_distinct_exit_code (test_cli.AgentDotfilesCliTest.test_search_no_match_has_distinct_exit_code) ... ok\ntest_search_scope_symlink_outside_root_denied (test_cli.AgentDotfilesCliTest.test_search_scope_symlink_outside_root_denied) ... ok\ntest_search_truncates_match_count_not_nonmatch_events (test_cli.AgentDotfilesCliTest.test_search_truncates_match_count_not_nonmatch_events) ... ok\ntest_tracked_files_keep_nul_separated_names (test_cli.AgentDotfilesCliTest.test_tracked_files_keep_nul_separated_names) ... ok\ntest_deleted_tracked_file_is_still_visible (test_context_quality.GitPatchEvidenceTest.test_deleted_tracked_file_is_still_visible) ... ok\ntest_existing_directory_is_not_a_file (test_context_quality.GitPatchEvidenceTest.test_existing_directory_is_not_a_file) ... ok\ntest_ignored_file_does_not_look_like_clean_diff (test_context_quality.GitPatchEvidenceTest.test_ignored_file_does_not_look_like_clean_diff) ... ok\ntest_literal_filename_does_not_capture_unrelated_diff (test_context_quality.GitPatchEvidenceTest.test_literal_filename_does_not_capture_unrelated_diff) ... ok\ntest_removed_directory_does_not_expand_to_many_files (test_context_quality.GitPatchEvidenceTest.test_removed_directory_does_not_expand_to_many_files) ... ok\ntest_staged_new_file_is_not_lost (test_context_quality.GitPatchEvidenceTest.test_staged_new_file_is_not_lost) ... ok\ntest_subdirectory_root_preserves_exact_native_patch (test_context_quality.GitPatchEvidenceTest.test_subdirectory_root_preserves_exact_native_patch) ... ok\ntest_unchanged_indexed_file_is_genuinely_empty (test_context_quality.GitPatchEvidenceTest.test_unchanged_indexed_file_is_genuinely_empty) ... ok\ntest_untracked_file_does_not_look_like_clean_diff (test_context_quality.GitPatchEvidenceTest.test_untracked_file_does_not_look_like_clean_diff) ... ok\ntest_empty_file_invalid_noninitial_range (test_empty_range_regression.EmptyRangeRegression.test_empty_file_invalid_noninitial_range) ... ok\ntest_file_granularity_still_reports_bounded_truncation (test_git_status_quality.GitStatusQualityTest.test_file_granularity_still_reports_bounded_truncation) ... ok\ntest_nested_untracked_paths_match_native_file_level_oracle (test_git_status_quality.GitStatusQualityTest.test_nested_untracked_paths_match_native_file_level_oracle) ... ok\ntest_inconclusive_report_is_published_and_preserves_failure (test_mutation_workflow.MutationWorkflowTest.test_inconclusive_report_is_published_and_preserves_failure) ... ok\ntest_absolute_inside_root_is_normalized (test_validation.ValidationMutationTest.test_absolute_inside_root_is_normalized) ... ok\ntest_absolute_outside_denied (test_validation.ValidationMutationTest.test_absolute_outside_denied) ... ok\ntest_empty_root_marker_denied (test_validation.ValidationMutationTest.test_empty_root_marker_denied) ... ok\ntest_limits_minimum_and_maximum (test_validation.ValidationMutationTest.test_limits_minimum_and_maximum) ... ok\ntest_limits_not_numbers (test_validation.ValidationMutationTest.test_limits_not_numbers) ... ok\ntest_limits_out_of_range (test_validation.ValidationMutationTest.test_limits_out_of_range) ... ok\ntest_parent_escape_denied (test_validation.ValidationMutationTest.test_parent_escape_denied) ... ok\ntest_path_lexically_smaller_than_dot_is_still_accepted (test_validation.ValidationMutationTest.test_path_lexically_smaller_than_dot_is_still_accepted) ... ok\ntest_regular_and_nested_paths (test_validation.ValidationMutationTest.test_regular_and_nested_paths) ... ok\ntest_symlink_inside_root_canonicalized (test_validation.ValidationMutationTest.test_symlink_inside_root_canonicalized) ... ok\ntest_symlink_outside_denied (test_validation.ValidationMutationTest.test_symlink_outside_denied) ... ok\ntest_unicode_and_spaces_preserved (test_validation.ValidationMutationTest.test_unicode_and_spaces_preserved) ... ok\n\n----------------------------------------------------------------------\nRan 58 tests in 3.553s\n\nOK\n"
+        },
+        "shell": {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/bashunit/bashunit",
+            "test",
+            "tests/shell",
+            "--strict"
+          ],
+          "exit": 0,
+          "stdout": "bashunit - 0.50.1 | Tests: 6\nRunning tests/shell/cli_test.sh\n✓ Passed: Doctor returns valid json without shell changes                   98ms\n✓ Passed: Missing source is explicit error not empty success               103ms\n✓ Passed: Read returns exact long line and digest                          128ms\n✓ Passed: Real git status preserves newline filename                       113ms\n✓ Passed: Git patch is full patch not diffstat                             120ms\n✓ Passed: Source checkout has no automatic publish or install               20ms\n\nTests:      6 passed, 6 total\nAssertions: 13 passed, 13 total\n\n All tests passed \nTime taken: 681ms\n",
+          "stderr": ""
+        }
+      },
+      "basic_evidence_checks": {
+        "php": true,
+        "rounding": true,
+        "refs_all_required": true,
+        "patch_all_fields_exact": true,
+        "history": true,
+        "source": true,
+        "untracked": true,
+        "ignored": true
+      },
+      "lifecycle_final_trace_index": 62,
+      "lifecycle_trace_complete": true,
+      "lifecycle_result": {
+        "task_id": "BENCH-757",
+        "state": "complete",
+        "next_action": "none",
+        "verification": "passed",
+        "review": "warn",
+        "review_sha256": "sha256:4d56988289521e3009bf51f9053daeb017494141ecf5174ab26305abee97dc28",
+        "learning": "findings_recorded",
+        "finding_id": "finding.2026-10-10.1da33c",
+        "actor": "codex-consumer-b2"
+      },
+      "metrics": {
+        "trace_records": 64,
+        "traced_elapsed_sum_seconds": 24.37248630599788,
+        "nested_wrapper_parents": [
+          26,
+          40,
+          48
+        ],
+        "leaf_records": 61,
+        "leaf_elapsed_sum_seconds": 21.977661640998576,
+        "start_epoch": 1791656238.4767802,
+        "end_epoch": 1791656428.670196,
+        "session_wall_seconds_approx": 190.19341588020325,
+        "model_tokens": null
+      },
+      "deviations": [
+        "First held-out orchestration used files instead of actual paths schema key. It failed before range probes; corrected and rerun without fabricated success.",
+        "Three nested parent records duplicate child output and time intervals; leaf statistics exclude these."
+      ],
+      "interpretation": "Installed-v2 context6/6; local before4/6 preserves known empty-file regressions; local after6/6. Minimal fix, all tests unchanged, canonical complete.",
+      "inventory_coordinate_verified": true,
+      "literal_patch_single_scope_verified": true,
+      "minimal_source_diff": "diff --git a/agent_dotfiles/cli.py b/agent_dotfiles/cli.py\nindex bf362b0..7336a4b 100644\n--- a/agent_dotfiles/cli.py\n+++ b/agent_dotfiles/cli.py\n@@ -250,7 +250,7 @@ def _read_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:\n     lines = [part + \"\\n\" for part in parts[:-1]]\n     if parts[-1]:\n         lines.append(parts[-1])\n-    if args.start > len(lines) and len(lines) != 0:\n+    if args.start > max(1, len(lines)):\n         raise CommandFailure(\"invalid_range\", f\"Start line {args.start} exceeds file length {len(lines)}\")\n     actual_end = min(args.end, len(lines))\n     content = \"\".join(lines[args.start - 1:actual_end])\n",
+      "receipt_sha256": {
+        "result.json": "705c521a318aeff7f85d080acb8f56bb895f1ae7a26961ca4d6bc681843ecc56",
+        "trace.jsonl": "ead00ccde11406a0df6a4b19e23642fcc136ba682905e62da3d8a663577d8eb4"
+      },
+      "context_quality": {
+        "missing_required_context_after_completion": [],
+        "unproven_context": [
+          "Dynamic/unsupported PHP dispatch and callers outside src",
+          "Actual runtime config-to-render execution"
+        ],
+        "irrelevant_or_excess_context": [
+          "Initial whole-repository rg --files output exceeds immediate source scope.",
+          "Historical log -p includes earlier bankers fixture commit in addition to current nearest change.",
+          "Nested orchestration receipts duplicate child output; these bytes are not model tokens."
+        ],
+        "meaningful_redundant_same_scope_retrieval_count": 2,
+        "repeated_retrieval": [
+          {
+            "indices": [
+              25,
+              27
+            ],
+            "purpose": "Same immutable heldout inventory repeated after orchestration schema-key failure. Retry resolves operator error, but source evidence itself was already available."
+          },
+          {
+            "indices": [
+              27,
+              41
+            ],
+            "purpose": "Same immutable heldout inventory repeated for after-fix local probes; no fixture bytes changed."
+          }
+        ],
+        "justified_followups": [
+          "RED/GREEN complete Python suites",
+          "Local CLI pre/post range checks reflect source mutation, not redundant evidence",
+          "Map output independently compared to original PHP",
+          "Full literal patch/native comparison and source whole hash are independent provenance checks",
+          "History reread with fuller metadata for receipt (A2) preserves commit identity"
+        ]
+      },
+      "validation_adherence": "A2/B2 each invoked required full Python, compileall, and Bashunit in consumer traces; evaluator independently reran Python/Bashunit.",
+      "whole_file_hash_for_selected_range_verified": "32-byte whole file SHA a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155 remains returned for8-byte line2 selection; bytes independently read and hashed."
+    }
+  },
+  "installed_runtime_validation": {
+    "evaluated_at_utc": "2026-10-10T18:21:37.060002+00:00",
+    "outside_consumer_timing": true,
+    "candidate_source_read": false,
+    "heldout_oracle_sha256": "124b06d0fa1562f7c05782d3535605002faa51f4e5ae374dad8f9d5918b8671d",
+    "results": {
+      "installed-v1": [
+        {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/installed-v1/bin/agent-dotfiles",
+            "read",
+            "vacant ledger δ\nprobe.txt",
+            "--root",
+            "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+            "--start",
+            "1",
+            "--end",
+            "1"
+          ],
+          "exit": 0,
+          "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":1,\"requested_end\":1,\"actual_end\":0,\"complete_file\":true,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+          "stderr": "",
+          "matches_heldout_oracle": true
+        },
+        {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/installed-v1/bin/agent-dotfiles",
+            "read",
+            "vacant ledger δ\nprobe.txt",
+            "--root",
+            "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+            "--start",
+            "2",
+            "--end",
+            "3"
+          ],
+          "exit": 0,
+          "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":2,\"requested_end\":3,\"actual_end\":0,\"complete_file\":false,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+          "stderr": "",
+          "matches_heldout_oracle": false
+        },
+        {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/installed-v1/bin/agent-dotfiles",
+            "read",
+            "vacant ledger δ\nprobe.txt",
+            "--root",
+            "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+            "--start",
+            "4",
+            "--end",
+            "7"
+          ],
+          "exit": 0,
+          "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":4,\"requested_end\":7,\"actual_end\":0,\"complete_file\":false,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+          "stderr": "",
+          "matches_heldout_oracle": false
+        },
+        {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/installed-v1/bin/agent-dotfiles",
+            "read",
+            "range λ\nledger.txt",
+            "--root",
+            "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+            "--start",
+            "1",
+            "--end",
+            "7"
+          ],
+          "exit": 0,
+          "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":1,\"requested_end\":7,\"actual_end\":3,\"complete_file\":true,\"content\":\"\\u03b1\\u2028\\u03b2\\r\\n\\t\\u7b2c\\u4e8c\\nlast without LF\",\"content_bytes\":32,\"truncated\":false}\n",
+          "stderr": "",
+          "matches_heldout_oracle": true
+        },
+        {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/installed-v1/bin/agent-dotfiles",
+            "read",
+            "range λ\nledger.txt",
+            "--root",
+            "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+            "--start",
+            "2",
+            "--end",
+            "2"
+          ],
+          "exit": 0,
+          "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":2,\"requested_end\":2,\"actual_end\":2,\"complete_file\":false,\"content\":\"\\t\\u7b2c\\u4e8c\\n\",\"content_bytes\":8,\"truncated\":false}\n",
+          "stderr": "",
+          "matches_heldout_oracle": true
+        },
+        {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/installed-v1/bin/agent-dotfiles",
+            "read",
+            "range λ\nledger.txt",
+            "--root",
+            "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+            "--start",
+            "4",
+            "--end",
+            "7"
+          ],
+          "exit": 2,
+          "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 4 exceeds file length 3\"}\n",
+          "stderr": "",
+          "matches_heldout_oracle": true
+        }
+      ],
+      "installed-v2": [
+        {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+            "read",
+            "vacant ledger δ\nprobe.txt",
+            "--root",
+            "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+            "--start",
+            "1",
+            "--end",
+            "1"
+          ],
+          "exit": 0,
+          "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":1,\"requested_end\":1,\"actual_end\":0,\"complete_file\":true,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+          "stderr": "",
+          "matches_heldout_oracle": true
+        },
+        {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+            "read",
+            "vacant ledger δ\nprobe.txt",
+            "--root",
+            "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+            "--start",
+            "2",
+            "--end",
+            "3"
+          ],
+          "exit": 2,
+          "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 2 exceeds file length 0\"}\n",
+          "stderr": "",
+          "matches_heldout_oracle": true
+        },
+        {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+            "read",
+            "vacant ledger δ\nprobe.txt",
+            "--root",
+            "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+            "--start",
+            "4",
+            "--end",
+            "7"
+          ],
+          "exit": 2,
+          "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 4 exceeds file length 0\"}\n",
+          "stderr": "",
+          "matches_heldout_oracle": true
+        },
+        {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+            "read",
+            "range λ\nledger.txt",
+            "--root",
+            "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+            "--start",
+            "1",
+            "--end",
+            "7"
+          ],
+          "exit": 0,
+          "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":1,\"requested_end\":7,\"actual_end\":3,\"complete_file\":true,\"content\":\"\\u03b1\\u2028\\u03b2\\r\\n\\t\\u7b2c\\u4e8c\\nlast without LF\",\"content_bytes\":32,\"truncated\":false}\n",
+          "stderr": "",
+          "matches_heldout_oracle": true
+        },
+        {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+            "read",
+            "range λ\nledger.txt",
+            "--root",
+            "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+            "--start",
+            "2",
+            "--end",
+            "2"
+          ],
+          "exit": 0,
+          "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":2,\"requested_end\":2,\"actual_end\":2,\"complete_file\":false,\"content\":\"\\t\\u7b2c\\u4e8c\\n\",\"content_bytes\":8,\"truncated\":false}\n",
+          "stderr": "",
+          "matches_heldout_oracle": true
+        },
+        {
+          "argv": [
+            "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+            "read",
+            "range λ\nledger.txt",
+            "--root",
+            "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+            "--start",
+            "4",
+            "--end",
+            "7"
+          ],
+          "exit": 2,
+          "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 4 exceeds file length 3\"}\n",
+          "stderr": "",
+          "matches_heldout_oracle": true
+        }
+      ]
+    },
+    "conclusion": "Installed v1 fails exactly two noninitial empty-file cases; installed v2 passes all six. Demonstrates persistent bounded quality fix, not generalized efficiency.",
+    "earlier_validation_note": "benchmark-installed-v1-v2-independent-heldout.json used candidate-v1/candidate-v2 executable paths despite artifact name; those raw argv remain truthful and preserved. This artifact tests actual installed-v1/installed-v2 paths used by consumers."
+  },
+  "limits": [
+    "Small synthetic PHP fixtures plus real Python coding regression",
+    "Same host, separate fresh consumers",
+    "No causal speed proof",
+    "Initial shared PHP prerequisite failure and corrected reruns must both be preserved",
+    "Spawn timestamps were recorded just before spawns, approximate session start. Trace subprocess times do not include model deliberation and have no record start/end timestamps. No per-turn or model token metrics available.",
+    "Consumer trace commands are developer-visible evidence; evaluator did not inspect candidate source or alter consumer/product files.",
+    "Independent test tool output retained with runner output truncation; completion/count/exit visible.",
+    "A2 one prompt read omitted from wrapper; B2 three nested wrapper parents and A2 grouped direct Python subprocesses mean command counts are not equivalent process counts.",
+    "Second trial intentionally adds an independently implemented native A context reader and installed B reader; complexity and independent agent choices differ.",
+    "Synthetic fixture literal references do not demonstrate runtime PHP invoice rendering.",
+    "Two trials with four fresh agents do not establish causal speed differences."
+  ],
+  "model_tokens": null,
+  "recommendation": "Retain native default when cost improvement is unproven. The bounded empty-file quality fix can be reviewed separately; no global adoption or generalized productivity claim follows."
+}

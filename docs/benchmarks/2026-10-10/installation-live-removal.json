@@ -1,0 +1,91 @@
+{
+  "verify": {
+    "exit": 0,
+    "report": {
+      "schema": "agent-dotfiles.v1.installation",
+      "operation": "verify",
+      "ok": true,
+      "source_revision": "8fa00fd30ab30025aacd99108ae51ba7e27bba86",
+      "files": 7
+    }
+  },
+  "uninstall": {
+    "exit": 0,
+    "report": {
+      "schema": "agent-dotfiles.v1.installation",
+      "operation": "uninstall",
+      "ok": true,
+      "source_revision": "8fa00fd30ab30025aacd99108ae51ba7e27bba86",
+      "files": 7
+    }
+  },
+  "rollback-doctor-v1": {
+    "exit": 0,
+    "report": {
+      "schema": "agent-dotfiles.v1.doctor",
+      "version": "0.2.0",
+      "required": {
+        "rg": {
+          "available": true,
+          "path": "/opt/codex/codex-path/rg"
+        },
+        "git": {
+          "available": true,
+          "path": "/usr/local/bin/git"
+        }
+      },
+      "optional": {
+        "jq": {
+          "available": true,
+          "path": "/usr/bin/jq"
+        },
+        "fd": {
+          "available": false,
+          "executable": null,
+          "path": null
+        },
+        "shellcheck": {
+          "available": false,
+          "path": null
+        },
+        "strace": {
+          "available": true,
+          "path": "/usr/bin/strace"
+        },
+        "hyperfine": {
+          "available": false,
+          "path": null
+        },
+        "ast-grep": {
+          "available": false,
+          "path": null
+        },
+        "ctags": {
+          "available": false,
+          "path": null
+        },
+        "difft": {
+          "available": false,
+          "path": null
+        },
+        "delta": {
+          "available": false,
+          "path": null
+        }
+      },
+      "missing_required": [],
+      "shell_startup_loaded": false,
+      "installation_performed": false
+    }
+  },
+  "remove-v1": {
+    "exit": 0,
+    "report": {
+      "schema": "agent-dotfiles.v1.installation",
+      "operation": "uninstall",
+      "ok": true,
+      "source_revision": "b6e339cdec2dcafcbfc52ca9020b3fbba9964ff2",
+      "files": 7
+    }
+  }
+}

@@ -1,0 +1,346 @@
+{
+  "oracle_sha256": "74e6d10163b1a637d6cdbcce08e524523fcb6e8704687fd6687aeeaa76bd8013",
+  "evaluated_at_utc": "2026-10-10T18:17:42.660584+00:00",
+  "baseline_commit": "33003d8dc5f52c77c02d353804db0c04345f6f27",
+  "consumers": {
+    "A1": {
+      "dimensions": {
+        "php": {
+          "status": "pass",
+          "definition_and_callers_equal_oracle": true,
+          "fresh_map_trace_indices": [
+            41,
+            42,
+            43
+          ],
+          "dynamic_uncertainty_present": true,
+          "original_source_verification_trace_indices": [
+            32
+          ]
+        },
+        "references": {
+          "status": "pass",
+          "values_equal_oracle": true,
+          "trace_indices": [
+            5
+          ],
+          "limitation": "Literal source/template link proven; fixture contains no runtime invoice configuration loader."
+        },
+        "patch": {
+          "status": "pass",
+          "declared_format": "native",
+          "text_equal_native_oracle": true,
+          "sha_equal_native_oracle": true,
+          "bytes_equal_native_oracle": true,
+          "single_literal_scope": true,
+          "raw_trace_indices": [
+            16,
+            26
+          ]
+        },
+        "history": {
+          "status": "pass",
+          "commit_and_paths_equal_oracle": true,
+          "original_historical_patch_trace_indices": [
+            9
+          ]
+        },
+        "inventory_source": {
+          "status": "pass",
+          "inventory_selected_root": "/workspace/scratch/dotfiles-mission/A1/src",
+          "emitted_paths": [
+            "Billing/Checkout.php",
+            "Billing/Preview.php",
+            "Billing/PriceCalculator.php",
+            "Legacy/PriceCalculator.php",
+            "note β\nline.txt"
+          ],
+          "source_used_root": "/workspace/scratch/dotfiles-mission/A1/src",
+          "source_used_path": "note β\nline.txt",
+          "native_source_bytes_equal": true,
+          "bytes": 50,
+          "trace_indices": [
+            17
+          ],
+          "coordinate_assessment": "A native Git from src emits src-root-relative paths; B tracked emits repository-root-relative src/* despite selected src root. Both preserve actual emitted paths and use the compatible source root. Root field alone in B output is ambiguous; consumer explicitly reports and handles it."
+        },
+        "worktree": {
+          "status": "pass",
+          "individual_untracked_equal_oracle": true,
+          "ignored_equal_oracle": true,
+          "trace_indices": [
+            12,
+            13,
+            17,
+            22,
+            23
+          ]
+        },
+        "fix": {
+          "status": "pass",
+          "changed_source_files": [
+            "agent_dotfiles/cli.py"
+          ],
+          "minimal_diff": "diff --git a/agent_dotfiles/cli.py b/agent_dotfiles/cli.py\nindex bf362b0..7336a4b 100644\n--- a/agent_dotfiles/cli.py\n+++ b/agent_dotfiles/cli.py\n@@ -250,7 +250,7 @@ def _read_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:\n     lines = [part + \"\\n\" for part in parts[:-1]]\n     if parts[-1]:\n         lines.append(parts[-1])\n-    if args.start > len(lines) and len(lines) != 0:\n+    if args.start > max(1, len(lines)):\n         raise CommandFailure(\"invalid_range\", f\"Start line {args.start} exceeds file length {len(lines)}\")\n     actual_end = min(args.end, len(lines))\n     content = \"\".join(lines[args.start - 1:actual_end])\n",
+          "all_tests_unchanged": true,
+          "consumer_red_suite_index": 6,
+          "consumer_green_suite_index": 19,
+          "independent_full_python_suite": "58 tests, exit 0",
+          "independent_shell_suite": "6 tests/13 assertions, exit 0",
+          "independent_range_probes": "All six pass, including empty initial and starts2/4 rejection; see independent-range-validation JSON.",
+          "consumer_missing_validation": "No consumer Bashunit invocation in trace despite AGENTS requirement; independent evaluator supplied and passed it. A1 also omitted standalone initial-empty CLI probe, though unchanged Python suite and evaluator confirm behavior."
+        },
+        "integrity": {
+          "status": "pass",
+          "trace_byte_and_stdout_hash_errors": [],
+          "initial_receipt_preserved": true,
+          "initial_map_and_lifecycle": "partial: PHP Class Phar unavailable, supported static caller completeness not freshly map-verified; Learning storage not recognized; complete false. Both reported honestly.",
+          "revised_lifecycle_complete": true,
+          "revised_next_action": "none",
+          "lifecycle_final_trace_index": 47
+        }
+      },
+      "context_quality": {
+        "required_evidence_complete_after_repair": true,
+        "missing_context_initial": [
+          "fresh PHP Map static call completeness",
+          "Learning closeout prerequisite"
+        ],
+        "missing_context_revised": [
+          "No runtime invoice wiring evidence in synthetic fixture; neither agent proves runtime behavior"
+        ],
+        "irrelevant_or_excess_context": [
+          "A initial bracket Git pathspec retrieved unrelated config/settings1.ini patch; corrected before final evidence.",
+          "A git log -p included earlier fixture commit beyond current-value commit; useful ancestry but extra.",
+          "Read of Legacy class useful disambiguation, not irrelevant."
+        ],
+        "repeated_retrieval": {
+          "justified": [
+            "RED then GREEN complete suite",
+            "Initial failed Map build then corrected prerequisite rebuild",
+            "Original PHP text and resolved Map coordinates verified independently",
+            "Git literal patch recaptured to bind returned text/hash (A) or native full-index compared with tool patch (B)",
+            "Untracked/ignored explicit provenance checks supplement status/patch outputs"
+          ],
+          "narrower_or_changed_scope": [
+            "A git ls-files src then Git -C src exact inventory follows selected-root requirement",
+            "A broad erroneous bracket pathspec then --literal-pathspecs corrects contamination",
+            "B config history log then specific original commit show narrows historical scope",
+            "B read-command search then 220..280 source and dedicated regression test supplies original logic",
+            "Learning retries changed root/schema, though not context retrieval and not countable as benefit"
+          ],
+          "redundant_identical_retrieval": [],
+          "meaningful_repeated_retrieval_count": 0,
+          "rule": "Strict count covers redundant same purpose/scope evidence retrieval, excludes help, governance commands, repaired prerequisites, RED/GREEN tests and justified independent verification. Command count is a separate metric."
+        }
+      },
+      "metrics": {
+        "trace_record_count": 50,
+        "initial_trace_record_count": 39,
+        "revised_trace_record_count": 11,
+        "all_record_elapsed_sum_seconds": 13.729111132999606,
+        "initial_record_elapsed_sum_seconds": 11.96001176099935,
+        "revised_record_elapsed_sum_seconds": 1.7690993720002552,
+        "nested_wrapper_parent_trace_indices": [],
+        "leaf_record_count": 50,
+        "leaf_elapsed_sum_seconds": 13.729111132999606,
+        "timing_caveat": "All-record sums overlap nested wrapper containers; leaf sums remove those parents but are not session wall time. A Python direct subprocess reads are only recorded through parent, not separate leaf calls. No timestamps to derive phase start.",
+        "spawn_epoch": 1791655733.5377946,
+        "initial_end_epoch": 1791655900.9075718,
+        "revised_end_epoch": 1791656031.00089,
+        "initial_session_wall_seconds_approx": 167.3697772026062,
+        "total_session_wall_seconds_approx": 297.46309542655945,
+        "model_tokens": null,
+        "token_claim": "Unavailable; output byte counts not substituted."
+      },
+      "receipts": {
+        "result_sha256": "53dcdcceac30d0f8cf543cca8a175b652077a0bcef0bf70d78b7eb6d74e2a757",
+        "initial_result_sha256": "bebfb3d38181fd8a21e6a37777656a50b154d4c5c7c50ebb936d2fb9bf78dfab",
+        "trace_sha256": "bbebae0c59bf17cecffc9b2e2807322dce737ffcabd0a128b0ad78d329844381"
+      }
+    },
+    "B1": {
+      "dimensions": {
+        "php": {
+          "status": "pass",
+          "definition_and_callers_equal_oracle": true,
+          "fresh_map_trace_indices": [
+            51,
+            52,
+            53
+          ],
+          "dynamic_uncertainty_present": true,
+          "original_source_verification_trace_indices": [
+            56
+          ]
+        },
+        "references": {
+          "status": "pass",
+          "values_equal_oracle": true,
+          "trace_indices": [
+            15
+          ],
+          "limitation": "Literal source/template link proven; fixture contains no runtime invoice configuration loader."
+        },
+        "patch": {
+          "status": "pass",
+          "declared_format": "full-index",
+          "text_equal_native_oracle": true,
+          "sha_equal_native_oracle": true,
+          "bytes_equal_native_oracle": true,
+          "single_literal_scope": true,
+          "raw_trace_indices": [
+            23,
+            34
+          ]
+        },
+        "history": {
+          "status": "pass",
+          "commit_and_paths_equal_oracle": true,
+          "original_historical_patch_trace_indices": [
+            33
+          ]
+        },
+        "inventory_source": {
+          "status": "pass",
+          "inventory_selected_root": "/workspace/scratch/dotfiles-mission/B1/src",
+          "emitted_paths": [
+            "src/Billing/Checkout.php",
+            "src/Billing/Preview.php",
+            "src/Billing/PriceCalculator.php",
+            "src/Legacy/PriceCalculator.php",
+            "src/note β\nline.txt"
+          ],
+          "source_used_root": "/workspace/scratch/dotfiles-mission/B1",
+          "source_used_path": "src/note β\nline.txt",
+          "native_source_bytes_equal": true,
+          "bytes": 50,
+          "trace_indices": [
+            22,
+            31,
+            32
+          ],
+          "coordinate_assessment": "A native Git from src emits src-root-relative paths; B tracked emits repository-root-relative src/* despite selected src root. Both preserve actual emitted paths and use the compatible source root. Root field alone in B output is ambiguous; consumer explicitly reports and handles it."
+        },
+        "worktree": {
+          "status": "pass",
+          "individual_untracked_equal_oracle": true,
+          "ignored_equal_oracle": true,
+          "trace_indices": [
+            24,
+            25,
+            26,
+            35,
+            36
+          ]
+        },
+        "fix": {
+          "status": "pass",
+          "changed_source_files": [
+            "agent_dotfiles/cli.py"
+          ],
+          "minimal_diff": "diff --git a/agent_dotfiles/cli.py b/agent_dotfiles/cli.py\nindex bf362b0..7336a4b 100644\n--- a/agent_dotfiles/cli.py\n+++ b/agent_dotfiles/cli.py\n@@ -250,7 +250,7 @@ def _read_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:\n     lines = [part + \"\\n\" for part in parts[:-1]]\n     if parts[-1]:\n         lines.append(parts[-1])\n-    if args.start > len(lines) and len(lines) != 0:\n+    if args.start > max(1, len(lines)):\n         raise CommandFailure(\"invalid_range\", f\"Start line {args.start} exceeds file length {len(lines)}\")\n     actual_end = min(args.end, len(lines))\n     content = \"\".join(lines[args.start - 1:actual_end])\n",
+          "all_tests_unchanged": true,
+          "consumer_red_suite_index": 10,
+          "consumer_green_suite_index": 38,
+          "independent_full_python_suite": "58 tests, exit 0",
+          "independent_shell_suite": "6 tests/13 assertions, exit 0",
+          "independent_range_probes": "All six pass, including empty initial and starts2/4 rejection; see independent-range-validation JSON.",
+          "consumer_missing_validation": "No consumer Bashunit invocation in trace despite AGENTS requirement; independent evaluator supplied and passed it. A1 also omitted standalone initial-empty CLI probe, though unchanged Python suite and evaluator confirm behavior."
+        },
+        "integrity": {
+          "status": "pass",
+          "trace_byte_and_stdout_hash_errors": [],
+          "initial_receipt_preserved": true,
+          "initial_map_and_lifecycle": "partial: PHP Class Phar unavailable, supported static caller completeness not freshly map-verified; Learning storage not recognized; complete false. Both reported honestly.",
+          "revised_lifecycle_complete": true,
+          "revised_next_action": "none",
+          "lifecycle_final_trace_index": 62
+        }
+      },
+      "context_quality": {
+        "required_evidence_complete_after_repair": true,
+        "missing_context_initial": [
+          "fresh PHP Map static call completeness",
+          "Learning closeout prerequisite"
+        ],
+        "missing_context_revised": [
+          "No runtime invoice wiring evidence in synthetic fixture; neither agent proves runtime behavior"
+        ],
+        "irrelevant_or_excess_context": [
+          "B initial rg --files emits whole small repository beyond immediate task scope.",
+          "B round|invoice|total search includes unrelated settings modes; narrower references selected correctly.",
+          "Nested wrapper parent receipts repeat child stdout/stderr, so presentation bytes duplicate underlying evidence."
+        ],
+        "repeated_retrieval": {
+          "justified": [
+            "RED then GREEN complete suite",
+            "Initial failed Map build then corrected prerequisite rebuild",
+            "Original PHP text and resolved Map coordinates verified independently",
+            "Git literal patch recaptured to bind returned text/hash (A) or native full-index compared with tool patch (B)",
+            "Untracked/ignored explicit provenance checks supplement status/patch outputs"
+          ],
+          "narrower_or_changed_scope": [
+            "A git ls-files src then Git -C src exact inventory follows selected-root requirement",
+            "A broad erroneous bracket pathspec then --literal-pathspecs corrects contamination",
+            "B config history log then specific original commit show narrows historical scope",
+            "B read-command search then 220..280 source and dedicated regression test supplies original logic",
+            "Learning retries changed root/schema, though not context retrieval and not countable as benefit"
+          ],
+          "redundant_identical_retrieval": [
+            {
+              "trace_indices": [
+                22,
+                31
+              ],
+              "purpose": "B same candidate tracked selected-root inventory; second request reused same scope with no source change, although performed to bind returned unusual name to following source read"
+            }
+          ],
+          "meaningful_repeated_retrieval_count": 1,
+          "rule": "Strict count covers redundant same purpose/scope evidence retrieval, excludes help, governance commands, repaired prerequisites, RED/GREEN tests and justified independent verification. Command count is a separate metric."
+        }
+      },
+      "metrics": {
+        "trace_record_count": 64,
+        "initial_trace_record_count": 50,
+        "revised_trace_record_count": 14,
+        "all_record_elapsed_sum_seconds": 21.558825013000842,
+        "initial_record_elapsed_sum_seconds": 18.867464745001598,
+        "revised_record_elapsed_sum_seconds": 2.6913602679992437,
+        "nested_wrapper_parent_trace_indices": [
+          6,
+          11,
+          21,
+          30,
+          37,
+          41,
+          55
+        ],
+        "leaf_record_count": 57,
+        "leaf_elapsed_sum_seconds": 14.967846602999998,
+        "timing_caveat": "All-record sums overlap nested wrapper containers; leaf sums remove those parents but are not session wall time. A Python direct subprocess reads are only recorded through parent, not separate leaf calls. No timestamps to derive phase start.",
+        "spawn_epoch": 1791655733.537796,
+        "initial_end_epoch": 1791655895.4357839,
+        "revised_end_epoch": 1791656042.806401,
+        "initial_session_wall_seconds_approx": 161.89798784255981,
+        "total_session_wall_seconds_approx": 309.2686049938202,
+        "model_tokens": null,
+        "token_claim": "Unavailable; output byte counts not substituted."
+      },
+      "receipts": {
+        "result_sha256": "166423a588824b323d7d349e320b36758509148f5073219505abff1ece35efc6",
+        "initial_result_sha256": "e037d27fcf1f75226b2e16f9d6bd0a90af56017ff95109af49e9813f19fb8cd4",
+        "trace_sha256": "625783cf3661990131e46142702ff20bfeb1bd6ea3d700f55bb86f13ed6cee93"
+      }
+    }
+  },
+  "limits": [
+    "Small synthetic PHP fixtures plus real Python coding regression",
+    "Same host, separate fresh consumers",
+    "No causal speed proof",
+    "Initial shared PHP prerequisite failure and corrected reruns must both be preserved",
+    "Spawn timestamps were recorded just before spawns, approximate session start. Trace subprocess times do not include model deliberation and have no record start/end timestamps. No per-turn or model token metrics available.",
+    "Consumer trace commands are developer-visible evidence; evaluator did not inspect candidate source or alter consumer/product files.",
+    "Independent test tool output retained with runner output truncation; completion/count/exit visible."
+  ]
+}

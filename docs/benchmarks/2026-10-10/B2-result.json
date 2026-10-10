@@ -1,0 +1,627 @@
+{
+  "php": {
+    "symbol": "Billing\\PriceCalculator::total",
+    "definition": {
+      "path": "src/Billing/PriceCalculator.php",
+      "line": 4
+    },
+    "callers": [
+      {
+        "path": "src/Billing/Checkout.php",
+        "line": 5
+      },
+      {
+        "path": "src/Billing/Preview.php",
+        "line": 5
+      }
+    ],
+    "uncertainty": "Fresh Map scoped to src identified all supported statically resolved callers and original source confirmed coordinates. These are instance calls resolved statically. Dynamic dispatch, reflection, variable method names, and calls outside src are not established by this scoped static map."
+  },
+  "references": {
+    "rounding": "nearest",
+    "refs": [
+      {
+        "path": "config/billing.yaml",
+        "line": 2
+      },
+      {
+        "path": "templates/receipt.twig",
+        "line": 1
+      }
+    ],
+    "uncertainty": "Config and template text references plus historical coordinated change establish fixture linkage; no runtime rendering execution was performed."
+  },
+  "patch": {
+    "path": "config/settings[1].ini",
+    "text": "diff --git a/config/settings[1].ini b/config/settings[1].ini\nindex 3621722a9fcf798e00dd012061d9ee5dbe256693..6ccc4da42b3a38c813722529b2bd998ad8144071 100644\n--- a/config/settings[1].ini\n+++ b/config/settings[1].ini\n@@ -1 +1 @@\n-invoice.mode=old\n+invoice.mode=selected-new\n",
+    "sha256": "d6ba8213574da5b27d7ebe13d6472b3e3b83c003e34c0337848195a68168f28d",
+    "bytes": 272,
+    "native_verified": true
+  },
+  "history": {
+    "commit": "33003d8dc5f52c77c02d353804db0c04345f6f27",
+    "paths": [
+      "config/billing.yaml",
+      "templates/receipt.twig"
+    ],
+    "original_patch_evidence": "receipt/trace.jsonl: git log -p -G round -- config templates"
+  },
+  "inventory": {
+    "root": "/workspace/scratch/dotfiles-mission/B2/src",
+    "paths": [
+      "src/Billing/Checkout.php",
+      "src/Billing/Preview.php",
+      "src/Billing/PriceCalculator.php",
+      "src/Legacy/PriceCalculator.php",
+      "src/note β\nline.txt"
+    ]
+  },
+  "source": {
+    "root": "/workspace/scratch/dotfiles-mission/B2",
+    "path": "src/note β\nline.txt",
+    "content": "  first\tline\nsecond literal\nlast without newline",
+    "sha256": "3f6ac2c270d3b28fec9d9097ed3eaec1c51646b0c8d66121ad4a1a0cd8f83131",
+    "content_bytes": 50,
+    "native_verified": true
+  },
+  "untracked": [
+    "work/critical.txt",
+    "work/critical_test.txt"
+  ],
+  "ignored": {
+    "path": "generated/hidden.txt",
+    "excluded_from_patch": true,
+    "content": "ignored diagnostic source\n",
+    "exclusion_error": "path_not_in_diff",
+    "exclusion_exit": 2,
+    "native_ignore_verified": true
+  },
+  "fix": {
+    "changed_files": [
+      "agent_dotfiles/cli.py"
+    ],
+    "tests_exit": 0,
+    "tests_count": 58,
+    "baseline_tests_exit": 1,
+    "shell_tests_exit": 0,
+    "shell_tests_count": 6,
+    "compileall_exit": 0,
+    "branch": "fix/B2-empty-range",
+    "description": "Replace exemption of all empty files with args.start > max(1, len(lines)); preserves initial empty read and rejects noninitial empty ranges."
+  },
+  "findings": [
+    {
+      "kind": "repository_regression",
+      "path": "agent_dotfiles/cli.py",
+      "line": 253,
+      "description": "Empty-file bounds check exempted all start lines. Local before probes incorrectly succeeded at 2:3 and 4:7; after fix both reject invalid_range. Installed context reader already handles these correctly.",
+      "evidence": "receipt/trace.jsonl",
+      "learning_finding": "finding.2026-10-10.1da33c"
+    },
+    {
+      "kind": "coordinate_frame_observation",
+      "description": "Tracked inventory selected root src but emitted Git repository-relative paths containing src/. Source read used repository root plus emitted src/note filename to avoid duplicating src/.",
+      "evidence": "inventory and source root/path fields"
+    },
+    {
+      "kind": "operator_probe_error",
+      "description": "First held-out orchestration used files instead of emitted paths field and failed KeyError before any probe; corrected schema field and all six probes executed.",
+      "evidence": "receipt/trace.jsonl"
+    }
+  ],
+  "heldout": {
+    "context_reader": {
+      "tool": "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+      "pin": "8fa00fd30ab30025aacd99108ae51ba7e27bba86"
+    },
+    "context_probes": [
+      {
+        "tool": "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "1",
+          "--end",
+          "1"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/B2/receipt/heldout\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":1,\"requested_end\":1,\"actual_end\":0,\"complete_file\":true,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.read",
+          "root": "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "path": "vacant ledger δ\nprobe.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "total_lines": 0,
+          "start": 1,
+          "requested_end": 1,
+          "actual_end": 0,
+          "complete_file": true,
+          "content": "",
+          "content_bytes": 0,
+          "truncated": false
+        }
+      },
+      {
+        "tool": "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "2",
+          "--end",
+          "3"
+        ],
+        "exit": 2,
+        "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 2 exceeds file length 0\"}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.error",
+          "error": "invalid_range",
+          "message": "Start line 2 exceeds file length 0"
+        }
+      },
+      {
+        "tool": "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "4",
+          "--end",
+          "7"
+        ],
+        "exit": 2,
+        "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 4 exceeds file length 0\"}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.error",
+          "error": "invalid_range",
+          "message": "Start line 4 exceeds file length 0"
+        }
+      },
+      {
+        "tool": "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "1",
+          "--end",
+          "7"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/B2/receipt/heldout\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":1,\"requested_end\":7,\"actual_end\":3,\"complete_file\":true,\"content\":\"\\u03b1\\u2028\\u03b2\\r\\n\\t\\u7b2c\\u4e8c\\nlast without LF\",\"content_bytes\":32,\"truncated\":false}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.read",
+          "root": "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "path": "range λ\nledger.txt",
+          "sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155",
+          "total_lines": 3,
+          "start": 1,
+          "requested_end": 7,
+          "actual_end": 3,
+          "complete_file": true,
+          "content": "α β\r\n\t第二\nlast without LF",
+          "content_bytes": 32,
+          "truncated": false
+        }
+      },
+      {
+        "tool": "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "2",
+          "--end",
+          "2"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/B2/receipt/heldout\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":2,\"requested_end\":2,\"actual_end\":2,\"complete_file\":false,\"content\":\"\\t\\u7b2c\\u4e8c\\n\",\"content_bytes\":8,\"truncated\":false}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.read",
+          "root": "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "path": "range λ\nledger.txt",
+          "sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155",
+          "total_lines": 3,
+          "start": 2,
+          "requested_end": 2,
+          "actual_end": 2,
+          "complete_file": false,
+          "content": "\t第二\n",
+          "content_bytes": 8,
+          "truncated": false
+        }
+      },
+      {
+        "tool": "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "4",
+          "--end",
+          "7"
+        ],
+        "exit": 2,
+        "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 4 exceeds file length 3\"}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.error",
+          "error": "invalid_range",
+          "message": "Start line 4 exceeds file length 3"
+        }
+      }
+    ],
+    "local_before_probes": [
+      {
+        "tool": "./bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "1",
+          "--end",
+          "1"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/B2/receipt/heldout\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":1,\"requested_end\":1,\"actual_end\":0,\"complete_file\":true,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.read",
+          "root": "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "path": "vacant ledger δ\nprobe.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "total_lines": 0,
+          "start": 1,
+          "requested_end": 1,
+          "actual_end": 0,
+          "complete_file": true,
+          "content": "",
+          "content_bytes": 0,
+          "truncated": false
+        }
+      },
+      {
+        "tool": "./bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "2",
+          "--end",
+          "3"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/B2/receipt/heldout\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":2,\"requested_end\":3,\"actual_end\":0,\"complete_file\":false,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.read",
+          "root": "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "path": "vacant ledger δ\nprobe.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "total_lines": 0,
+          "start": 2,
+          "requested_end": 3,
+          "actual_end": 0,
+          "complete_file": false,
+          "content": "",
+          "content_bytes": 0,
+          "truncated": false
+        }
+      },
+      {
+        "tool": "./bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "4",
+          "--end",
+          "7"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/B2/receipt/heldout\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":4,\"requested_end\":7,\"actual_end\":0,\"complete_file\":false,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.read",
+          "root": "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "path": "vacant ledger δ\nprobe.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "total_lines": 0,
+          "start": 4,
+          "requested_end": 7,
+          "actual_end": 0,
+          "complete_file": false,
+          "content": "",
+          "content_bytes": 0,
+          "truncated": false
+        }
+      },
+      {
+        "tool": "./bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "1",
+          "--end",
+          "7"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/B2/receipt/heldout\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":1,\"requested_end\":7,\"actual_end\":3,\"complete_file\":true,\"content\":\"\\u03b1\\u2028\\u03b2\\r\\n\\t\\u7b2c\\u4e8c\\nlast without LF\",\"content_bytes\":32,\"truncated\":false}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.read",
+          "root": "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "path": "range λ\nledger.txt",
+          "sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155",
+          "total_lines": 3,
+          "start": 1,
+          "requested_end": 7,
+          "actual_end": 3,
+          "complete_file": true,
+          "content": "α β\r\n\t第二\nlast without LF",
+          "content_bytes": 32,
+          "truncated": false
+        }
+      },
+      {
+        "tool": "./bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "2",
+          "--end",
+          "2"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/B2/receipt/heldout\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":2,\"requested_end\":2,\"actual_end\":2,\"complete_file\":false,\"content\":\"\\t\\u7b2c\\u4e8c\\n\",\"content_bytes\":8,\"truncated\":false}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.read",
+          "root": "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "path": "range λ\nledger.txt",
+          "sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155",
+          "total_lines": 3,
+          "start": 2,
+          "requested_end": 2,
+          "actual_end": 2,
+          "complete_file": false,
+          "content": "\t第二\n",
+          "content_bytes": 8,
+          "truncated": false
+        }
+      },
+      {
+        "tool": "./bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "4",
+          "--end",
+          "7"
+        ],
+        "exit": 2,
+        "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 4 exceeds file length 3\"}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.error",
+          "error": "invalid_range",
+          "message": "Start line 4 exceeds file length 3"
+        }
+      }
+    ],
+    "local_after_probes": [
+      {
+        "tool": "./bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "1",
+          "--end",
+          "1"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/B2/receipt/heldout\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":1,\"requested_end\":1,\"actual_end\":0,\"complete_file\":true,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.read",
+          "root": "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "path": "vacant ledger δ\nprobe.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "total_lines": 0,
+          "start": 1,
+          "requested_end": 1,
+          "actual_end": 0,
+          "complete_file": true,
+          "content": "",
+          "content_bytes": 0,
+          "truncated": false
+        }
+      },
+      {
+        "tool": "./bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "2",
+          "--end",
+          "3"
+        ],
+        "exit": 2,
+        "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 2 exceeds file length 0\"}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.error",
+          "error": "invalid_range",
+          "message": "Start line 2 exceeds file length 0"
+        }
+      },
+      {
+        "tool": "./bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "4",
+          "--end",
+          "7"
+        ],
+        "exit": 2,
+        "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 4 exceeds file length 0\"}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.error",
+          "error": "invalid_range",
+          "message": "Start line 4 exceeds file length 0"
+        }
+      },
+      {
+        "tool": "./bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "1",
+          "--end",
+          "7"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/B2/receipt/heldout\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":1,\"requested_end\":7,\"actual_end\":3,\"complete_file\":true,\"content\":\"\\u03b1\\u2028\\u03b2\\r\\n\\t\\u7b2c\\u4e8c\\nlast without LF\",\"content_bytes\":32,\"truncated\":false}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.read",
+          "root": "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "path": "range λ\nledger.txt",
+          "sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155",
+          "total_lines": 3,
+          "start": 1,
+          "requested_end": 7,
+          "actual_end": 3,
+          "complete_file": true,
+          "content": "α β\r\n\t第二\nlast without LF",
+          "content_bytes": 32,
+          "truncated": false
+        }
+      },
+      {
+        "tool": "./bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "2",
+          "--end",
+          "2"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/B2/receipt/heldout\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":2,\"requested_end\":2,\"actual_end\":2,\"complete_file\":false,\"content\":\"\\t\\u7b2c\\u4e8c\\n\",\"content_bytes\":8,\"truncated\":false}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.read",
+          "root": "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "path": "range λ\nledger.txt",
+          "sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155",
+          "total_lines": 3,
+          "start": 2,
+          "requested_end": 2,
+          "actual_end": 2,
+          "complete_file": false,
+          "content": "\t第二\n",
+          "content_bytes": 8,
+          "truncated": false
+        }
+      },
+      {
+        "tool": "./bin/agent-dotfiles",
+        "arguments": [
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/B2/receipt/heldout",
+          "--start",
+          "4",
+          "--end",
+          "7"
+        ],
+        "exit": 2,
+        "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 4 exceeds file length 3\"}\n",
+        "stderr": "",
+        "outcome": {
+          "schema": "agent-dotfiles.v1.error",
+          "error": "invalid_range",
+          "message": "Start line 4 exceeds file length 3"
+        }
+      }
+    ],
+    "native_verification": [
+      {
+        "path": "vacant ledger δ\nprobe.txt",
+        "content": "",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "range λ\nledger.txt",
+        "content": "α β\r\n\t第二\nlast without LF",
+        "bytes": 32,
+        "sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155"
+      }
+    ]
+  },
+  "lifecycle": {
+    "task_id": "BENCH-757",
+    "state": "complete",
+    "next_action": "none",
+    "verification": "passed",
+    "review": "warn",
+    "review_sha256": "sha256:4d56988289521e3009bf51f9053daeb017494141ecf5174ab26305abee97dc28",
+    "learning": "findings_recorded",
+    "finding_id": "finding.2026-10-10.1da33c",
+    "actor": "codex-consumer-b2"
+  },
+  "blockers": []
+}
