@@ -1,0 +1,39 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile
+        run: python -m compileall -q agent_dotfiles bin tests
+      - name: Contract tests
+        run: python -m unittest discover -s tests -v
+
+  bashunit-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      # Commit and release verified against the official annotated 0.50.1 tag.
+      - uses: TypedDevs/bashunit@28ea63c467f1f461a6368c93e5c264051b141c6f # 0.50.1
+        with:
+          version: '0.50.1'
+          verify-checksum: 'true'
+      - name: Bashunit real-CLI integration tests
+        run: bashunit test tests/shell --strict

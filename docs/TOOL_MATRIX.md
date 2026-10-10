@@ -1,0 +1,47 @@
+# Agent CLI tool matrix
+
+A tool appearing in dotfiles does **not** prove it is agent-safe. Test actual executable behavior rather than copying aliases.
+
+| Tool | Goal | Usage/contract | Policy |
+| --- | --- | --- | --- |
+| `rg` | Literal, file search | `rg --json -F -- PATTERN .`, `rg --files -0` | Required for search wrapper |
+| `git` | Version-control evidence | `git status --porcelain=v1 -z`, `git ls-files -z` | Required for normal coding workflow, detected only |
+| `jq` | JSON processing | `jq -c FILTER FILE`; validate with `jq empty FILE` | Optional, prefer no display decoration |
+| `fd` or `fdfind` | Alternate file search | `fd --type f --print0` | Optional, **explicit selection**, no silent semantic fallback |
+| `shellcheck` | Shell diagnostics | File-scoped invocation | Optional, gate before CI use |
+| `strace` | Linux syscall evidence | Small, scoped target; sanitize sensitive traces | Optional, never always-on |
+| `hyperfine` | Command performance evidence | Repeat runs, record machine + cache state | Optional, benchmark harness later |
+| `fzf` | Interactive terminal selection | TTY and key binding assumptions | Excluded from agent profile |
+| `ag` with pager | Human readable text search | Can invoke `less` or add color | Excluded from agent profile |
+| `.redpill` functions/aliases | Human shell shortcuts | Interactive startup, global shell changes | Excluded from agent profile |
+
+## Differences that matter
+
+- Shell `fd()` and executable `fd` are different objects. Python uses explicit executable paths, no shell resolution.
+- `rg --files`, `fd` and `git ls-files` have different inclusion, ignore and tracking semantics. Choose deliberately.
+- Colors, pagers, terminal width, timestamps and current shell function tables must not affect machine output.
+- Filenames may contain spaces or newlines: use NUL separators internally; JSON path strings encode newlines, and non-UTF-8 paths are represented as Base64 objects.
+- A capped result is an incomplete result. `agent-dotfiles` signals this in the JSON and exits 3.
+
+## Measurement before broader rollout
+
+Benchmark representative repo tasks with the same fixtures, warm/cold cache conditions, match counts, output bytes, p50/p95 elapsed time and false/missed matches. Keep the existing agent-loop Map-vs-literal decision boundary. No tool wins solely by being new.
+
+## Additional candidates (researched, not adopted as defaults)
+
+| Candidate | Benefit | Caveat / recommendation |
+| --- | --- | --- |
+| `ast-grep` (never assume `sg`) | Structural non-PHP queries, JSON stream, source ranges | Optional experiment for TS/JS/etc.; Map is still primary for PHP when fresh. No `--rewrite`, `--update-all` or interactive mode. |
+| Universal Ctags | Language-diverse symbol discovery with JSON lines | JSON requires build-time `libjansson`; verify `--list-output-formats` and selected parsers. Read-only, supplementary to Map. |
+| `git log -S` / `-G` | Origin of changed literals/patterns | History is *not* proof of current callers; read chosen commit and source. No new dependency. |
+| `git blame -L --line-porcelain` | Attribution of an exact range | Can be large; always scope lines, then inspect identified commits. |
+| `git diff --binary --full-index` | Exact patch with binary reconstruction information | Larger output is intentional. Never replace with `--stat` during review. |
+| `difftastic` | Human-oriented syntax diff | Presentation aid, not the canonical raw patch. Benchmark before adding. |
+| `delta` | Human-oriented diff pager | Exclude from machine output by default (color/pager dependence). |
+
+Sources: https://ast-grep.github.io/reference/cli/ ,
+https://docs.ctags.io/en/stable/man/ctags-json-output.5.html ,
+https://git-scm.com/docs/git-log , https://git-scm.com/docs/git-blame .
+
+**Tool inventory is detection, not endorsement.** `doctor` reports optional
+binaries; their mere presence does not change workflow routing or authorization.
