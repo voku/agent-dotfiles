@@ -65,6 +65,27 @@ class GitPatchEvidenceTest(unittest.TestCase):
                 self.assertNotIn("new a1.php", report["patch"]["text"])
                 self.assertFalse(report["truncated"])
 
+    def test_subdirectory_root_preserves_exact_native_patch(self) -> None:
+        (self.root / "src").mkdir()
+        source = self.root / "src" / "a[1].php"
+        source.write_text("before\n")
+        self.commit()
+        source.write_text("after\n")
+        result = subprocess.run(
+            [sys.executable, str(CLI), "git-patch", "a[1].php", "--root", str(source.parent)],
+            capture_output=True, text=True, check=False, timeout=15,
+        )
+        self.assertEqual(0, result.returncode, result.stdout)
+        evidence = json.loads(result.stdout)
+        native = subprocess.run(
+            [GIT, "diff", "--no-ext-diff", "--no-textconv", "--no-color", "--binary",
+             "--full-index", "--", "a[1].php"], cwd=source.parent, capture_output=True,
+            check=True, timeout=10, env={"GIT_LITERAL_PATHSPECS": "1"},
+        ).stdout
+        self.assertEqual({"text": native.decode()}, evidence["patch"])
+        self.assertEqual(hashlib.sha256(native).hexdigest(), evidence["sha256"])
+        self.assertEqual("a[1].php", evidence["path"])
+
     def test_untracked_file_does_not_look_like_clean_diff(self) -> None:
         (self.root / "tracked.php").write_text("tracked\n")
         self.commit()

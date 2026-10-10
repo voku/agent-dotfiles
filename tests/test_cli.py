@@ -292,6 +292,13 @@ class AgentDotfilesCliTest(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertEqual(report["error"], "path_escape")
 
+    def test_git_index_output_is_bounded(self) -> None:
+        self.executable("git", "import sys\nif sys.argv[1] == 'ls-files':\n  sys.stdout.buffer.write(b'a'*(3*1024*1024))")
+        code, report = self.cli("git-patch", "missing.php")
+        self.assertEqual(2, code)
+        self.assertEqual("output_too_large", report["error"])
+        self.assertNotIn("patch", report)
+
     def test_git_patch_cap_is_explicit_error_without_partial_patch(self) -> None:
         self.executable("git", "import sys\nsys.stdout.buffer.write(b'a'*(3*1024*1024))")
         code, report = self.cli("git-patch", "file.php")
