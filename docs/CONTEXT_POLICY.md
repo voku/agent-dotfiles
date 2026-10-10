@@ -80,6 +80,12 @@ pass rate, raw bytes and model token use. Include deliberately long lines,
 renames, newlines in paths, hidden/ignored files, non-UTF8 files, failing tools,
 ambiguous callers and edits in distant files.
 
-A tool ships only if correctness is no worse and measured **total** task cost
-improves. If no measurable benefit exists, prefer the native CLI and remove the
-wrapper. No numbers are claimed without this experiment.
+Default adoption in an agent-loop consumer requires correctness to be no worse
+and measured **total** task cost to improve. If no measurable benefit exists,
+prefer the native CLI and remove the wrapper from that consumer's default routing.
+A reviewed optional release can preserve explicit evidence operations and
+correctness fixes without establishing an efficiency benefit. It must report the
+experiment honestly and must not automatically alter host policy or activation.
+This follows the quality-first mission: negative or inconclusive comparisons are
+valid evidence, not permission to claim savings. No numbers are claimed without
+the experiment.

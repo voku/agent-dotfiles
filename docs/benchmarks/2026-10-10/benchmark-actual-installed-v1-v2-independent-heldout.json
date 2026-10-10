@@ -1,0 +1,218 @@
+{
+  "evaluated_at_utc": "2026-10-10T18:21:37.060002+00:00",
+  "outside_consumer_timing": true,
+  "candidate_source_read": false,
+  "heldout_oracle_sha256": "124b06d0fa1562f7c05782d3535605002faa51f4e5ae374dad8f9d5918b8671d",
+  "results": {
+    "installed-v1": [
+      {
+        "argv": [
+          "/workspace/scratch/dotfiles-mission/installed-v1/bin/agent-dotfiles",
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+          "--start",
+          "1",
+          "--end",
+          "1"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":1,\"requested_end\":1,\"actual_end\":0,\"complete_file\":true,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+        "stderr": "",
+        "matches_heldout_oracle": true
+      },
+      {
+        "argv": [
+          "/workspace/scratch/dotfiles-mission/installed-v1/bin/agent-dotfiles",
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+          "--start",
+          "2",
+          "--end",
+          "3"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":2,\"requested_end\":3,\"actual_end\":0,\"complete_file\":false,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+        "stderr": "",
+        "matches_heldout_oracle": false
+      },
+      {
+        "argv": [
+          "/workspace/scratch/dotfiles-mission/installed-v1/bin/agent-dotfiles",
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+          "--start",
+          "4",
+          "--end",
+          "7"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":4,\"requested_end\":7,\"actual_end\":0,\"complete_file\":false,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+        "stderr": "",
+        "matches_heldout_oracle": false
+      },
+      {
+        "argv": [
+          "/workspace/scratch/dotfiles-mission/installed-v1/bin/agent-dotfiles",
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+          "--start",
+          "1",
+          "--end",
+          "7"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":1,\"requested_end\":7,\"actual_end\":3,\"complete_file\":true,\"content\":\"\\u03b1\\u2028\\u03b2\\r\\n\\t\\u7b2c\\u4e8c\\nlast without LF\",\"content_bytes\":32,\"truncated\":false}\n",
+        "stderr": "",
+        "matches_heldout_oracle": true
+      },
+      {
+        "argv": [
+          "/workspace/scratch/dotfiles-mission/installed-v1/bin/agent-dotfiles",
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+          "--start",
+          "2",
+          "--end",
+          "2"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":2,\"requested_end\":2,\"actual_end\":2,\"complete_file\":false,\"content\":\"\\t\\u7b2c\\u4e8c\\n\",\"content_bytes\":8,\"truncated\":false}\n",
+        "stderr": "",
+        "matches_heldout_oracle": true
+      },
+      {
+        "argv": [
+          "/workspace/scratch/dotfiles-mission/installed-v1/bin/agent-dotfiles",
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+          "--start",
+          "4",
+          "--end",
+          "7"
+        ],
+        "exit": 2,
+        "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 4 exceeds file length 3\"}\n",
+        "stderr": "",
+        "matches_heldout_oracle": true
+      }
+    ],
+    "installed-v2": [
+      {
+        "argv": [
+          "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+          "--start",
+          "1",
+          "--end",
+          "1"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"vacant ledger \\u03b4\\nprobe.txt\",\"sha256\":\"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\"total_lines\":0,\"start\":1,\"requested_end\":1,\"actual_end\":0,\"complete_file\":true,\"content\":\"\",\"content_bytes\":0,\"truncated\":false}\n",
+        "stderr": "",
+        "matches_heldout_oracle": true
+      },
+      {
+        "argv": [
+          "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+          "--start",
+          "2",
+          "--end",
+          "3"
+        ],
+        "exit": 2,
+        "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 2 exceeds file length 0\"}\n",
+        "stderr": "",
+        "matches_heldout_oracle": true
+      },
+      {
+        "argv": [
+          "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+          "read",
+          "vacant ledger δ\nprobe.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+          "--start",
+          "4",
+          "--end",
+          "7"
+        ],
+        "exit": 2,
+        "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 4 exceeds file length 0\"}\n",
+        "stderr": "",
+        "matches_heldout_oracle": true
+      },
+      {
+        "argv": [
+          "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+          "--start",
+          "1",
+          "--end",
+          "7"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":1,\"requested_end\":7,\"actual_end\":3,\"complete_file\":true,\"content\":\"\\u03b1\\u2028\\u03b2\\r\\n\\t\\u7b2c\\u4e8c\\nlast without LF\",\"content_bytes\":32,\"truncated\":false}\n",
+        "stderr": "",
+        "matches_heldout_oracle": true
+      },
+      {
+        "argv": [
+          "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+          "--start",
+          "2",
+          "--end",
+          "2"
+        ],
+        "exit": 0,
+        "stdout": "{\"schema\":\"agent-dotfiles.v1.read\",\"root\":\"/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures\",\"path\":\"range \\u03bb\\nledger.txt\",\"sha256\":\"a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155\",\"total_lines\":3,\"start\":2,\"requested_end\":2,\"actual_end\":2,\"complete_file\":false,\"content\":\"\\t\\u7b2c\\u4e8c\\n\",\"content_bytes\":8,\"truncated\":false}\n",
+        "stderr": "",
+        "matches_heldout_oracle": true
+      },
+      {
+        "argv": [
+          "/workspace/scratch/dotfiles-mission/installed-v2/bin/agent-dotfiles",
+          "read",
+          "range λ\nledger.txt",
+          "--root",
+          "/workspace/scratch/dotfiles-mission/evidence/heldout-fixtures",
+          "--start",
+          "4",
+          "--end",
+          "7"
+        ],
+        "exit": 2,
+        "stdout": "{\"schema\": \"agent-dotfiles.v1.error\", \"error\": \"invalid_range\", \"message\": \"Start line 4 exceeds file length 3\"}\n",
+        "stderr": "",
+        "matches_heldout_oracle": true
+      }
+    ]
+  },
+  "conclusion": "Installed v1 fails exactly two noninitial empty-file cases; installed v2 passes all six. Demonstrates persistent bounded quality fix, not generalized efficiency.",
+  "earlier_validation_note": "benchmark-installed-v1-v2-independent-heldout.json used candidate-v1/candidate-v2 executable paths despite artifact name; those raw argv remain truthful and preserved. This artifact tests actual installed-v1/installed-v2 paths used by consumers."
+}

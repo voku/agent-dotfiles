@@ -1,0 +1,98 @@
+{
+  "frozen_at_utc": "2026-10-10T18:15:53.184207+00:00",
+  "provenance": "Independent evaluator synthesized held-out bytes and native Python LF-line range expectations before A2/B2 directories exist or outputs are read; candidate source never inspected.",
+  "parent_fixture_copy": "Copy these exact evidence/heldout-fixtures files into each receipt/heldout before launch; do not add/change tests, work, config or source.",
+  "files": [
+    {
+      "name": "vacant ledger δ\nprobe.txt",
+      "consumer_path": "receipt/heldout/vacant ledger δ\nprobe.txt",
+      "utf8_text": "",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "range λ\nledger.txt",
+      "consumer_path": "receipt/heldout/range λ\nledger.txt",
+      "utf8_text": "α β\r\n\t第二\nlast without LF",
+      "bytes": 32,
+      "sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155"
+    }
+  ],
+  "checks": [
+    {
+      "path": "receipt/heldout/vacant ledger δ\nprobe.txt",
+      "start": 1,
+      "end": 1,
+      "expected_exit": 0,
+      "error": null,
+      "content": "",
+      "content_bytes": 0,
+      "total_lines": 0,
+      "complete_file": true,
+      "whole_file_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "receipt/heldout/vacant ledger δ\nprobe.txt",
+      "start": 2,
+      "end": 3,
+      "expected_exit": 2,
+      "error": "invalid_range",
+      "content": null,
+      "content_bytes": null,
+      "total_lines": null,
+      "complete_file": null,
+      "whole_file_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "receipt/heldout/vacant ledger δ\nprobe.txt",
+      "start": 4,
+      "end": 7,
+      "expected_exit": 2,
+      "error": "invalid_range",
+      "content": null,
+      "content_bytes": null,
+      "total_lines": null,
+      "complete_file": null,
+      "whole_file_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "receipt/heldout/range λ\nledger.txt",
+      "start": 1,
+      "end": 7,
+      "expected_exit": 0,
+      "error": null,
+      "content": "α β\r\n\t第二\nlast without LF",
+      "content_bytes": 32,
+      "total_lines": 3,
+      "complete_file": true,
+      "whole_file_sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155"
+    },
+    {
+      "path": "receipt/heldout/range λ\nledger.txt",
+      "start": 2,
+      "end": 2,
+      "expected_exit": 0,
+      "error": null,
+      "content": "\t第二\n",
+      "content_bytes": 8,
+      "total_lines": 3,
+      "complete_file": false,
+      "whole_file_sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155"
+    },
+    {
+      "path": "receipt/heldout/range λ\nledger.txt",
+      "start": 4,
+      "end": 7,
+      "expected_exit": 2,
+      "error": "invalid_range",
+      "content": null,
+      "content_bytes": null,
+      "total_lines": null,
+      "complete_file": null,
+      "whole_file_sha256": "a52bfef75cf33a9d917fcebe17d11e8e91df20c21a8577efa26b714ae6a85155"
+    }
+  ],
+  "scoring": "All six before-fix context reader probes must report verified outcomes without passing off invalid ranges as successful source; local CLI before-fix failures expected, after-fix all oracle expectations must hold. Native A reader must validate same oracle cases independently, B candidate reader must be tested separately from local fixed CLI.",
+  "interpretation": "U+2028 is a literal within the first LF line, CRLF preserved; hashes bind whole bytes even for range2..2.",
+  "tokens": "Model tokens unavailable."
+}

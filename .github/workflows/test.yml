@@ -21,8 +21,33 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Compile
-        run: python -m compileall -q agent_dotfiles bin tests
+        run: python -m compileall -q agent_dotfiles bin tests tools
       - name: Contract tests
+        run: |
+          test_status=0
+          python -m unittest discover -s tests -v > contract-tests.log 2>&1 || test_status=$?
+          cat contract-tests.log
+          exit "$test_status"
+      - name: Capability diagnostics
+        if: always()
+        run: python bin/agent-dotfiles doctor > capabilities.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: python-${{ matrix.python-version }}-diagnostics
+          path: |
+            contract-tests.log
+            capabilities.json
+
+  macos-installation:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Installation and source contracts on macOS
         run: python -m unittest discover -s tests -v
 
   bashunit-integration:

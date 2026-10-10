@@ -1,0 +1,554 @@
+{
+  "loop_source_commit": "15507c3a313693eed45e2b1c98eda9c3aae7a7ef",
+  "lockfile_tracked": false,
+  "vendor_provenance": "Reused installed builder dependencies, regenerated release autoload, platform checks and1391fasttests passed. Dependency source references frozen separately; no claim of release lockfile resolution.",
+  "installed_manifest_sha256": "9b2edb1046808577ad0da3789bd289772ffe6e839fe6237ecdf5c0dcea78d80e",
+  "packages": [
+    {
+      "name": "brianium/paratest",
+      "version": "v7.8.6",
+      "source_reference": "58988a27ede69f89a1dcc27a6af6b1e1c3936df0",
+      "source_url": "https://github.com/paratestphp/paratest.git"
+    },
+    {
+      "name": "clue/ndjson-react",
+      "version": "v1.3.0",
+      "source_reference": "392dc165fce93b5bb5c637b67e59619223c931b0",
+      "source_url": "https://github.com/clue/reactphp-ndjson.git"
+    },
+    {
+      "name": "composer/pcre",
+      "version": "3.4.0",
+      "source_reference": "d5a341b3fb61f3001970940afb1d332968a183ed",
+      "source_url": "https://github.com/composer/pcre.git"
+    },
+    {
+      "name": "composer/semver",
+      "version": "3.5.1",
+      "source_reference": "528948210cc46f967a4b98e83b19e76f2b504993",
+      "source_url": "https://github.com/composer/semver.git"
+    },
+    {
+      "name": "composer/xdebug-handler",
+      "version": "3.0.5",
+      "source_reference": "6c1925561632e83d60a44492e0b344cf48ab85ef",
+      "source_url": "https://github.com/composer/xdebug-handler.git"
+    },
+    {
+      "name": "doctrine/deprecations",
+      "version": "1.1.6",
+      "source_reference": "d4fe3e6fd9bb9e72557a19674f44d8ac7db4c6ca",
+      "source_url": "https://github.com/doctrine/deprecations.git"
+    },
+    {
+      "name": "ergebnis/agent-detector",
+      "version": "1.2.0",
+      "source_reference": "e211f17928c8b95a51e06040792d57f5462fb271",
+      "source_url": "https://github.com/ergebnis/agent-detector.git"
+    },
+    {
+      "name": "evenement/evenement",
+      "version": "v3.0.2",
+      "source_reference": "0a16b0d71ab13284339abb99d9d2bd813640efbc",
+      "source_url": "https://github.com/igorw/evenement.git"
+    },
+    {
+      "name": "fidry/cpu-core-counter",
+      "version": "1.4.1",
+      "source_reference": "d384a7d0d6e67aa497327260ca95023e92dc2032",
+      "source_url": "https://github.com/theofidry/cpu-core-counter.git"
+    },
+    {
+      "name": "friendsofphp/php-cs-fixer",
+      "version": "v3.95.27",
+      "source_reference": "1d0c68ee5f37446d8ad5970b82384cd1bb0a3317",
+      "source_url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git"
+    },
+    {
+      "name": "helgesverre/toon",
+      "version": "v3.2.1",
+      "source_reference": "55ca6ba93846bde75eeb04dac70a99fe0bb435dd",
+      "source_url": "https://github.com/HelgeSverre/toon-php.git"
+    },
+    {
+      "name": "jean85/pretty-package-versions",
+      "version": "2.1.1",
+      "source_reference": "4d7aa5dab42e2a76d99559706022885de0e18e1a",
+      "source_url": "https://github.com/Jean85/pretty-package-versions.git"
+    },
+    {
+      "name": "myclabs/deep-copy",
+      "version": "1.14.0",
+      "source_reference": "8680aa248f8e07bc8fb43f56f0f5fc77a0c96aae",
+      "source_url": "https://github.com/myclabs/DeepCopy.git"
+    },
+    {
+      "name": "nikic/php-parser",
+      "version": "v5.9.0",
+      "source_reference": "9e33da9553fe7786f0962b35f4e4ecf01be89def",
+      "source_url": "https://github.com/nikic/PHP-Parser.git"
+    },
+    {
+      "name": "phar-io/manifest",
+      "version": "2.0.4",
+      "source_reference": "54750ef60c58e43759730615a392c31c80e23176",
+      "source_url": "https://github.com/phar-io/manifest.git"
+    },
+    {
+      "name": "phar-io/version",
+      "version": "3.2.1",
+      "source_reference": "4f7fd7836c6f332bb2933569e566a0d6c4cbed74",
+      "source_url": "https://github.com/phar-io/version.git"
+    },
+    {
+      "name": "phpdocumentor/reflection-common",
+      "version": "2.2.1",
+      "source_reference": "ee15a5a2022c8383906b225055e9496a6a5e6e3b",
+      "source_url": "https://github.com/phpDocumentor/ReflectionCommon.git"
+    },
+    {
+      "name": "phpdocumentor/reflection-docblock",
+      "version": "6.0.3",
+      "source_reference": "7bae67520aa9f5ecc506d646810bd40d9da54582",
+      "source_url": "https://github.com/phpDocumentor/ReflectionDocBlock.git"
+    },
+    {
+      "name": "phpdocumentor/type-resolver",
+      "version": "2.1.0",
+      "source_reference": "dbe2133bb23e2e33a6834f4ed417f24a1b167769",
+      "source_url": "https://github.com/phpDocumentor/TypeResolver.git"
+    },
+    {
+      "name": "phpstan/phpdoc-parser",
+      "version": "2.3.6",
+      "source_reference": "1427af4647235b4a73b13940b1f1258d3584f36e",
+      "source_url": "https://github.com/phpstan/phpdoc-parser.git"
+    },
+    {
+      "name": "phpstan/phpstan",
+      "version": "2.3.1",
+      "source_reference": null,
+      "source_url": null
+    },
+    {
+      "name": "phpunit/php-code-coverage",
+      "version": "11.0.12",
+      "source_reference": "2c1ed04922802c15e1de5d7447b4856de949cf56",
+      "source_url": "https://github.com/sebastianbergmann/php-code-coverage.git"
+    },
+    {
+      "name": "phpunit/php-file-iterator",
+      "version": "5.1.1",
+      "source_reference": "2f3a64888c814fc235386b7387dd5b5ed92ad903",
+      "source_url": "https://github.com/sebastianbergmann/php-file-iterator.git"
+    },
+    {
+      "name": "phpunit/php-invoker",
+      "version": "5.0.1",
+      "source_reference": "c1ca3814734c07492b3d4c5f794f4b0995333da2",
+      "source_url": "https://github.com/sebastianbergmann/php-invoker.git"
+    },
+    {
+      "name": "phpunit/php-text-template",
+      "version": "4.0.1",
+      "source_reference": "3e0404dc6b300e6bf56415467ebcb3fe4f33e964",
+      "source_url": "https://github.com/sebastianbergmann/php-text-template.git"
+    },
+    {
+      "name": "phpunit/php-timer",
+      "version": "7.0.1",
+      "source_reference": "3b415def83fbcb41f991d9ebf16ae4ad8b7837b3",
+      "source_url": "https://github.com/sebastianbergmann/php-timer.git"
+    },
+    {
+      "name": "phpunit/phpunit",
+      "version": "11.5.57",
+      "source_reference": "36b75bf56a8535623f5b3e24b27ea1823759da1a",
+      "source_url": "https://github.com/sebastianbergmann/phpunit.git"
+    },
+    {
+      "name": "psr/container",
+      "version": "2.0.2",
+      "source_reference": "c71ecc56dfe541dbd90c5360474fbc405f8d5963",
+      "source_url": "https://github.com/php-fig/container.git"
+    },
+    {
+      "name": "psr/event-dispatcher",
+      "version": "1.0.0",
+      "source_reference": "dbefd12671e8a14ec7f180cab83036ed26714bb0",
+      "source_url": "https://github.com/php-fig/event-dispatcher.git"
+    },
+    {
+      "name": "psr/log",
+      "version": "3.0.2",
+      "source_reference": "f16e1d5863e37f8d8c2a01719f5b34baa2b714d3",
+      "source_url": "https://github.com/php-fig/log.git"
+    },
+    {
+      "name": "psr/simple-cache",
+      "version": "3.0.0",
+      "source_reference": "764e0b3939f5ca87cb904f570ef9be2d78a07865",
+      "source_url": "https://github.com/php-fig/simple-cache.git"
+    },
+    {
+      "name": "react/cache",
+      "version": "v1.2.0",
+      "source_reference": "d47c472b64aa5608225f47965a484b75c7817d5b",
+      "source_url": "https://github.com/reactphp/cache.git"
+    },
+    {
+      "name": "react/child-process",
+      "version": "v0.6.7",
+      "source_reference": "970f0e71945556422ee4570ccbabaedc3cf04ad3",
+      "source_url": "https://github.com/reactphp/child-process.git"
+    },
+    {
+      "name": "react/dns",
+      "version": "v1.14.0",
+      "source_reference": "7562c05391f42701c1fccf189c8225fece1cd7c3",
+      "source_url": "https://github.com/reactphp/dns.git"
+    },
+    {
+      "name": "react/event-loop",
+      "version": "v1.6.0",
+      "source_reference": "ba276bda6083df7e0050fd9b33f66ad7a4ac747a",
+      "source_url": "https://github.com/reactphp/event-loop.git"
+    },
+    {
+      "name": "react/promise",
+      "version": "v3.3.0",
+      "source_reference": "23444f53a813a3296c1368bb104793ce8d88f04a",
+      "source_url": "https://github.com/reactphp/promise.git"
+    },
+    {
+      "name": "react/socket",
+      "version": "v1.17.0",
+      "source_reference": "ef5b17b81f6f60504c539313f94f2d826c5faa08",
+      "source_url": "https://github.com/reactphp/socket.git"
+    },
+    {
+      "name": "react/stream",
+      "version": "v1.4.0",
+      "source_reference": "1e5b0acb8fe55143b5b426817155190eb6f5b18d",
+      "source_url": "https://github.com/reactphp/stream.git"
+    },
+    {
+      "name": "sebastian/cli-parser",
+      "version": "3.0.2",
+      "source_reference": "15c5dd40dc4f38794d383bb95465193f5e0ae180",
+      "source_url": "https://github.com/sebastianbergmann/cli-parser.git"
+    },
+    {
+      "name": "sebastian/code-unit",
+      "version": "3.0.3",
+      "source_reference": "54391c61e4af8078e5b276ab082b6d3c54c9ad64",
+      "source_url": "https://github.com/sebastianbergmann/code-unit.git"
+    },
+    {
+      "name": "sebastian/code-unit-reverse-lookup",
+      "version": "4.0.1",
+      "source_reference": "183a9b2632194febd219bb9246eee421dad8d45e",
+      "source_url": "https://github.com/sebastianbergmann/code-unit-reverse-lookup.git"
+    },
+    {
+      "name": "sebastian/comparator",
+      "version": "6.3.3",
+      "source_reference": "2c95e1e86cb8dd41beb8d502057d1081ccc8eca9",
+      "source_url": "https://github.com/sebastianbergmann/comparator.git"
+    },
+    {
+      "name": "sebastian/complexity",
+      "version": "4.0.1",
+      "source_reference": "ee41d384ab1906c68852636b6de493846e13e5a0",
+      "source_url": "https://github.com/sebastianbergmann/complexity.git"
+    },
+    {
+      "name": "sebastian/diff",
+      "version": "6.0.2",
+      "source_reference": "b4ccd857127db5d41a5b676f24b51371d76d8544",
+      "source_url": "https://github.com/sebastianbergmann/diff.git"
+    },
+    {
+      "name": "sebastian/environment",
+      "version": "7.2.1",
+      "source_reference": "a5c75038693ad2e8d4b6c15ba2403532647830c4",
+      "source_url": "https://github.com/sebastianbergmann/environment.git"
+    },
+    {
+      "name": "sebastian/exporter",
+      "version": "6.3.2",
+      "source_reference": "70a298763b40b213ec087c51c739efcaa90bcd74",
+      "source_url": "https://github.com/sebastianbergmann/exporter.git"
+    },
+    {
+      "name": "sebastian/global-state",
+      "version": "7.0.2",
+      "source_reference": "3be331570a721f9a4b5917f4209773de17f747d7",
+      "source_url": "https://github.com/sebastianbergmann/global-state.git"
+    },
+    {
+      "name": "sebastian/lines-of-code",
+      "version": "3.0.1",
+      "source_reference": "d36ad0d782e5756913e42ad87cb2890f4ffe467a",
+      "source_url": "https://github.com/sebastianbergmann/lines-of-code.git"
+    },
+    {
+      "name": "sebastian/object-enumerator",
+      "version": "6.0.1",
+      "source_reference": "f5b498e631a74204185071eb41f33f38d64608aa",
+      "source_url": "https://github.com/sebastianbergmann/object-enumerator.git"
+    },
+    {
+      "name": "sebastian/object-reflector",
+      "version": "4.0.1",
+      "source_reference": "6e1a43b411b2ad34146dee7524cb13a068bb35f9",
+      "source_url": "https://github.com/sebastianbergmann/object-reflector.git"
+    },
+    {
+      "name": "sebastian/recursion-context",
+      "version": "6.0.3",
+      "source_reference": "f6458abbf32a6c8174f8f26261475dc133b3d9dc",
+      "source_url": "https://github.com/sebastianbergmann/recursion-context.git"
+    },
+    {
+      "name": "sebastian/type",
+      "version": "5.1.3",
+      "source_reference": "f77d2d4e78738c98d9a68d2596fe5e8fa380f449",
+      "source_url": "https://github.com/sebastianbergmann/type.git"
+    },
+    {
+      "name": "sebastian/version",
+      "version": "5.0.2",
+      "source_reference": "c687e3387b99f5b03b6caa64c74b63e2936ff874",
+      "source_url": "https://github.com/sebastianbergmann/version.git"
+    },
+    {
+      "name": "staabm/side-effects-detector",
+      "version": "1.0.5",
+      "source_reference": "d8334211a140ce329c13726d4a715adbddd0a163",
+      "source_url": "https://github.com/staabm/side-effects-detector.git"
+    },
+    {
+      "name": "symfony/console",
+      "version": "v8.1.8",
+      "source_reference": "4b81146e3ee248ea969186f85499b54fbc78db08",
+      "source_url": "https://github.com/symfony/console.git"
+    },
+    {
+      "name": "symfony/deprecation-contracts",
+      "version": "v3.7.1",
+      "source_reference": "f3202fa1b5097b0af062dc978b32ecf63404e31d",
+      "source_url": "https://github.com/symfony/deprecation-contracts.git"
+    },
+    {
+      "name": "symfony/event-dispatcher",
+      "version": "v8.1.5",
+      "source_reference": "7458da64220376b2e0dc2d8451bf43382c1ad297",
+      "source_url": "https://github.com/symfony/event-dispatcher.git"
+    },
+    {
+      "name": "symfony/event-dispatcher-contracts",
+      "version": "v3.7.1",
+      "source_reference": "c7de7a00ffb67842132da02ea92988a39ccd9f4e",
+      "source_url": "https://github.com/symfony/event-dispatcher-contracts.git"
+    },
+    {
+      "name": "symfony/filesystem",
+      "version": "v8.1.6",
+      "source_reference": "7599ebb855fede59413ddb7f15198d67bfcae7ba",
+      "source_url": "https://github.com/symfony/filesystem.git"
+    },
+    {
+      "name": "symfony/finder",
+      "version": "v8.1.8",
+      "source_reference": "bd4fed193a3132c91c5c93595cbfc78988915822",
+      "source_url": "https://github.com/symfony/finder.git"
+    },
+    {
+      "name": "symfony/options-resolver",
+      "version": "v8.1.0",
+      "source_reference": "88f9c561f678a02d54b897014049fa839e33ff82",
+      "source_url": "https://github.com/symfony/options-resolver.git"
+    },
+    {
+      "name": "symfony/polyfill-ctype",
+      "version": "v1.37.0",
+      "source_reference": "141046a8f9477948ff284fa65be2095baafb94f2",
+      "source_url": "https://github.com/symfony/polyfill-ctype.git"
+    },
+    {
+      "name": "symfony/polyfill-iconv",
+      "version": "v1.43.0",
+      "source_reference": "254724d95fe01b679cd97d88786e9623ee00bfb7",
+      "source_url": "https://github.com/symfony/polyfill-iconv.git"
+    },
+    {
+      "name": "symfony/polyfill-intl-grapheme",
+      "version": "v1.43.0",
+      "source_reference": "5cac8f4db97208823aa353f59a01faad2da52c75",
+      "source_url": "https://github.com/symfony/polyfill-intl-grapheme.git"
+    },
+    {
+      "name": "symfony/polyfill-intl-normalizer",
+      "version": "v1.43.0",
+      "source_reference": "ebd57ccc7edb93d632e184efbe7693d2517bab3b",
+      "source_url": "https://github.com/symfony/polyfill-intl-normalizer.git"
+    },
+    {
+      "name": "symfony/polyfill-mbstring",
+      "version": "v1.43.0",
+      "source_reference": "4d5d331bf731e0aedbc6b2f5e61135b7b7996a72",
+      "source_url": "https://github.com/symfony/polyfill-mbstring.git"
+    },
+    {
+      "name": "symfony/polyfill-php72",
+      "version": "v1.31.0",
+      "source_reference": "fa2ae56c44f03bed91a39bfc9822e31e7c5c38ce",
+      "source_url": "https://github.com/symfony/polyfill-php72.git"
+    },
+    {
+      "name": "symfony/polyfill-php80",
+      "version": "v1.43.0",
+      "source_reference": "9c6a5d6b01ca51d486c813e9a9c0ed55f208bb74",
+      "source_url": "https://github.com/symfony/polyfill-php80.git"
+    },
+    {
+      "name": "symfony/polyfill-php81",
+      "version": "v1.38.1",
+      "source_reference": "6bfb9c766cacffbc8e118cb87217d08ed84e5cd7",
+      "source_url": "https://github.com/symfony/polyfill-php81.git"
+    },
+    {
+      "name": "symfony/polyfill-php84",
+      "version": "v1.43.0",
+      "source_reference": "22c6548499cbe5c5bb072fc0c42312dff062a015",
+      "source_url": "https://github.com/symfony/polyfill-php84.git"
+    },
+    {
+      "name": "symfony/polyfill-php85",
+      "version": "v1.43.0",
+      "source_reference": "86a42cbcc07adc331481a5ab310a4024bfc227f6",
+      "source_url": "https://github.com/symfony/polyfill-php85.git"
+    },
+    {
+      "name": "symfony/process",
+      "version": "v8.1.7",
+      "source_reference": "10823b09358e690df4ff943e24e8492bb1019fc3",
+      "source_url": "https://github.com/symfony/process.git"
+    },
+    {
+      "name": "symfony/service-contracts",
+      "version": "v3.7.3",
+      "source_reference": "15e6a07ec2a2c75ceb1b21dd98105ee8456d2257",
+      "source_url": "https://github.com/symfony/service-contracts.git"
+    },
+    {
+      "name": "symfony/stopwatch",
+      "version": "v8.1.0",
+      "source_reference": "21c07b026905d596e8379caeb115d87aa479499d",
+      "source_url": "https://github.com/symfony/stopwatch.git"
+    },
+    {
+      "name": "symfony/string",
+      "version": "v8.1.7",
+      "source_reference": "d950140b5f56f31901e5b7a0c04ffc3a3deb943c",
+      "source_url": "https://github.com/symfony/string.git"
+    },
+    {
+      "name": "symfony/yaml",
+      "version": "v7.4.20",
+      "source_reference": "0222bf4dfaa1e3ceb8fff579635d655f2950d5a7",
+      "source_url": "https://github.com/symfony/yaml.git"
+    },
+    {
+      "name": "theseer/tokenizer",
+      "version": "1.3.1",
+      "source_reference": "b7489ce515e168639d17feec34b8847c326b0b3c",
+      "source_url": "https://github.com/theseer/tokenizer.git"
+    },
+    {
+      "name": "voku/agent-edit",
+      "version": "0.4.4",
+      "source_reference": "de30cc8b97c7e77793699e900c9f36a538101e28",
+      "source_url": "https://github.com/voku/agent-edit.git"
+    },
+    {
+      "name": "voku/agent-graph",
+      "version": "0.3.1",
+      "source_reference": "33486d52132ad0da057279e162f2424db0db5159",
+      "source_url": "https://github.com/voku/agent-graph.git"
+    },
+    {
+      "name": "voku/agent-kanban",
+      "version": "0.4.4",
+      "source_reference": "3c8377fa28142e96ae624506963b6e0fa03863f8",
+      "source_url": "https://github.com/voku/agent-kanban.git"
+    },
+    {
+      "name": "voku/agent-learning",
+      "version": "0.18.32",
+      "source_reference": "5ed177691ff28544452dc650ac4d36f12aae2cc5",
+      "source_url": "https://github.com/voku/agent-learning.git"
+    },
+    {
+      "name": "voku/agent-map",
+      "version": "0.22.2",
+      "source_reference": "80f8b30a805c6b6ae7b956b0d47142061ab3d1fb",
+      "source_url": "https://github.com/voku/agent-map.git"
+    },
+    {
+      "name": "voku/agent-recall-compiler",
+      "version": "0.25.8",
+      "source_reference": "6110b710f72bd589925a3f894fe2f35424612546",
+      "source_url": "https://github.com/voku/agent-recall-compiler.git"
+    },
+    {
+      "name": "voku/agent-session",
+      "version": "0.7.1",
+      "source_reference": "4e08341edfdf0d5321523453cedd4d4d25e97833",
+      "source_url": "https://github.com/voku/agent-session.git"
+    },
+    {
+      "name": "voku/itp-context",
+      "version": "0.3.0",
+      "source_reference": "785a61d9ec8cb0eb9a868908a97314ec4b69c173",
+      "source_url": "https://github.com/voku/itp-context.git"
+    },
+    {
+      "name": "voku/portable-ascii",
+      "version": "2.1.1",
+      "source_reference": "8e1051fe39379367aecf014f41744ce7539a856f",
+      "source_url": "https://github.com/voku/portable-ascii.git"
+    },
+    {
+      "name": "voku/portable-utf8",
+      "version": "6.1.1",
+      "source_reference": "837e32cd4b166320cc3e70e3ffe1ba413e81ee46",
+      "source_url": "https://github.com/voku/portable-utf8.git"
+    },
+    {
+      "name": "voku/simple-cache",
+      "version": "6.1.0",
+      "source_reference": "c5d8b516d6780ae297adf4bcd7f87b0b81b8ccb3",
+      "source_url": "https://github.com/voku/simple-cache.git"
+    },
+    {
+      "name": "voku/simple-php-code-parser",
+      "version": "0.22.15",
+      "source_reference": "08e2018bde2fad85026a090d0dd737a3cefb76b6",
+      "source_url": "https://github.com/voku/Simple-PHP-Code-Parser.git"
+    },
+    {
+      "name": "voku/stop-words",
+      "version": "2.0.1",
+      "source_reference": "8e63c0af20f800b1600783764e0ce19e53969f71",
+      "source_url": "https://github.com/voku/stop-words.git"
+    },
+    {
+      "name": "webmozart/assert",
+      "version": "2.5.0",
+      "source_reference": "8a163706bbcac613733dba03f51e13b5eb1bb819",
+      "source_url": "https://github.com/webmozarts/assert.git"
+    }
+  ]
+}

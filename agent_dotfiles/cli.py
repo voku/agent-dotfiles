@@ -250,7 +250,7 @@ def _read_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     lines = [part + "\n" for part in parts[:-1]]
     if parts[-1]:
         lines.append(parts[-1])
-    if args.start > len(lines) and len(lines) != 0:
+    if args.start > max(1, len(lines)):
         raise CommandFailure("invalid_range", f"Start line {args.start} exceeds file length {len(lines)}")
     actual_end = min(args.end, len(lines))
     content = "".join(lines[args.start - 1:actual_end])

@@ -2,7 +2,7 @@
 
 **Small, non-interactive CLI defaults for coding agents.**
 
-Based on lessons from [voku/dotfiles](https://github.com/voku/dotfiles) and the navigation boundaries in [voku/agent-loop](https://github.com/voku/agent-loop), but deliberately **not** a copy of the interactive `.redpill` installation. This is a separate, lean rewrite intended for `voku/agent-dotfiles`. Current version: **0.2.0**, discovery/dogfood stage.
+Based on lessons from [voku/dotfiles](https://github.com/voku/dotfiles) and the navigation boundaries in [voku/agent-loop](https://github.com/voku/agent-loop). Current version: **0.3.0**. It uses Python's standard library and native Git/ripgrep, with explicit optional installation.
 
 ## What works now
 
@@ -14,9 +14,9 @@ Based on lessons from [voku/dotfiles](https://github.com/voku/dotfiles) and the 
 - Index-only `tracked` listing (`git ls-files -z`) with correct handling of unusual paths.
 - Exact `git-patch` for one path using Git binary/full-index diff, SHA-256 and an error if output cannot fit; no replacement with diffstat.
 - Stable JSON envelopes and explicit result limits. Search respects `.gitignore` by default; `--hidden` is opt-in.
-- No installations, aliases, prompts, network access, background daemons, repository edits, or shell startup files.
+- Runtime commands do not install anything, access the network or load shell startup files. A separate, explicit installer supports pinned private prefixes, verification and safe removal.
 
-**Not implemented:** automatic tool installation, `agent-loop` integration, benchmarks, automatic fallback between different search semantics. Those require evidence and a separately reviewed integration change.
+See [pinned installation and rollback](docs/INSTALLATION.md) and the [optional agent-loop consumer contract](docs/AGENT_LOOP.md). Automatic installation and host-policy changes remain outside the CLI contract.
 
 ## Requirements
 
@@ -80,13 +80,13 @@ latency and retries, not savings percentages.
 
 ## Tests: Python contracts + Bashunit integration
 
-The **32 Python unittest contracts** remain authoritative for internal parsing,
+The Python unittest contracts remain authoritative for internal parsing,
 path safety, byte preservation and failure handling. Bashunit 0.50.1 adds
 **end-to-end shell/CLI tests** for actual executable behavior and exit codes;
 it does not replace the Python tests with lossy snapshots.
 
 ```sh
-python3 -m compileall -q agent_dotfiles bin tests
+python3 -m compileall -q agent_dotfiles bin tests tools
 python3 -m unittest discover -s tests -v
 # After installing/pinning bashunit 0.50.1 separately:
 bashunit test tests/shell --strict
