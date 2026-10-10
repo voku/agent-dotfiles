@@ -16,6 +16,7 @@ import tempfile
 
 SCHEMA = "agent-dotfiles.v1.installation"
 MANIFEST = "installation.json"
+SHELL_ASSETS = {"shell/.bashrc", "shell/.zshrc", "shell/agent-functions.sh"}
 LAUNCHER = b'''#!/usr/bin/env python3
 """Explicitly activated isolated agent-dotfiles; do not create bytecode."""
 import sys
@@ -82,8 +83,8 @@ def install(source: Path, revision: str, prefix: Path) -> dict:
         raise SetupError("existing prefix must be an empty directory")
     tracked = git(source, "ls-files", "-z").split(b"\0")
     paths = [os.fsdecode(name) for name in tracked if name]
-    paths = [name for name in paths if name in ("LICENSE", "bin/agent-dotfiles") or runtime_path(name)]
-    required = {"LICENSE", "bin/agent-dotfiles", "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"}
+    paths = [name for name in paths if name in ("LICENSE", "bin/agent-dotfiles") or name in SHELL_ASSETS or runtime_path(name)]
+    required = {"LICENSE", "bin/agent-dotfiles", "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"} | SHELL_ASSETS
     if not required.issubset(paths):
         raise SetupError("tracked runtime files are missing")
     contents = {}
@@ -136,7 +137,7 @@ def verify(prefix: Path) -> dict:
         raise SetupError("unknown or invalid installation manifest")
     files = manifest["files"]
     required = {"LICENSE", "libexec/agent-dotfiles", "bin/agent-dotfiles",
-                "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"}
+                "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"} | SHELL_ASSETS
     if not required.issubset(files):
         raise SetupError("incomplete installation manifest")
     directories = set()
