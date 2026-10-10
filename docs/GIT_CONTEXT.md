@@ -25,7 +25,7 @@ git ls-files -z
 rg --files -0
 
 # Identify changes without losing paths that contain spaces/newlines.
-git status --porcelain=v1 -z
+git status --porcelain=v1 -z --untracked-files=all
 git diff --name-status -z -M
 git diff --cached --name-status -z -M
 

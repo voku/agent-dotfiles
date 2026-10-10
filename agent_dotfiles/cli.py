@@ -185,7 +185,7 @@ def _search_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
 def _git_status_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     root = _require_root(args.root)
     executable = _require_executable("git")
-    command = [executable, "status", "--porcelain=v1", "-z", "--untracked-files=normal"]
+    command = [executable, "status", "--porcelain=v1", "-z", "--untracked-files=all"]
     pending_rename: dict[str, Any] | None = None
 
     def parse_entry(record: bytes) -> dict[str, Any] | None:
