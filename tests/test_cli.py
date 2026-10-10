@@ -225,7 +225,7 @@ class AgentDotfilesCliTest(unittest.TestCase):
     def test_git_patch_preserves_complete_patch_and_hash(self) -> None:
         import hashlib
         (self.project / "file.php").write_text("example", encoding="utf-8")
-        self.executable("git", "import sys\nassert sys.argv[-3:] == ['HEAD~1', '--', 'file.php']\nassert '--binary' in sys.argv and '--full-index' in sys.argv\nassert '--no-ext-diff' in sys.argv\nsys.stdout.buffer.write(b'diff --git a/file.php b/file.php\\n+full line\\n')")
+        self.executable("git", "import sys\nassert 'HEAD~1' in sys.argv and sys.argv[-2:] == ['--', 'file.php']\nassert '--binary' in sys.argv and '--full-index' in sys.argv\nassert '--no-ext-diff' in sys.argv\nif '--name-only' in sys.argv:\n  sys.stdout.buffer.write(b'file.php\\0')\nelse:\n  sys.stdout.buffer.write(b'diff --git a/file.php b/file.php\\n+full line\\n')")
         code, report = self.cli("git-patch", "file.php", "--base", "HEAD~1")
         self.assertEqual(code, 0)
         patch = b"diff --git a/file.php b/file.php\n+full line\n"

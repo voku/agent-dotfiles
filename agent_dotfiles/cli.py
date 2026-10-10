@@ -326,7 +326,7 @@ def _capture_exact(command: list[str], *, cwd: Path) -> bytes:
     with tempfile.TemporaryFile(mode="w+b") as stderr_file:
         try:
             process = subprocess.Popen(command, cwd=cwd, stdout=subprocess.PIPE, stderr=stderr_file, shell=False,
-                                       env={**os.environ, "GIT_PAGER": "cat", "GIT_OPTIONAL_LOCKS": "0", "LC_ALL": "C"})
+                                       env={**os.environ, "GIT_PAGER": "cat", "GIT_OPTIONAL_LOCKS": "0", "LC_ALL": "C", "GIT_LITERAL_PATHSPECS": "1"})
         except OSError as exc:
             raise CommandFailure("spawn_failed", f"Could not execute {Path(command[0]).name}: {exc}") from exc
         captured = bytearray()
@@ -360,9 +360,34 @@ def _capture_exact(command: list[str], *, cwd: Path) -> bytes:
         return bytes(captured)
 
 
+def _indexed_path(executable: str, root: Path, selected: str) -> bool:
+    """Distinguish a clean indexed file from content omitted by Git diff.
+
+    This is called only for empty patches: an untracked or ignored source file
+    is not covered by git diff and must not look like verified empty evidence.
+    """
+    try:
+        result = subprocess.run(
+            [executable, "ls-files", "--error-unmatch", "-z", "--", selected],
+            cwd=root, capture_output=True, timeout=PROCESS_TIMEOUT_SECONDS,
+            check=False,
+            env={**os.environ, "GIT_LITERAL_PATHSPECS": "1", "GIT_OPTIONAL_LOCKS": "0", "LC_ALL": "C"},
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise CommandFailure("timeout", "Git index check timed out") from exc
+    except OSError as exc:
+        raise CommandFailure("spawn_failed", f"Could not inspect Git index: {exc}") from exc
+    if result.returncode not in (0, 1):
+        raise CommandFailure("tool_failed", f"Git index check failed with exit {result.returncode}")
+    # Git's literal pathspec still selects descendants of a directory.
+    return result.returncode == 0 and result.stdout.split(b"\0") == [os.fsencode(selected), b""]
+
+
 def _git_patch_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     root = _require_root(args.root)
     selected = _relative_path(root, args.file)
+    if (root / selected).is_dir():
+        raise CommandFailure("invalid_file", "git-patch requires an exact file, not a directory")
     executable = _require_executable("git")
     command = [executable, "diff", "--no-ext-diff", "--no-textconv", "--no-color", "--binary", "--full-index"]
     if args.staged:
@@ -371,8 +396,22 @@ def _git_patch_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
         if args.base.startswith("-") or not args.base.strip():
             raise CommandFailure("invalid_ref", "Base revision cannot begin with '-' or be empty")
         command.append(args.base)
-    command.extend(("--", selected))
-    raw = _capture_exact(command, cwd=root)
+    # Even literal pathspecs can select directory descendants. Recheck which
+    # changed filenames Git selected before claiming single-file evidence.
+    raw = _capture_exact([*command, "--", selected], cwd=root)
+    if raw:
+        changed = _capture_exact([*command, "--name-only", "-z", "--", selected], cwd=root)
+        if changed != os.fsencode(selected) + b"\0":
+            raise CommandFailure(
+                "ambiguous_path",
+                "Git diff selected a different path or multiple paths; choose one exact file.",
+            )
+    if not raw and not _indexed_path(executable, root, selected):
+        raise CommandFailure(
+            "path_not_in_diff",
+            "No Git patch: path is absent from the index; Git diff omits untracked and ignored "
+            "files. Use git-status and read to inspect current contents.",
+        )
     try:
         payload: dict[str, str] = {"text": raw.decode("utf-8", errors="strict")}
     except UnicodeDecodeError:
