@@ -4,6 +4,7 @@ if [ -z "${BASH_VERSION:-}" ]; then
   return 2
 fi
 _agent_df_shell_dir="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || return 2
+# shellcheck source=agent-functions.sh
 . "$_agent_df_shell_dir/agent-functions.sh"
 _agent_df_status=$?
 unset _agent_df_shell_dir

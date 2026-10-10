@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Shared explicit Bash/Zsh helpers. Do not source this file directly.
 if [ -z "${_agent_df_shell_dir:-}" ]; then
   printf '%s\n' 'agent-dotfiles: source shell/.bashrc or shell/.zshrc instead' >&2
