@@ -1,0 +1,12 @@
+# Read-only aliases for explicit, project-scoped Git invocations.
+# This file is NOT installed or sourced by agent-dotfiles.
+# Example: git -c include.path=/absolute/path/config/gitconfig.agent.example agent-history -n 10
+[alias]
+    agent-status = status --porcelain=v1 -z --untracked-files=normal
+    agent-files = ls-files --cached -z
+    agent-changed = diff --name-status -z
+    agent-staged = diff --cached --name-status -z
+    agent-patch = diff --no-ext-diff --no-textconv --binary --full-index --no-color
+    agent-history = log --no-color --date=iso-strict --format=%H%x09%aI%x09%s
+    agent-path-history = log --follow --no-color --date=iso-strict --format=%H%x09%aI%x09%s
+    agent-blame = blame --line-porcelain
