@@ -58,7 +58,7 @@ class ShellDotfilesTest(unittest.TestCase):
         )
         result = self.run_profile(executable, profile, script)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn('"schema": "agent-dotfiles.v1.doctor"', result.stdout)
+        self.assertEqual(json.loads(result.stdout.splitlines()[0])["schema"], "agent-dotfiles.v1.doctor")
         self.assertIn("commit ", result.stdout)
         self.assertIn("author ", result.stdout)
         self.assertEqual(

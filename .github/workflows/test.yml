@@ -50,6 +50,16 @@ jobs:
       - name: Installation and source contracts on macOS
         run: python -m unittest discover -s tests -v
 
+  shell-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Zsh for an independent shell consumer
+        run: sudo apt-get update -qq && sudo apt-get install -y zsh
+      - name: Exercise installed Bash and Zsh profiles
+        run: python3 -m unittest discover -s tests -p test_shell_dotfiles.py -v
+
   bashunit-integration:
     runs-on: ubuntu-latest
     timeout-minutes: 10

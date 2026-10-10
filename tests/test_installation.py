@@ -21,7 +21,7 @@ class InstallationTest(unittest.TestCase):
         self.root = Path(temporary.name).resolve()
         self.source = self.root / "source"
         self.source.mkdir()
-        for name in ("agent_dotfiles", "bin"):
+        for name in ("agent_dotfiles", "bin", "shell"):
             shutil.copytree(PROJECT / name, self.source / name,
                             ignore=shutil.ignore_patterns("__pycache__"))
         shutil.copyfile(PROJECT / "LICENSE", self.source / "LICENSE")

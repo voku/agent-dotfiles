@@ -5,6 +5,11 @@ source_root="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 case "${1:-}" in
   install)
     shift
+    for argument in "$@"; do
+      case "$argument" in
+        --source|--source=*) printf '%s\n' "install.sh: --source cannot override the script checkout" >&2; exit 2 ;;
+      esac
+    done
     exec python3 "$source_root/tools/install.py" install --source "$source_root" "$@"
     ;;
   verify|uninstall)
