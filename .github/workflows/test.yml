@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Compile
-        run: python -m compileall -q agent_dotfiles bin tests
+        run: python -m compileall -q agent_dotfiles bin tests tools
       - name: Contract tests
         run: python -m unittest discover -s tests -v
 

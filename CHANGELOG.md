@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0
+
+- Integrate targeted mutation testing with summaries retained on nonzero reports.
+- Preserve literal file-scoped patches, subdirectory roots and bounded index checks.
+- Expose individual untracked files in Git status.
+- Add explicit offline, full-commit-pinned installation, verification and safe removal.
+- Reject nonexistent noninitial ranges in empty files, found independently by
+  fresh governed consumers; preserve initial empty-file reads.
+- Document optional consumer activation, rollback, coordinate frames and measured
+  comparison limits. No agent-loop host policy or global shell configuration changes.
+
+
 ## 0.2.0 - Context-first navigation
 
 - Added exact, source-digest-bound `read` and full-fidelity `git-patch` commands.
@@ -19,7 +31,7 @@
 - Added first-party executable contract tests and CI matrix.
 - Documented upstream dotfiles provenance and separation from `agent-loop`.
 
-No release tag has been created. No GitHub repository has been published yet.
+At the original bootstrap checkpoint, no release tag or GitHub repository had been published.
 
 ## Unreleased bootstrap
 
