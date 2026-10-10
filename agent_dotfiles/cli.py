@@ -21,23 +21,17 @@ import time
 from typing import Any, Callable
 
 from . import __version__
+from .validation import CommandFailure, MAX_LIMIT, _relative_path, _valid_limit
 
 SCHEMA_VERSION = "agent-dotfiles.v1"
 MAX_CAPTURE_BYTES = 2 * 1024 * 1024
 PROCESS_TIMEOUT_SECONDS = 20
 DEFAULT_LIMIT = 100
-MAX_LIMIT = 1000
 MAX_CONTEXT_LINES = 400
 MAX_CONTEXT_FILE_BYTES = 16 * 1024 * 1024
 
 REQUIRED_TOOLS = ("rg", "git")
 OPTIONAL_TOOLS = ("jq", "fd", "shellcheck", "strace", "hyperfine", "ast-grep", "ctags", "difft", "delta")
-
-
-class CommandFailure(Exception):
-    def __init__(self, reason: str, message: str) -> None:
-        super().__init__(message)
-        self.reason = reason
 
 
 def _resolve_executable(name: str) -> str | None:
@@ -288,20 +282,6 @@ def _scope_path(root: Path, path: str) -> str:
     return relative
 
 
-def _relative_path(root: Path, path: str) -> str:
-    if not path or path == ".":
-        raise CommandFailure("invalid_file", "A specific file path is required")
-    candidate = Path(path)
-    resolved = (root / candidate).resolve()
-    try:
-        relative = resolved.relative_to(root)
-    except ValueError as exc:
-        raise CommandFailure("path_escape", f"File resolves outside selected root: {path}") from exc
-    if str(relative) == ".":
-        raise CommandFailure("invalid_file", "Root directory is not a file")
-    return relative.as_posix()
-
-
 def _tracked_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     root = _require_root(args.root)
     executable = _require_executable("git")
@@ -515,16 +495,6 @@ def _collect_records(
             raise CommandFailure("tool_failed", stderr_message)
 
     return records, truncated, process_exit
-
-
-def _valid_limit(raw: str) -> int:
-    try:
-        limit = int(raw)
-    except ValueError as exc:
-        raise argparse.ArgumentTypeError("limit must be an integer") from exc
-    if not 1 <= limit <= MAX_LIMIT:
-        raise argparse.ArgumentTypeError(f"limit must be between 1 and {MAX_LIMIT}")
-    return limit
 
 
 def _positive_int(raw: str) -> int:
