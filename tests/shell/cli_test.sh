@@ -24,8 +24,12 @@ function test_doctor_returns_valid_json_without_shell_changes() {
 
 function test_missing_source_is_explicit_error_not_empty_success() {
   local output status result
-  output="$(python3 "$CLI" read absent.php --root "$TEST_ROOT")"
-  status=$?
+  # Under bashunit --strict, a deliberate nonzero exit must be handled within an if.
+  if output="$(python3 "$CLI" read absent.php --root "$TEST_ROOT")"; then
+    status=0
+  else
+    status=$?
+  fi
   assert_same '2' "$status"
   result="$(printf '%s' "$output" | python3 -c 'import json,sys; x=json.load(sys.stdin); print(x["schema"]+" "+x["error"])')"
   assert_same 'agent-dotfiles.v1.error invalid_file' "$result"
