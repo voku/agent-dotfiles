@@ -1,0 +1,17 @@
+agent-dotfiles0.3.0 — explicit optional installation
+
+Trusted source: https://github.com/voku/agent-dotfiles
+Approved full commit: d158e6c821cdae8064ac7b3817a0dd282236f842
+
+Obtain a clean Git checkout and check out the exact commit above. With canonical private absolute SOURCE and PREFIX paths, invoke:
+
+python3 SOURCE/tools/install.py install --source SOURCE --revision d158e6c821cdae8064ac7b3817a0dd282236f842 --prefix PREFIX
+PREFIX/bin/agent-dotfiles doctor
+python3 SOURCE/tools/install.py verify --prefix PREFIX --revision d158e6c821cdae8064ac7b3817a0dd282236f842
+
+Activate only by the absolute executable path in a fresh consumer. No global PATH/shell/Git changes or runtime replacement. To remove an untouched installation:
+python3 SOURCE/tools/install.py uninstall --prefix PREFIX --revision d158e6c821cdae8064ac7b3817a0dd282236f842
+
+Modified or unknown files cause refusal and remain preserved. For rollback retain a separate prior approved prefix and invoke it in a fresh consumer. Native Git/ripgrep/Loop remain available without the optional tool.
+
+Source tarball is reproducible and auditable; installer requires Git metadata, so use the clean trusted checkout rather than the extracted tarball. Checksums do not authenticate source or replace review. Details: docs/INSTALLATION.md and docs/FULL_CYCLE.md.

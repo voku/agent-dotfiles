@@ -1,0 +1,18 @@
+bashunit - 0.50.1 | Tests: 8
+Running tests/shell/cli_test.sh
+✓ Passed: Doctor returns valid json without shell changes                  101ms
+✓ Passed: Missing source is explicit error not empty success               123ms
+✓ Passed: Read returns exact long line and digest                          140ms
+✓ Passed: Real git status preserves newline filename                       113ms
+✓ Passed: Git patch is full patch not diffstat                             134ms
+✓ Passed: Source checkout has no automatic publish or install               18ms
+
+Running tests/shell/installation_test.sh
+✓ Passed: Pinned install consumer verify and rollback                      390ms
+✓ Passed: Modified consumer is preserved on removal refusal                192ms
+
+Tests:      8 passed, 8 total
+Assertions: 19 passed, 19 total
+
+ All tests passed 
+Time taken: 1.37s
