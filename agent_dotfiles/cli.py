@@ -21,23 +21,17 @@ import time
 from typing import Any, Callable
 
 from . import __version__
+from .validation import CommandFailure, MAX_LIMIT, _relative_path, _valid_limit
 
 SCHEMA_VERSION = "agent-dotfiles.v1"
 MAX_CAPTURE_BYTES = 2 * 1024 * 1024
 PROCESS_TIMEOUT_SECONDS = 20
 DEFAULT_LIMIT = 100
-MAX_LIMIT = 1000
 MAX_CONTEXT_LINES = 400
 MAX_CONTEXT_FILE_BYTES = 16 * 1024 * 1024
 
 REQUIRED_TOOLS = ("rg", "git")
 OPTIONAL_TOOLS = ("jq", "fd", "shellcheck", "strace", "hyperfine", "ast-grep", "ctags", "difft", "delta")
-
-
-class CommandFailure(Exception):
-    def __init__(self, reason: str, message: str) -> None:
-        super().__init__(message)
-        self.reason = reason
 
 
 def _resolve_executable(name: str) -> str | None:
@@ -288,20 +282,6 @@ def _scope_path(root: Path, path: str) -> str:
     return relative
 
 
-def _relative_path(root: Path, path: str) -> str:
-    if not path or path == ".":
-        raise CommandFailure("invalid_file", "A specific file path is required")
-    candidate = Path(path)
-    resolved = (root / candidate).resolve()
-    try:
-        relative = resolved.relative_to(root)
-    except ValueError as exc:
-        raise CommandFailure("path_escape", f"File resolves outside selected root: {path}") from exc
-    if str(relative) == ".":
-        raise CommandFailure("invalid_file", "Root directory is not a file")
-    return relative.as_posix()
-
-
 def _tracked_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     root = _require_root(args.root)
     executable = _require_executable("git")
@@ -326,7 +306,7 @@ def _capture_exact(command: list[str], *, cwd: Path) -> bytes:
     with tempfile.TemporaryFile(mode="w+b") as stderr_file:
         try:
             process = subprocess.Popen(command, cwd=cwd, stdout=subprocess.PIPE, stderr=stderr_file, shell=False,
-                                       env={**os.environ, "GIT_PAGER": "cat", "GIT_OPTIONAL_LOCKS": "0", "LC_ALL": "C"})
+                                       env={**os.environ, "GIT_PAGER": "cat", "GIT_OPTIONAL_LOCKS": "0", "LC_ALL": "C", "GIT_LITERAL_PATHSPECS": "1"})
         except OSError as exc:
             raise CommandFailure("spawn_failed", f"Could not execute {Path(command[0]).name}: {exc}") from exc
         captured = bytearray()
@@ -360,9 +340,24 @@ def _capture_exact(command: list[str], *, cwd: Path) -> bytes:
         return bytes(captured)
 
 
+def _indexed_path(executable: str, root: Path, selected: str) -> bool:
+    """Distinguish a clean indexed file from content omitted by Git diff.
+
+    This is called only for empty patches: an untracked or ignored source file
+    is not covered by git diff and must not look like verified empty evidence.
+    """
+    # ls-files without --error-unmatch returns empty output for absent paths.
+    # Reuse bounded capture: even a literal directory can select descendants.
+    indexed = _capture_exact([executable, "ls-files", "-z", "--", selected], cwd=root)
+    return indexed == os.fsencode(selected) + b"\0"
+
+
+
 def _git_patch_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     root = _require_root(args.root)
     selected = _relative_path(root, args.file)
+    if (root / selected).is_dir():
+        raise CommandFailure("invalid_file", "git-patch requires an exact file, not a directory")
     executable = _require_executable("git")
     command = [executable, "diff", "--no-ext-diff", "--no-textconv", "--no-color", "--binary", "--full-index"]
     if args.staged:
@@ -371,8 +366,22 @@ def _git_patch_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
         if args.base.startswith("-") or not args.base.strip():
             raise CommandFailure("invalid_ref", "Base revision cannot begin with '-' or be empty")
         command.append(args.base)
-    command.extend(("--", selected))
-    raw = _capture_exact(command, cwd=root)
+    # Even literal pathspecs can select directory descendants. Recheck which
+    # changed filenames Git selected before claiming single-file evidence.
+    raw = _capture_exact([*command, "--", selected], cwd=root)
+    if raw:
+        changed = _capture_exact([*command, "--name-only", "--relative", "-z", "--", selected], cwd=root)
+        if changed != os.fsencode(selected) + b"\0":
+            raise CommandFailure(
+                "ambiguous_path",
+                "Git diff selected a different path or multiple paths; choose one exact file.",
+            )
+    if not raw and not _indexed_path(executable, root, selected):
+        raise CommandFailure(
+            "path_not_in_diff",
+            "No Git patch: path is absent from the index; Git diff omits untracked and ignored "
+            "files. Use git-status and read to inspect current contents.",
+        )
     try:
         payload: dict[str, str] = {"text": raw.decode("utf-8", errors="strict")}
     except UnicodeDecodeError:
@@ -486,16 +495,6 @@ def _collect_records(
             raise CommandFailure("tool_failed", stderr_message)
 
     return records, truncated, process_exit
-
-
-def _valid_limit(raw: str) -> int:
-    try:
-        limit = int(raw)
-    except ValueError as exc:
-        raise argparse.ArgumentTypeError("limit must be an integer") from exc
-    if not 1 <= limit <= MAX_LIMIT:
-        raise argparse.ArgumentTypeError(f"limit must be between 1 and {MAX_LIMIT}")
-    return limit
 
 
 def _positive_int(raw: str) -> int:
