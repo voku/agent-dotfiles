@@ -71,7 +71,7 @@ def check_search(raw: bytes, oracle: list[dict[str, Any]]) -> None:
         raise AssertionError("Search results differ from the native full rg --json oracle")
 
 
-def check_read(raw: bytes, original: bytes) -> None:
+def check_read(raw: bytes, original: bytes, root: Path) -> None:
     value = json_object(raw)
     text = original.decode("utf-8")
     lines = text.split("\n")
@@ -81,8 +81,11 @@ def check_read(raw: bytes, original: bytes) -> None:
     selected = "".join(expected[START - 1:END])
     if (
         value.get("schema") != "agent-dotfiles.v1.read"
+        or value.get("root") != str(root)
+        or value.get("path") != SOURCE
         or value.get("truncated") is not False
         or value.get("start") != START
+        or value.get("requested_end") != END
         or value.get("actual_end") != min(END, len(expected))
         or value.get("sha256") != hashlib.sha256(original).hexdigest()
         or value.get("content") != selected
@@ -161,14 +164,14 @@ def main() -> int:
         read_args = ["read", SOURCE, "--root", str(php_repo),
                      "--start", str(START), "--end", str(END)]
         check_search(execute([binary, *search_args], dotfiles, trace), oracle)
-        check_read(execute([binary, *read_args], dotfiles, trace), source)
+        check_read(execute([binary, *read_args], dotfiles, trace), source, php_repo)
         report["checks"].append("direct-cli-search-and-read")
 
         for name in ("bash", "zsh"):
             search = shell_call(name, consumer, "agent_search", search_args[1:])
             read = shell_call(name, consumer, "agent_read", read_args[1:])
             check_search(execute(search, dotfiles, trace), oracle)
-            check_read(execute(read, dotfiles, trace), source)
+            check_read(execute(read, dotfiles, trace), source, php_repo)
             report["checks"].append(name + "-fresh-shell-search-and-read")
 
         native_status = execute(
