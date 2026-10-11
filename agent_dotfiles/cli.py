@@ -232,10 +232,10 @@ def _workspace_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     # An inherited Git override can make rev-parse report an ancestor checkout
     # even when --root explicitly selects a nested, independent repository.
     # Refuse ambiguity rather than silently sampling a different worktree.
-    if "GIT_DIR" in os.environ or "GIT_WORK_TREE" in os.environ:
+    if any(name in os.environ for name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")):
         raise CommandFailure(
             "invalid_repository",
-            "Explicit workspace identity cannot use inherited GIT_DIR/GIT_WORK_TREE overrides",
+            "Explicit workspace identity refuses inherited Git directory, worktree or index overrides",
         )
     git = _require_executable("git")
     try:

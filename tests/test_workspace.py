@@ -217,5 +217,22 @@ class WorkspaceTest(unittest.TestCase):
         self.assertEqual(code, 2, report)
         self.assertEqual(report["error"], "invalid_repository")
 
+
+    def test_inherited_alternate_index_cannot_report_dirty_checkout_as_clean(self) -> None:
+        index_path = self.repo / ".git" / "index"
+        pristine_index = self.root / "pristine.index"
+        shutil.copyfile(index_path, pristine_index)
+        (self.repo / "tracked.txt").write_text("new staged contents\n", encoding="utf-8")
+        self.git("add", "tracked.txt")
+        (self.repo / "tracked.txt").write_text("initial\n", encoding="utf-8")
+        normal_code, normal = self.workspace()
+        self.assertEqual(normal_code, 0, normal)
+        self.assertEqual(normal["changes"], [{"xy": "MM", "path": "tracked.txt"}])
+        self.assertFalse(normal["clean"])
+
+        code, report = self.workspace(environment={"GIT_INDEX_FILE": str(pristine_index)})
+        self.assertEqual(code, 2, report)
+        self.assertEqual(report["error"], "invalid_repository")
+
 if __name__ == "__main__":
     unittest.main()
