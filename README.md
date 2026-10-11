@@ -1,8 +1,60 @@
 # agent-dotfiles
 
-**Small, non-interactive CLI defaults for coding agents.**
+**Bash/Zsh dotfiles and evidence-preserving CLI helpers for coding agents.**
 
-Based on lessons from [voku/dotfiles](https://github.com/voku/dotfiles) and the navigation boundaries in [voku/agent-loop](https://github.com/voku/agent-loop). Current version: **0.3.0**. It uses Python's standard library and native Git/ripgrep, with explicit optional installation.
+Inspired by [voku/dotfiles](https://github.com/voku/dotfiles), reworked for
+non-interactive coding workflows: explicit activation, namespaced functions,
+exact source evidence and no prompt hooks or startup-file edits. Python 3.10+
+standard-library code supplies stable JSON; Git and ripgrep supply native evidence.
+The latest published version is **0.3.0**; shell setup below is currently unreleased.
+
+## Quick start
+
+Use the checkout directly, without installation:
+
+```bash
+# Bash: explicit activation in the current shell
+source /path/to/agent-dotfiles/.bashrc
+agent_doctor
+agent_search 'function save(' --root /path/to/project --glob '*.php'
+agent_read src/Service.php --root /path/to/project --start 80 --end 180
+agent_status --root /path/to/project
+agent_patch src/Service.php --root /path/to/project --base HEAD~1
+agent_deactivate
+```
+
+Zsh users source `/path/to/agent-dotfiles/.zshrc` instead. Neither profile changes
+PATH, shell options, the current directory, prompts, user dotfiles or Git config.
+For a non-interactive agent session, use `env -u BASH_ENV bash --noprofile --norc` or `zsh -f`
+and explicitly source the reviewed profile. See [shell setup and helpers](docs/SHELL.md).
+
+For a reusable consumer, install a reviewed full commit into a private prefix:
+
+```sh
+./install.sh --prefix /existing/private/agent-tools --revision APPROVED_FULL_COMMIT_SHA
+./install.sh verify --prefix /existing/private/agent-tools --revision APPROVED_FULL_COMMIT_SHA
+```
+
+Then source the installed `/existing/private/agent-tools/.bashrc` or `.zshrc`
+in a fresh consumer shell. Replace the placeholders with your approved pin and
+actual absolute path. [Installation and rollback](docs/INSTALLATION.md) explains
+verification and safe removal. No package installation or network download occurs.
+
+## Layout
+
+```text
+.bashrc              explicit Bash activation
+.zshrc               explicit Zsh activation
+.shellrc             shared activation and validation
+.exports             agent-owned installation location
+.functions           namespaced source/Git helpers
+install.sh           pinned install / verify / uninstall entrypoint
+bin/agent-dotfiles   standalone machine-readable CLI
+agent_dotfiles/      Python standard-library implementation
+tools/install.py    verified private-prefix installer
+tests/               contracts and real shell/Git integration
+docs/                concise contracts, examples and historical evidence links
+```
 
 ## What works now
 
@@ -16,7 +68,7 @@ Based on lessons from [voku/dotfiles](https://github.com/voku/dotfiles) and the 
 - Stable JSON envelopes and explicit result limits. Search respects `.gitignore` by default; `--hidden` is opt-in.
 - Runtime commands do not install anything, access the network or load shell startup files. A separate, explicit installer supports pinned private prefixes, verification and safe removal.
 
-See [pinned installation and rollback](docs/INSTALLATION.md) and the [optional agent-loop consumer contract](docs/AGENT_LOOP.md). Automatic installation and host-policy changes remain outside the CLI contract.
+See [shell helpers](docs/SHELL.md), [pinned installation and rollback](docs/INSTALLATION.md) and the [optional agent-loop consumer contract](docs/AGENT_LOOP.md). Automatic installation and host-policy changes remain outside the CLI contract.
 
 ## Requirements
 

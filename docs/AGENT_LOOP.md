@@ -12,7 +12,10 @@ Before integration: compare against direct `rg --json`, `rg --files -0`, `git ls
 
 Keep a source-commit pin and a separate installation prefix for each approved
 toolset. Invoke its absolute `bin/agent-dotfiles` path in a fresh consumer, after
-checking the installation manifest and `doctor`. Never replace a running
+checking the installation manifest and `doctor`. Optional explicit sourcing of
+the pinned `.bashrc` or `.zshrc` exposes the same tools as namespaced shell
+functions; see [shell setup](SHELL.md). This does not install or override Loop
+skills or policy. Never replace a running
 builder's tools. See [installation](INSTALLATION.md) for verification/removal.
 
 If the executable is absent or doctor reports missing capabilities, continue

@@ -16,6 +16,7 @@ import tempfile
 
 SCHEMA = "agent-dotfiles.v1.installation"
 MANIFEST = "installation.json"
+SHELL_FILES = {".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"}
 LAUNCHER = b'''#!/usr/bin/env python3
 """Explicitly activated isolated agent-dotfiles; do not create bytecode."""
 import sys
@@ -82,8 +83,8 @@ def install(source: Path, revision: str, prefix: Path) -> dict:
         raise SetupError("existing prefix must be an empty directory")
     tracked = git(source, "ls-files", "-z").split(b"\0")
     paths = [os.fsdecode(name) for name in tracked if name]
-    paths = [name for name in paths if name in ("LICENSE", "bin/agent-dotfiles") or runtime_path(name)]
-    required = {"LICENSE", "bin/agent-dotfiles", "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"}
+    paths = [name for name in paths if name in {"LICENSE", "bin/agent-dotfiles"} | SHELL_FILES or runtime_path(name)]
+    required = {"LICENSE", "bin/agent-dotfiles", "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"} | SHELL_FILES
     if not required.issubset(paths):
         raise SetupError("tracked runtime files are missing")
     contents = {}
@@ -139,9 +140,11 @@ def verify(prefix: Path) -> dict:
                 "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"}
     if not required.issubset(files):
         raise SetupError("incomplete installation manifest")
+    if set(files) & SHELL_FILES and not SHELL_FILES.issubset(files):
+        raise SetupError("incomplete shell profile manifest")
     directories = set()
     for name, entry in files.items():
-        if name not in required and not runtime_path(name):
+        if name not in required | SHELL_FILES and not runtime_path(name):
             raise SetupError("unsafe or unknown installation entry")
         if (not isinstance(entry, dict) or set(entry) != {"sha256", "mode"}
                 or not isinstance(entry["sha256"], str)

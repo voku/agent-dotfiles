@@ -22,8 +22,7 @@ commit and check out that commit yourself. Use its independently approved **full
 the approval pin. Run this installer from the reviewed checkout:
 
 ```sh
-python3 /path/to/agent-dotfiles/tools/install.py install \
-  --source /path/to/agent-dotfiles \
+/path/to/agent-dotfiles/install.sh \
   --revision APPROVED_FULL_COMMIT_SHA \
   --prefix /private/existing-parent/agent-dotfiles-APPROVED_FULL_COMMIT_SHA
 ```
@@ -32,7 +31,8 @@ Replace the capitalized placeholders. The prefix must be absent or empty, outsid
 the checkout, and without symlinks or `..` components. All tracked checkout files
 must be clean; untracked and ignored files are excluded. The installer reads the
 pinned Git objects and checks the runtime files against the working copy. It copies
-only tracked Python package files, the original entry point and the license, plus
+only tracked Python package files, the original entry point, the five agent-owned
+shell profiles/shared files and the license, plus
 a small generated launcher and a versioned installation manifest. It refuses
 tracked runtime symlinks. Installation is staged beside the prefix and renamed
 only after validation, leaving an existing installation untouched on failure.
@@ -45,15 +45,16 @@ records the source SHA, SHA-256 file digests and modes; it contains no credentia
 
 ## Activate, diagnose and verify
 
-Activation is an explicit invocation by absolute path. Do not source interactive
-dotfiles or change PATH, user shells, global Git configuration or agent-loop
-instructions. In a fresh consumer session, invoke the approved version directly:
+Activation is explicit: invoke the absolute executable or source the installed
+agent-owned profile in a fresh Bash/Zsh consumer. Never source user/upstream
+interactive dotfiles or modify user startup files. See [shell setup](SHELL.md).
+First verify the approved version and inspect capabilities:
 
 ```sh
-/private/existing-parent/agent-dotfiles-APPROVED_FULL_COMMIT_SHA/bin/agent-dotfiles doctor
-python3 /path/to/agent-dotfiles/tools/install.py verify \
+/path/to/agent-dotfiles/install.sh verify \
   --prefix /private/existing-parent/agent-dotfiles-APPROVED_FULL_COMMIT_SHA \
   --revision APPROVED_FULL_COMMIT_SHA
+/private/existing-parent/agent-dotfiles-APPROVED_FULL_COMMIT_SHA/bin/agent-dotfiles doctor
 ```
 
 `doctor` reports the actual executable inventory; `doctor --strict` returns 2
@@ -82,11 +83,12 @@ session. No global state needs restoration. To remove a version, stop its consum
 and use the same reviewed installer version:
 
 ```sh
-python3 /path/to/agent-dotfiles/tools/install.py uninstall \
+/path/to/agent-dotfiles/install.sh uninstall \
   --prefix /private/existing-parent/agent-dotfiles-APPROVED_FULL_COMMIT_SHA \
   --revision APPROVED_FULL_COMMIT_SHA
 ```
 
+Deactivate the helpers or exit their consumer shell before removal.
 Removal validates the manifest and complete tree first. Modified files, missing
 files, unknown directories/files and symlinks cause refusal with the entire prefix
 preserved. Inspect the error and recover your local changes yourself; there is no

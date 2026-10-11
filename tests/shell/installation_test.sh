@@ -11,7 +11,8 @@ source, fixture = map(Path, sys.argv[1:])
 fixture.mkdir()
 for name in ('agent_dotfiles', 'bin'):
     shutil.copytree(source / name, fixture / name, ignore=shutil.ignore_patterns('__pycache__'))
-shutil.copyfile(source / 'LICENSE', fixture / 'LICENSE')
+for name in ('LICENSE', '.bashrc', '.zshrc', '.shellrc', '.functions', '.exports'):
+    shutil.copyfile(source / name, fixture / name)
 PY
   git init -q "$INSTALL_TEST_ROOT/source"
   git -C "$INSTALL_TEST_ROOT/source" add .
@@ -46,4 +47,13 @@ function test_modified_consumer_is_preserved_on_removal_refusal() {
   assert_same '2' "$status"
   assert_file_exists "$INSTALL_TEST_ROOT/consumer/agent_dotfiles/__init__.py"
   assert_same '# retained local change' "$(cat "$INSTALL_TEST_ROOT/consumer/agent_dotfiles/__init__.py")"
+}
+
+function test_installed_bash_helpers_preserve_source_and_safe_deactivation() {
+  local output
+  python3 "$INSTALL_PROJECT/tools/install.py" install --source "$INSTALL_TEST_ROOT/source" --revision "$INSTALL_TEST_PIN" --prefix "$INSTALL_TEST_ROOT/consumer" >/dev/null
+  printf 'first\nsecond\n' > "$INSTALL_TEST_ROOT/literal [λ].txt"
+  output="$(env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc"; agent_read "$2" --root "$3" --start 2 --end 2; agent_deactivate' consumer "$INSTALL_TEST_ROOT/consumer" 'literal [λ].txt' "$INSTALL_TEST_ROOT")"
+  assert_same 'second' "$(printf '%s' "$output" | python3 -c 'import json,sys; print(json.load(sys.stdin)["content"], end="")')"
+  python3 "$INSTALL_PROJECT/tools/install.py" verify --prefix "$INSTALL_TEST_ROOT/consumer" --revision "$INSTALL_TEST_PIN" >/dev/null
 }

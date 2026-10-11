@@ -1,0 +1,2 @@
+# Only the explicitly selected agent-owned root is exported.
+builtin export AGENT_DOTFILES_HOME="$1"
