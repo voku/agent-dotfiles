@@ -27,6 +27,7 @@ agent_doctor
 agent_search 'function save(' --root /path/to/project --glob '*.php'
 agent_read src/Service.php --root /path/to/project --start 80 --end 180
 agent_status --root /path/to/project
+agent_dotfiles workspace --root /path/to/project
 agent_patch src/Service.php --root /path/to/project --base HEAD~1
 agent_deactivate
 ```
@@ -73,6 +74,7 @@ docs/                concise contracts, examples and historical evidence links
 - Read-only `doctor` inventory for `rg`, `git`, `jq`, `fd`/`fdfind`, `shellcheck`, `strace`, `hyperfine`.
 - Bounded file discovery, using direct `rg --files --null` by default or explicit `fd`/`fdfind`.
 - Bounded Git status, using `git status --porcelain=v1 -z` with rename/copy paths decoded in order.
+- Read-only `workspace` identity: canonical Git checkout root, HEAD, branch/detached state, local tool path/version and bounded original status entries. The requested root must belong to the reported checkout; inherited `GIT_DIR`, `GIT_WORK_TREE` and `GIT_INDEX_FILE` overrides are refused. HEAD is checked before and after the scan, but the worktree scan is not atomic; truncated status exits 3 and never claims a clean tree. Unavailable HEAD and invalid repository roots produce distinct errors. The reported tool path is not a verified installation signature.
 - Bounded text search, using `rg --json` and literal matching by default. Original `rg` match records are preserved, including byte-encoded paths and lines. Explicit `--path` / repeatable `--glob` can narrow a question without truncating original matches.
 - Exact UTF-8 `read` ranges with original whitespace/newlines, EOF metadata and SHA-256 of the whole file. No ellipses.
 - Index-only `tracked` listing (`git ls-files -z`) with correct handling of unusual paths.
@@ -95,6 +97,7 @@ From the checkout:
 ./bin/agent-dotfiles doctor --strict
 ./bin/agent-dotfiles files --root . --limit 50
 ./bin/agent-dotfiles git-status --root . --limit 50
+./bin/agent-dotfiles workspace --root . --limit 50
 ./bin/agent-dotfiles files --engine fd --limit 50 # explicit alternative; different semantics
 ./bin/agent-dotfiles search 'function save(' --root . --limit 20
 ./bin/agent-dotfiles search '^final class ' --regex --limit 20
@@ -113,7 +116,7 @@ All **successful** commands print one JSON object to stdout. There is no pager o
 | 2 | Explicit error: invalid arguments, missing tool, bad output, timeout, or subprocess failure; doctor `--strict` also uses 2 |
 | 3 | **Truncated**: more records than `--limit`, or output byte cap exceeded. Treat results as incomplete. |
 
-Output schemas: `agent-dotfiles.v1.doctor`, `agent-dotfiles.v1.files`, `agent-dotfiles.v1.git-status`, `agent-dotfiles.v1.search`, `agent-dotfiles.v1.tracked`, `agent-dotfiles.v1.read`, `agent-dotfiles.v1.git-patch`, `agent-dotfiles.v1.error`. An exact `read` or `git-patch` command **fails** if the requested content would exceed the cap. It never returns a shortened source or patch. A result with `truncated: true` must **never** be presented as a complete repository search. Limits default to 100, maximum 1000; process output is limited to 2 MiB and wall time to 20 seconds.
+Output schemas: `agent-dotfiles.v1.doctor`, `agent-dotfiles.v1.files`, `agent-dotfiles.v1.git-status`, `agent-dotfiles.v1.workspace`, `agent-dotfiles.v1.search`, `agent-dotfiles.v1.tracked`, `agent-dotfiles.v1.read`, `agent-dotfiles.v1.git-patch`, `agent-dotfiles.v1.error`. An exact `read` or `git-patch` command **fails** if the requested content would exceed the cap. It never returns a shortened source or patch. A result with `truncated: true` must **never** be presented as a complete repository search. Limits default to 100, maximum 1000; process output is limited to 2 MiB and wall time to 20 seconds.
 
 ### Source of truth
 

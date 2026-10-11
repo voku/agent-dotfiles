@@ -225,6 +225,70 @@ def _git_status_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     return report, 3 if truncated else 0
 
 
+
+def _workspace_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
+    """Identify the exact Git checkout and return bounded, non-atomic status."""
+    requested_root = _require_root(args.root)
+    # An inherited Git override can make rev-parse report an ancestor checkout
+    # even when --root explicitly selects a nested, independent repository.
+    # Refuse ambiguity rather than silently sampling a different worktree.
+    if any(name in os.environ for name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")):
+        raise CommandFailure(
+            "invalid_repository",
+            "Explicit workspace identity refuses inherited Git directory, worktree or index overrides",
+        )
+    git = _require_executable("git")
+    try:
+        top = _capture_exact([git, "rev-parse", "--show-toplevel"], cwd=requested_root)
+    except CommandFailure as exc:
+        if exc.reason != "tool_failed":
+            raise
+        raise CommandFailure("invalid_repository", f"Cannot identify Git checkout: {exc}") from exc
+    checkout = Path(os.fsdecode(top.removesuffix(b"\n"))).resolve()
+    if not checkout.is_dir() or (checkout != requested_root and checkout not in requested_root.parents):
+        raise CommandFailure("invalid_repository", "Git resolved a checkout outside the requested root")
+
+    def identity() -> tuple[str, str | dict[str, str] | None]:
+        try:
+            raw_head = _capture_exact([git, "rev-parse", "--verify", "HEAD"], cwd=checkout)
+        except CommandFailure as exc:
+            if exc.reason != "tool_failed":
+                raise
+            raise CommandFailure("missing_head", f"Git HEAD is unavailable: {exc}") from exc
+        try:
+            head = raw_head.removesuffix(b"\n").decode("ascii", errors="strict")
+        except UnicodeDecodeError as exc:
+            raise CommandFailure("invalid_tool_output", "Git HEAD contains non-ASCII bytes") from exc
+        if len(head) not in (40, 64) or any(c not in "0123456789abcdef" for c in head):
+            raise CommandFailure("invalid_tool_output", "Git returned an invalid HEAD object ID")
+        raw_branch = _capture_exact([git, "branch", "--show-current"], cwd=checkout).removesuffix(b"\n")
+        return head, _filesystem_path(raw_branch) if raw_branch else None
+
+    before = identity()
+    status, status_code = _git_status_command(argparse.Namespace(root=str(checkout), limit=args.limit))
+    after = identity()
+    if before != after:
+        raise CommandFailure("snapshot_changed", "HEAD or branch changed while collecting Git status")
+
+    truncated = bool(status["truncated"])
+    return {
+        "schema": SCHEMA_VERSION + ".workspace",
+        "version": __version__,
+        "tool_home": str(Path(__file__).resolve().parent.parent),
+        "requested_root": str(requested_root),
+        "root": str(checkout),
+        "head": before[0],
+        "branch": before[1],
+        "detached": before[1] is None,
+        "changes": status["changes"],
+        "clean": None if truncated else not status["changes"],
+        "truncated": truncated,
+        "limit": args.limit,
+        "head_unchanged_during_probe": True,
+        "worktree_atomic": False,
+    }, status_code
+
+
 def _read_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     """Return an exact, digest-bound source range; never ellipsize its content."""
     root = _require_root(args.root)
@@ -534,6 +598,10 @@ def _parser() -> argparse.ArgumentParser:
     git_status.add_argument("--root", default=".")
     git_status.add_argument("--limit", type=_valid_limit, default=DEFAULT_LIMIT)
 
+    workspace = subcommands.add_parser("workspace", help="Bounded Git checkout identity and worktree status")
+    workspace.add_argument("--root", default=".")
+    workspace.add_argument("--limit", type=_valid_limit, default=DEFAULT_LIMIT)
+
     read = subcommands.add_parser("read", help="Full-fidelity UTF-8 source range with file SHA-256")
     read.add_argument("file", help="A single file within --root")
     read.add_argument("--root", default=".")
@@ -563,6 +631,8 @@ def main(argv: list[str] | None = None) -> int:
             report, exit_code = _search_command(args)
         elif args.command == "git-status":
             report, exit_code = _git_status_command(args)
+        elif args.command == "workspace":
+            report, exit_code = _workspace_command(args)
         elif args.command == "read":
             report, exit_code = _read_command(args)
         elif args.command == "tracked":
