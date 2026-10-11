@@ -230,13 +230,23 @@ def _workspace_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     """Identify the exact Git checkout and return bounded, non-atomic status."""
     requested_root = _require_root(args.root)
     git = _require_executable("git")
-    top = _capture_exact([git, "rev-parse", "--show-toplevel"], cwd=requested_root)
+    try:
+        top = _capture_exact([git, "rev-parse", "--show-toplevel"], cwd=requested_root)
+    except CommandFailure as exc:
+        if exc.reason != "tool_failed":
+            raise
+        raise CommandFailure("invalid_repository", f"Cannot identify Git checkout: {exc}") from exc
     checkout = Path(os.fsdecode(top.removesuffix(b"\n"))).resolve()
-    if not checkout.is_dir():
-        raise CommandFailure("invalid_repository", "Git checkout root is not a directory")
+    if not checkout.is_dir() or (checkout != requested_root and checkout not in requested_root.parents):
+        raise CommandFailure("invalid_repository", "Git resolved a checkout outside the requested root")
 
     def identity() -> tuple[str, str | dict[str, str] | None]:
-        raw_head = _capture_exact([git, "rev-parse", "--verify", "HEAD"], cwd=checkout)
+        try:
+            raw_head = _capture_exact([git, "rev-parse", "--verify", "HEAD"], cwd=checkout)
+        except CommandFailure as exc:
+            if exc.reason != "tool_failed":
+                raise
+            raise CommandFailure("missing_head", f"Git HEAD is unavailable: {exc}") from exc
         try:
             head = raw_head.removesuffix(b"\n").decode("ascii", errors="strict")
         except UnicodeDecodeError as exc:
@@ -256,6 +266,7 @@ def _workspace_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     return {
         "schema": SCHEMA_VERSION + ".workspace",
         "version": __version__,
+        "tool_home": str(Path(__file__).resolve().parent.parent),
         "requested_root": str(requested_root),
         "root": str(checkout),
         "head": before[0],

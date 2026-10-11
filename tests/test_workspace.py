@@ -40,11 +40,11 @@ class WorkspaceTest(unittest.TestCase):
                                    capture_output=True, text=True, check=True, timeout=10)
         return completed.stdout.strip()
 
-    def workspace(self, *args: str) -> tuple[int, dict[str, object]]:
+    def workspace(self, *args: str, environment: dict[str, str] | None = None) -> tuple[int, dict[str, object]]:
         completed = subprocess.run([sys.executable, str(CLI), "workspace",
                                     "--root", str(self.repo), *args],
                                    cwd=self.root, capture_output=True, text=True,
-                                   env={**os.environ, "GIT_OPTIONAL_LOCKS": "0"},
+                                   env={**os.environ, "GIT_OPTIONAL_LOCKS": "0", **(environment or {})},
                                    check=False, timeout=20)
         self.assertEqual(completed.stderr, "", completed.stderr)
         return completed.returncode, json.loads(completed.stdout)
@@ -56,6 +56,7 @@ class WorkspaceTest(unittest.TestCase):
         self.assertEqual(code, 0, report)
         self.assertEqual(report["schema"], "agent-dotfiles.v1.workspace")
         self.assertEqual(report["root"], str(self.repo))
+        self.assertEqual(report["tool_home"], str(PROJECT.resolve()))
         self.assertEqual(report["requested_root"], str(nested))
         self.assertEqual(report["head"], self.git("rev-parse", "HEAD"))
         self.assertEqual(report["branch"], self.git("branch", "--show-current"))
@@ -94,7 +95,7 @@ class WorkspaceTest(unittest.TestCase):
         self.assertEqual(len(report["changes"]), 1)
 
     def test_git_rename_keeps_original_path_and_bounded_record(self) -> None:
-        renamed = "renamed [雪]\\n.txt"
+        renamed = "renamed [雪]\n.txt"
         self.git("mv", "tracked.txt", renamed)
         code, report = self.workspace("--limit", "1")
         self.assertEqual(code, 0, report)
@@ -152,14 +153,42 @@ class WorkspaceTest(unittest.TestCase):
         code, report = self.workspace("--root", str(plain))
         self.assertEqual(code, 2)
         self.assertEqual(report["schema"], "agent-dotfiles.v1.error")
-        self.assertEqual(report["error"], "tool_failed")
+        self.assertEqual(report["error"], "invalid_repository")
         unborn = self.root / "unborn"
         unborn.mkdir()
         self.git("init", "-q", cwd=unborn)
         code, report = self.workspace("--root", str(unborn))
         self.assertEqual(code, 2)
-        self.assertEqual(report["error"], "tool_failed")
+        self.assertEqual(report["error"], "missing_head")
 
+
+
+    def test_non_utf8_untracked_filename_preserves_original_bytes(self) -> None:
+        import base64
+        path = os.fsencode(self.repo) + b"/byte-\xff.txt"
+        descriptor = os.open(path, os.O_CREAT | os.O_WRONLY, 0o600)
+        os.close(descriptor)
+        code, report = self.workspace()
+        self.assertEqual(code, 0, report)
+        self.assertEqual(report["changes"], [{
+            "xy": "??",
+            "path": {"base64": base64.b64encode(b"byte-\xff.txt").decode("ascii")},
+        }])
+
+    def test_inherited_git_worktree_override_cannot_redirect_requested_root(self) -> None:
+        alternate = self.root / "other checkout"
+        alternate.mkdir()
+        self.git("init", "-q", cwd=alternate)
+        (alternate / "other.txt").write_text("other", encoding="utf-8")
+        self.git("-C", str(alternate), "add", "other.txt")
+        self.git("-C", str(alternate), "-c", "user.name=Fixture",
+                 "-c", "user.email=fixture@example.invalid", "commit", "-qm", "other")
+        code, report = self.workspace(environment={
+            "GIT_DIR": str(alternate / ".git"),
+            "GIT_WORK_TREE": str(alternate),
+        })
+        self.assertEqual(code, 2, report)
+        self.assertEqual(report["error"], "invalid_repository")
 
 if __name__ == "__main__":
     unittest.main()
