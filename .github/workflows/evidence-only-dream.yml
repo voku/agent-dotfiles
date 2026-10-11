@@ -222,10 +222,10 @@ jobs:
           ref: 1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14
           path: product
           persist-credentials: false
-      - name: Install Zsh in independent runner
+      - name: Prepare independent runner capabilities
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq zsh
+          sudo apt-get install -y -qq zsh ripgrep
       - name: Preview install, exercise consumers, and remove pinned prefix
         run: |
           set -euo pipefail
@@ -237,7 +237,10 @@ jobs:
           test ! -e "$prefix"
           ./product/install.sh install --prefix "$prefix" --revision "$pin" > reports/consumer/install.json
           ./product/install.sh verify --prefix "$prefix" --revision "$pin" > reports/consumer/verify.json
-          "$prefix/bin/agent-dotfiles" doctor --strict > reports/consumer/doctor.json
+          if ! "$prefix/bin/agent-dotfiles" doctor --strict > reports/consumer/doctor.json; then
+            cat reports/consumer/doctor.json
+            exit 2
+          fi
           cp "$prefix/installation.json" reports/consumer/manifest.json
           python3 - <<'PY'
           import json
