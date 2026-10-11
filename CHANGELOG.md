@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0
+## 0.4.0 (unreleased)
 
 - Require Linux Bash/Zsh activation tests and ShellCheck validation of the root
   shell layout; preserve source paths and caller shell state.
