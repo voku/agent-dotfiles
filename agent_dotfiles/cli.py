@@ -225,6 +225,51 @@ def _git_status_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     return report, 3 if truncated else 0
 
 
+
+def _workspace_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
+    """Identify the exact Git checkout and return bounded, non-atomic status."""
+    requested_root = _require_root(args.root)
+    git = _require_executable("git")
+    top = _capture_exact([git, "rev-parse", "--show-toplevel"], cwd=requested_root)
+    checkout = Path(os.fsdecode(top.removesuffix(b"\n"))).resolve()
+    if not checkout.is_dir():
+        raise CommandFailure("invalid_repository", "Git checkout root is not a directory")
+
+    def identity() -> tuple[str, str | dict[str, str] | None]:
+        raw_head = _capture_exact([git, "rev-parse", "--verify", "HEAD"], cwd=checkout)
+        try:
+            head = raw_head.removesuffix(b"\n").decode("ascii", errors="strict")
+        except UnicodeDecodeError as exc:
+            raise CommandFailure("invalid_tool_output", "Git HEAD contains non-ASCII bytes") from exc
+        if len(head) not in (40, 64) or any(c not in "0123456789abcdef" for c in head):
+            raise CommandFailure("invalid_tool_output", "Git returned an invalid HEAD object ID")
+        raw_branch = _capture_exact([git, "branch", "--show-current"], cwd=checkout).removesuffix(b"\n")
+        return head, _filesystem_path(raw_branch) if raw_branch else None
+
+    before = identity()
+    status, status_code = _git_status_command(argparse.Namespace(root=str(checkout), limit=args.limit))
+    after = identity()
+    if before != after:
+        raise CommandFailure("snapshot_changed", "HEAD or branch changed while collecting Git status")
+
+    truncated = bool(status["truncated"])
+    return {
+        "schema": SCHEMA_VERSION + ".workspace",
+        "version": __version__,
+        "requested_root": str(requested_root),
+        "root": str(checkout),
+        "head": before[0],
+        "branch": before[1],
+        "detached": before[1] is None,
+        "changes": status["changes"],
+        "clean": None if truncated else not status["changes"],
+        "truncated": truncated,
+        "limit": args.limit,
+        "head_unchanged_during_probe": True,
+        "worktree_atomic": False,
+    }, status_code
+
+
 def _read_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     """Return an exact, digest-bound source range; never ellipsize its content."""
     root = _require_root(args.root)
@@ -534,6 +579,10 @@ def _parser() -> argparse.ArgumentParser:
     git_status.add_argument("--root", default=".")
     git_status.add_argument("--limit", type=_valid_limit, default=DEFAULT_LIMIT)
 
+    workspace = subcommands.add_parser("workspace", help="Bounded Git checkout identity and worktree status")
+    workspace.add_argument("--root", default=".")
+    workspace.add_argument("--limit", type=_valid_limit, default=DEFAULT_LIMIT)
+
     read = subcommands.add_parser("read", help="Full-fidelity UTF-8 source range with file SHA-256")
     read.add_argument("file", help="A single file within --root")
     read.add_argument("--root", default=".")
@@ -563,6 +612,8 @@ def main(argv: list[str] | None = None) -> int:
             report, exit_code = _search_command(args)
         elif args.command == "git-status":
             report, exit_code = _git_status_command(args)
+        elif args.command == "workspace":
+            report, exit_code = _workspace_command(args)
         elif args.command == "read":
             report, exit_code = _read_command(args)
         elif args.command == "tracked":
