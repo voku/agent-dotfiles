@@ -128,7 +128,12 @@ jobs:
           assert plan["operation"] == "plan"
           assert plan["source_revision"] == sys.argv[3] == manifest["source_revision"]
           assert plan["entries"] == manifest["files"], "preview differs from installed payload"
-          assert len(plan["entries"]) >= 16
+          required = {
+              ".bashrc", ".zshrc", ".shellrc",
+              "shell/core/activation.sh", "shell/core/deactivation.sh",
+              "shell/modules/context.sh", "shell/modules/git.sh",
+          }
+          assert required.issubset(plan["entries"]), "required shell assets missing"
           PY
 
           env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc" || exit $?; agent_doctor || exit $?; agent_deactivate' fresh-bash "$prefix" > "$root/bash-doctor.json"
@@ -139,8 +144,10 @@ jobs:
 
           # Exercise the real workspace CLI through both freshly activated
           # shells, then independently compare its claims to native Git.
-          env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc" || exit $?; agent_dotfiles workspace --root "$2"; agent_rc=$?; agent_deactivate || exit $?; exit "$agent_rc"'             fresh-bash "$prefix" "$GITHUB_WORKSPACE" > "$root/bash-workspace.json"
-          env -u ZDOTDIR zsh -f -c 'source "$1/.zshrc" || exit $?; agent_dotfiles workspace --root "$2"; agent_rc=$?; agent_deactivate || exit $?; exit "$agent_rc"'             fresh-zsh "$prefix" "$GITHUB_WORKSPACE" > "$root/zsh-workspace.json"
+          env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc" || exit $?; agent_dotfiles workspace --root "$2"; agent_rc=$?; agent_deactivate || exit $?; exit "$agent_rc"' \
+            fresh-bash "$prefix" "$GITHUB_WORKSPACE" > "$root/bash-workspace.json"
+          env -u ZDOTDIR zsh -f -c 'source "$1/.zshrc" || exit $?; agent_dotfiles workspace --root "$2"; agent_rc=$?; agent_deactivate || exit $?; exit "$agent_rc"' \
+            fresh-zsh "$prefix" "$GITHUB_WORKSPACE" > "$root/zsh-workspace.json"
           python3 - "$root/bash-workspace.json" "$root/zsh-workspace.json" "$CANDIDATE_SHA" <<'PY'
           import json
           import sys
