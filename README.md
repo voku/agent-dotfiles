@@ -11,3 +11,7 @@ Read the per-arm independent grades and machine-scope audit separately: correct 
 Benchmark tool candidate: `b9ea6199e9ca50d1168cc8257e03dfb792966157`. Final reviewed product core/cold-install pin: `e41260137b0e2677307bbcb5b607a28718459080`. These are distinct and running consumers were not upgraded. Exact final CI, merged/released source and final owner closeout are recorded separately after completion; this snapshot is not release approval.
 
 General productivity: INCONCLUSIVE. Guarded fresh-shell activation prevents false success in the independently reproduced cases. See agent-dotfiles PR #16 and docs/EVALUATION_2026-10-11.md for the readable report.
+
+## Subsequent publication and momentum probes
+
+PUBLICATION.json records the exact merged-source CI/mutation/release receipts and the correctly scoped parent closeouts; the original failure remains preserved. `momentum-probes-2026-10-11.tar.gz` with MOMENTUM_SHA256SUMS contains fresh bootstrap, current pre-PLAN and guidance-consistency probes plus actual pinned-shell source evidence. Source snapshots match worktree-read hashes before documentation publication links were appended. These probes do not prove general productivity or implement #637/#742 orchestration.
