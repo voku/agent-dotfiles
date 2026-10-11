@@ -39,7 +39,7 @@ jobs:
           path: php
           persist-credentials: false
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.15'
 
@@ -81,7 +81,7 @@ jobs:
 
       - name: Retain machine-readable evidence even if a parity gate fails
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: real-php-command-evidence
           path: |
