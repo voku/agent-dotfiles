@@ -145,31 +145,31 @@ jobs:
                   ;;
               esac
               python3 - "$phase" "$result_status" "$result" "$repo" "$head" "$prefix" <<'PY'
-import json
-import sys
-
-phase, raw_status, payload, repo, head, prefix = sys.argv[1:]
-report = json.loads(payload)
-status = int(raw_status)
-assert report["schema"] == "agent-dotfiles.v1.workspace", report
-assert report["requested_root"] == repo and report["root"] == repo, report
-assert report["tool_home"] == prefix and report["head"] == head, report
-assert report["detached"] is False and isinstance(report["branch"], str), report
-assert report["worktree_atomic"] is False, report
-assert report["head_unchanged_during_probe"] is True, report
-assert report["limit"] == 1, report
-if phase == "clean":
-    assert status == 0 and report["clean"] is True, report
-    assert report["truncated"] is False and report["changes"] == [], report
-elif phase == "dirty":
-    assert status == 0 and report["clean"] is False, report
-    assert report["truncated"] is False, report
-    assert report["changes"] == [{"xy": " M", "path": "tracked.txt"}], report
-else:
-    assert phase == "truncated" and status == 3, (phase, status, report)
-    assert report["truncated"] is True and report["clean"] is None, report
-    assert len(report["changes"]) == 1, report
-PY
+          import json
+          import sys
+          
+          phase, raw_status, payload, repo, head, prefix = sys.argv[1:]
+          report = json.loads(payload)
+          status = int(raw_status)
+          assert report["schema"] == "agent-dotfiles.v1.workspace", report
+          assert report["requested_root"] == repo and report["root"] == repo, report
+          assert report["tool_home"] == prefix and report["head"] == head, report
+          assert report["detached"] is False and isinstance(report["branch"], str), report
+          assert report["worktree_atomic"] is False, report
+          assert report["head_unchanged_during_probe"] is True, report
+          assert report["limit"] == 1, report
+          if phase == "clean":
+              assert status == 0 and report["clean"] is True, report
+              assert report["truncated"] is False and report["changes"] == [], report
+          elif phase == "dirty":
+              assert status == 0 and report["clean"] is False, report
+              assert report["truncated"] is False, report
+              assert report["changes"] == [{"xy": " M", "path": "tracked.txt"}], report
+          else:
+              assert phase == "truncated" and status == 3, (phase, status, report)
+              assert report["truncated"] is True and report["clean"] is None, report
+              assert len(report["changes"]) == 1, report
+          PY
             done
           done
           test ! -e "$repo/.git/index.lock"
