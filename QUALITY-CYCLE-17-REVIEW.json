@@ -1,0 +1,23 @@
+{
+  "verdict": "PASS",
+  "scope": [
+    "docs/QUALITY_CYCLE_17.md",
+    "README.md"
+  ],
+  "report_sha256": "36db0d630ae4390f0905892e6770c3618e6f1c9a8dc4f1ed15c43c3678aa14bc",
+  "readme_diff_sha256": "71eb5bc801bfa48efe7072402875788d5ea33d3fd69ae1401d48d109857c5146",
+  "product_mutation": false,
+  "independent_checks": [
+    "All six metrics independently checked against finalconsumerresults and oraclegrades; summed2369.064294465 rounds2369.064 correct.",
+    "First sourcecorrect/scoped runs clearlyexcludedgovernedcycle dueLearningpattern blocker; heldout actualfinish exits0 with explicitownerAPIfallback/disclosedaliaslimitation.",
+    "Seededdefectlabels and public/private boundary accurate; guided B/C actualtoolusage accurate; Bash-onlytrial distinguished from BashZshpreflightparity.",
+    "All six linked GitHubruns currentlycompleted/success onexactclaimedHEADs; PR17merged7935618, LearningPR165 mergedd1df4e independentlyverified.",
+    "HeldoutComposerCI actual1539 tests10380/10379/10379 assertions,1warning1deprecation2skips; allindividualexit0.",
+    "FreshLearning verification sourced1df4e:2cases12commands10zero2intentionalexit1; no-op/rollback/capture/validate receiptschecked.",
+    "Dreamreportsactualzeros/nullcoverage; sixselecteddotfilesFindings+oneownerFinding, priorreportlinks in dotfilesconsolidationinput; no fabricatedmodelconclusions/promotions.",
+    "SourceSHAunchanged afterpendinggraderun provenallheldout; exactfinalcommitsmatchreport.",
+    "No causalwall/runtime/token/modelclaim, explicitINCONCLUSIVE comparator and unreleasedownerfix notinsertedinto frozenLoop."
+  ],
+  "remaining_blockers": [],
+  "publication_limit": "Rawartifactlink can be appended only after actual verifiedpublication; finalreportSHA thenchanges and thisreview coverspriorcontent plus factualpublicationlinkdelta only."
+}

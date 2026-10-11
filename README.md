@@ -15,3 +15,13 @@ General productivity: INCONCLUSIVE. Guarded fresh-shell activation prevents fals
 ## Subsequent publication and momentum probes
 
 PUBLICATION.json records the exact merged-source CI/mutation/release receipts and the correctly scoped parent closeouts; the original failure remains preserved. `momentum-probes-2026-10-11.tar.gz` with MOMENTUM_SHA256SUMS contains fresh bootstrap, current pre-PLAN and guidance-consistency probes plus actual pinned-shell source evidence. Source snapshots match worktree-read hashes before documentation publication links were appended. These probes do not prove general productivity or implement #637/#742 orchestration.
+
+## Additional quality cycle (PR17 and fresh PHP repairs)
+
+`quality-cycle-17.tar.gz` preserves 1,199 payload files plus a hash/byte manifest:
+private-then-disclosed independent oracles, both seed bundles, six repair bundles,
+actual command traces and raw owner contracts/session/review/Learning states.
+First-round blockers and harness timeouts are retained. Source snapshots precede
+the report publication-link append and DOTFILES18 closeout; those follow separately.
+`QUALITY-CYCLE-17-REVIEW.json` is the independent report review. This is source/evidence
+publication, not a release or active-guidance approval.
