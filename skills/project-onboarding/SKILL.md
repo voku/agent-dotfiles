@@ -30,10 +30,13 @@ configuration, or run a project's test/static-analysis commands automatically.
    when an evidence-preserving reader is available; otherwise record the path
    and that a digest was unavailable.
 2. Treat the `scripts` object as declared capability, not proof that a command
-   will pass. If `composer` is available, `composer run --list --format=json`
-   may enumerate scripts without running them. Do not run `composer test`,
-   `composer ci`, `phpstan`, PHPUnit, or install/update commands until the
-   task asks for a verification command and its scope is understood.
+   will pass. If `composer` is available, `composer run --list --format=json --no-plugins --no-scripts`
+   may enumerate its view of scripts without running
+   plugins or scripts. If that inventory is unavailable, use the already-read
+   raw `composer.json` scripts object and report the limitation. Do not run
+   `composer test`, `composer ci`, `phpstan`, PHPUnit, or install/update
+   commands until the task asks for a verification command and its scope is
+   understood.
 3. Look for the actual configuration files before naming a check: `phpunit.xml`
    or `phpunit.xml.dist`, `phpstan.neon` or `phpstan.neon.dist`, `psalm.xml`,
    `infection*.json`, `rector.php`, `Makefile`, and CI workflow files. Report

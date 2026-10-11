@@ -19,10 +19,11 @@ class ProjectOnboardingSkillTest(unittest.TestCase):
         self.assertTrue(content.startswith("---\nname: project-onboarding\n"))
         for marker in ("git rev-parse --show-toplevel",
                        "git status --porcelain=v1 -z --untracked-files=all",
-                       "composer run --list --format=json",
+                       "composer run --list --format=json --no-plugins --no-scripts",
                        "agent-loop map", "VERIFIED:", "UNAVAILABLE", "INCOMPLETE"):
             self.assertIn(marker, content)
-        self.assertIn("Do not run `composer test`,", content)
+        self.assertIn("`composer test`, `composer ci`, `phpstan`, PHPUnit, or install/update",
+                      content)
         for forbidden in ("composer install", "composer update", "eval ", "PATH="):
             self.assertNotIn(forbidden, content)
 
@@ -43,6 +44,11 @@ class ProjectOnboardingSkillTest(unittest.TestCase):
         documentation = (PROJECT / "docs/PROJECT_ONBOARDING.md").read_text()
         self.assertIn('CODEX_SKILLS_DIR="$PWD/.codex/skills"', documentation)
         self.assertIn('CLAUDE_SKILLS_DIR="$PWD/.claude/skills"', documentation)
+        self.assertIn("init install-assets --agent=codex", documentation)
+        self.assertIn("--extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills --dry-run",
+                      documentation)
+        self.assertNotIn("init sync-skills --agent=codex", documentation)
+        self.assertNotIn("--skills-root=", documentation)
 
 
 if __name__ == "__main__":
