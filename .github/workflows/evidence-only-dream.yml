@@ -206,13 +206,13 @@ jobs:
             # No Finding or original project record is rewritten.
             set +e
             (cd "$project" && php "$owner" learn validate \
-              --task-id-pattern '/^(?:[A-Z][A-Z0-9_-]*-[0-9]+|TODO@[A-Za-z0-9_:/.\\-]+|[A-Za-z0-9][A-Za-z0-9._]*(?:-[A-Za-z0-9._]+){2,}|PHP17-[ABC][12])$/') \
+              --task-id-pattern '~^(?:[A-Z][A-Z0-9_-]*-[0-9]+|TODO@[A-Za-z0-9_:./-]+|[A-Za-z0-9][A-Za-z0-9._]*(?:-[A-Za-z0-9._]+){2,}|PHP17-[ABC][12])$~') \
               > "reports/custom-task-proof/$arm.validate.log" 2>&1
             status=$?
             dream=125
             if test "$status" -eq 0; then
               (cd "$project" && php "$owner" learn dream \
-                --task-id-pattern '/^(?:[A-Z][A-Z0-9_-]*-[0-9]+|TODO@[A-Za-z0-9_:/.\\-]+|[A-Za-z0-9][A-Za-z0-9._]*(?:-[A-Za-z0-9._]+){2,}|PHP17-[ABC][12])$/' --dry-run --format=json \
+                --task-id-pattern '~^(?:[A-Z][A-Z0-9_-]*-[0-9]+|TODO@[A-Za-z0-9_:./-]+|[A-Za-z0-9][A-Za-z0-9._]*(?:-[A-Za-z0-9._]+){2,}|PHP17-[ABC][12])$~' --dry-run --format=json \
                 --report "$GITHUB_WORKSPACE/reports/custom-task-proof/$arm.dream.json") \
                 > "reports/custom-task-proof/$arm.stdout.json" \
                 2> "reports/custom-task-proof/$arm.stderr.txt"
