@@ -226,6 +226,21 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.command("verify")[0], 2)
         self.assertEqual(self.command("uninstall")[0], 2)
 
+    def test_pre_modular_shell_manifest_still_verifies_and_uninstalls(self):
+        # Model v0.4.0: all five profiles exist, but no shell/modules/ tree.
+        self.assertEqual(self.install()[0], 0)
+        manifest = self.prefix / "installation.json"
+        data = json.loads(manifest.read_text())
+        for name in ("shell/modules/context.sh", "shell/modules/git.sh"):
+            (self.prefix / name).unlink()
+            del data["files"][name]
+        (self.prefix / "shell/modules").rmdir()
+        (self.prefix / "shell").rmdir()
+        manifest.write_text(json.dumps(data))
+        self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
+        self.assertEqual(self.command("uninstall", "--revision", self.revision)[0], 0)
+        self.assertFalse(self.prefix.exists())
+
     def test_cli_only_legacy_manifest_still_verifies_and_uninstalls(self):
         self.assertEqual(self.install()[0], 0)
         manifest = self.prefix / "installation.json"
