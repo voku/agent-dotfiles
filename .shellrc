@@ -17,7 +17,7 @@ _agent_dotfiles_activate() {
     }
     _agent_home=${_agent_home%.}
     _agent_home=${_agent_home%$'\n'}
-    for _agent_name in .exports .functions; do
+    for _agent_name in .exports .functions shell/modules/context.sh shell/modules/git.sh; do
         if [ ! -r "$_agent_home/$_agent_name" ]; then
             printf 'agent-dotfiles: required %s is missing or unreadable\n' "$_agent_name" >&2
             unset -f _agent_dotfiles_activate

@@ -1,14 +1,8 @@
-# Owned namespace only; forward arguments and the executable status unchanged.
-agent_dotfiles() { PYTHONDONTWRITEBYTECODE=1 command "$AGENT_DOTFILES_HOME/bin/agent-dotfiles" "$@"; }
-agent_doctor() { agent_dotfiles doctor "$@"; }
-agent_files() { agent_dotfiles files "$@"; }
-agent_search() { agent_dotfiles search "$@"; }
-agent_read() { agent_dotfiles read "$@"; }
-agent_tracked() { agent_dotfiles tracked "$@"; }
-agent_status() { agent_dotfiles git-status "$@"; }
-agent_patch() { agent_dotfiles git-patch "$@"; }
-agent_history() { command git --no-pager --literal-pathspecs -c color.ui=false log "$@"; }
-agent_blame() { command git --no-pager --literal-pathspecs -c color.ui=false blame --line-porcelain "$@"; }
+# Explicit module order; no plugin search, globbing, user startup, or eval.
+# shellcheck source=shell/modules/context.sh
+. "$AGENT_DOTFILES_HOME/shell/modules/context.sh"
+# shellcheck source=shell/modules/git.sh
+. "$AGENT_DOTFILES_HOME/shell/modules/git.sh"
 agent_deactivate() {
     unset AGENT_DOTFILES_HOME
     unset -f agent_dotfiles agent_doctor agent_files agent_search agent_read agent_tracked agent_status agent_patch agent_history agent_blame agent_deactivate
