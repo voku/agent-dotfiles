@@ -34,6 +34,13 @@ jobs:
           ref: 38e71bf8c4dbc0702d26b235bfaea6726e33c12e
           path: owner
           persist-credentials: false
+      - name: Pin original PHP source for authentic guidance target restoration
+        uses: actions/checkout@v7
+        with:
+          repository: voku/agent-loop
+          ref: fad403a209d7d9f4438bf7036ce962780f44938c
+          path: original-php-source
+          persist-credentials: false
       - name: Setup PHP owner runtime
         uses: shivammathur/setup-php@2.37.2
         with:
@@ -234,6 +241,396 @@ jobs:
             echo 'can accept the source workflow pattern with explicit --task-id-pattern.'
             echo 'No original record is changed. Results are diagnostic, not owner approval.'
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Validate actual archived Learning against pinned original PHP source
+        run: |
+          set -euo pipefail
+          source="$GITHUB_WORKSPACE/original-php-source"
+          test "$(git -C "$source" rev-parse HEAD)" = fad403a209d7d9f4438bf7036ce962780f44938c
+          test -f "$source/MEMORY.md"
+          owner="$GITHUB_WORKSPACE/owner/bin/agent-loop"
+          corpus="$RUNNER_TEMP/learning-corpus/consumers"
+          mkdir -p reports/restored-context "$RUNNER_TEMP/reconstructed"
+          sha256sum "$source/MEMORY.md" > reports/restored-context/genuine-memory.sha256
+          : > reports/restored-context/outcomes.tsv
+          for arm in A1 A2 B1 B2 C1 C2; do
+            original="$corpus/$arm/.agent-loop/learning"
+            project="$RUNNER_TEMP/reconstructed/$arm"
+            mkdir -p "$project"
+            # Restore an ACTUAL recorded source commit. Seed and repair commits
+            # differ, so this is a reconstructed baseline, not the original
+            # complete session state or a retroactive governance approval.
+            git -C "$source" archive HEAD | tar -xf - -C "$project"
+            # The fixture owns this disposable path. Overlay untouched original
+            # Learning corpus bytes, rather than substituting invented Findings.
+            rm -rf -- "$project/.agent-loop/learning"
+            mkdir -p "$project/.agent-loop"
+            cp -a "$original" "$project/.agent-loop/learning"
+            (cd "$original" && find . -type f -print0 | sort -z | xargs -0r sha256sum) \
+              > "reports/restored-context/$arm.before"
+            set +e
+            (cd "$project" && php "$owner" learn validate \
+              --task-id-pattern '~^(?:[A-Z][A-Z0-9_-]*-[0-9]+|TODO@[A-Za-z0-9_:./-]+|[A-Za-z0-9][A-Za-z0-9._]*(?:-[A-Za-z0-9._]+){2,}|PHP17-[ABC][12])$~') \
+              > "reports/restored-context/$arm.validate.log" 2>&1
+            validated=$?
+            dream=125
+            if test "$validated" -eq 0; then
+              (cd "$project" && php "$owner" learn dream --dry-run --format=json \
+                --task-id-pattern '~^(?:[A-Z][A-Z0-9_-]*-[0-9]+|TODO@[A-Za-z0-9_:./-]+|[A-Za-z0-9][A-Za-z0-9._]*(?:-[A-Za-z0-9._]+){2,}|PHP17-[ABC][12])$~' \
+                --report "$GITHUB_WORKSPACE/reports/restored-context/$arm.dream.json") \
+                > "reports/restored-context/$arm.stdout.json" \
+                2> "reports/restored-context/$arm.stderr.log"
+              dream=$?
+            fi
+            set -e
+            (cd "$project/.agent-loop/learning" && find . -type f -print0 | sort -z | xargs -0r sha256sum) \
+              > "reports/restored-context/$arm.after"
+            cmp "reports/restored-context/$arm.before" "reports/restored-context/$arm.after" || {
+              echo "Historical Learning bytes mutated: $arm" >&2
+              exit 1
+            }
+            printf '%s\t%s\t%s\n' "$arm" "$validated" "$dream" \
+              >> reports/restored-context/outcomes.tsv
+          done
+          cat reports/restored-context/outcomes.tsv
+          {
+            echo '### Reconstructed historical owner Dream (not exact original project)'
+            echo 'Original PHP baseline at fad403a209d7d9f4438bf7036ce962780f44938c'
+            echo 'provides authentic MEMORY.md; six SHA-preserved archived Learning roots'
+            echo 'are combined with source code without changing the original exports.'
+            echo 'Explicit union task-ID pattern honors existing default and PHP17 fixtures.'
+            echo 'Individual validation/Dream statuses and reports are saved as artifacts.'
+            echo 'Green is only valid when supported owner commands succeeded; no guidance promotion.'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if grep -Ev 
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: owner-learning-inventory-20261011
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 14
+
+  fresh-owner-dream:
+    name: Fresh scaffold owner validation and Dream
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Pin immutable product source
+        uses: actions/checkout@v7
+        with:
+          repository: voku/agent-dotfiles
+          ref: 1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14
+          path: product
+          persist-credentials: false
+      - name: Pin actual agent-loop Dream owner
+        uses: actions/checkout@v7
+        with:
+          repository: voku/agent-loop
+          ref: 38e71bf8c4dbc0702d26b235bfaea6726e33c12e
+          path: owner
+          persist-credentials: false
+      - name: Prepare PHP 8.4 and Composer
+        uses: shivammathur/setup-php@2.37.2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+      - name: Install pinned owner dependencies
+        working-directory: owner
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = 38e71bf8c4dbc0702d26b235bfaea6726e33c12e
+          composer install --no-dev --no-interaction --prefer-dist --no-progress
+          test -f vendor/autoload.php
+      - name: Create isolated genuine scaffold, validate, and invoke Dream
+        run: |
+          set -euo pipefail
+          test "$(git -C product rev-parse HEAD)" = 1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14
+          mkdir -p reports/fresh-owner "$RUNNER_TEMP/fresh-product"
+          # Copy the pinned source only. This is an independent temporary project
+          # with a real Git repository; it does not rewrite the product checkout.
+          git -C product archive HEAD | tar -xf - -C "$RUNNER_TEMP/fresh-product"
+          git -C "$RUNNER_TEMP/fresh-product" init -q
+          git -C "$RUNNER_TEMP/fresh-product" add -A
+          git -C "$RUNNER_TEMP/fresh-product" -c user.name=Evidence \
+            -c user.email=evidence@example.invalid commit -qm 'fixture: reviewed dotfiles source'
+          owner="$GITHUB_WORKSPACE/owner/bin/agent-loop"
+          fresh="$RUNNER_TEMP/fresh-product"
+          (cd "$fresh" && php "$owner" init scaffold --prefix=DOTFILES) \
+            > reports/fresh-owner/scaffold.log 2>&1
+          test -d "$fresh/.agent-loop/tasks"
+          test -d "$fresh/.agent-loop/learning/findings"
+          (cd "$fresh" && php "$owner" learn validate) \
+            > reports/fresh-owner/validate.log 2>&1
+          # Dream is read-only with respect to Learning-owned source files.
+          find "$fresh/.agent-loop/learning" -type f -print0 |
+            sort -z | xargs -0r sha256sum > reports/fresh-owner/before.sha256
+          (cd "$fresh" && php "$owner" learn dream --dry-run --format=json \
+            --report "$GITHUB_WORKSPACE/reports/fresh-owner/dream.json") \
+            > reports/fresh-owner/stdout.json 2> reports/fresh-owner/dream.stderr
+          find "$fresh/.agent-loop/learning" -type f -print0 |
+            sort -z | xargs -0r sha256sum > reports/fresh-owner/after.sha256
+          cmp reports/fresh-owner/before.sha256 reports/fresh-owner/after.sha256
+          python3 -m json.tool reports/fresh-owner/dream.json > /dev/null
+          python3 -m json.tool reports/fresh-owner/stdout.json > /dev/null
+          {
+            echo '### Real fresh owner Dream execution'
+            echo 'Product 1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14'
+            echo 'Loop owner 38e71bf8c4dbc0702d26b235bfaea6726e33c12e'
+            echo 'A new repository was scaffolded through the pinned owner CLI.'
+            echo 'Owner validate and Dream --dry-run succeeded; Learning source hashes unchanged.'
+            echo 'This proves the runtime path, not historical findings validation or productive learning.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish exact Dream execution evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fresh-owner-dream-20261011
+          path: reports/fresh-owner/
+          if-no-files-found: warn
+          retention-days: 14
+
+  cold-tool-consumer:
+    name: Pinned install and real Bash-Zsh consumer
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Pin reviewed product source
+        uses: actions/checkout@v7
+        with:
+          repository: voku/agent-dotfiles
+          ref: 1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14
+          path: product
+          persist-credentials: false
+      - name: Prepare independent runner capabilities
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq zsh ripgrep
+      - name: Preview install, exercise consumers, and remove pinned prefix
+        run: |
+          set -euo pipefail
+          pin=1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14
+          test "$(git -C product rev-parse HEAD)" = "$pin"
+          prefix="$RUNNER_TEMP/agent-dotfiles-consumer"
+          mkdir -p reports/consumer
+          ./product/install.sh plan --prefix "$prefix" --revision "$pin" > reports/consumer/plan.json
+          test ! -e "$prefix"
+          ./product/install.sh install --prefix "$prefix" --revision "$pin" > reports/consumer/install.json
+          ./product/install.sh verify --prefix "$prefix" --revision "$pin" > reports/consumer/verify.json
+          if ! "$prefix/bin/agent-dotfiles" doctor --strict > reports/consumer/doctor.json; then
+            cat reports/consumer/doctor.json
+            exit 2
+          fi
+          cp "$prefix/installation.json" reports/consumer/manifest.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path("reports/consumer/plan.json").read_text())
+          m = json.loads(Path("reports/consumer/manifest.json").read_text())
+          assert p["source_revision"] == m["source_revision"]
+          assert p["entries"] == m["files"], "plan must be byte-identical to installed manifest"
+          assert len(p["entries"]) > 5
+          PY
+          env -u BASH_ENV bash --noprofile --norc -c \
+            '. "$1/.bashrc" || exit $?; agent_dotfiles workspace --root "$2" > "$3"; agent_rc=$?; agent_deactivate || exit $?; exit "$agent_rc"' \
+            runner "$prefix" "$GITHUB_WORKSPACE/product" "$GITHUB_WORKSPACE/reports/consumer/bash.json"
+          zsh -f -c \
+            '. "$1/.zshrc" || exit $?; agent_dotfiles workspace --root "$2" > "$3"; agent_rc=$?; agent_deactivate || exit $?; exit "$agent_rc"' \
+            runner "$prefix" "$GITHUB_WORKSPACE/product" "$GITHUB_WORKSPACE/reports/consumer/zsh.json"
+          python3 - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+          expected = subprocess.check_output(["git", "-C", "product", "rev-parse", "HEAD"], text=True).strip()
+          for shell in ("bash", "zsh"):
+              data = json.loads(Path(f"reports/consumer/{shell}.json").read_text())
+              assert data["head"] == expected, (shell, data.get("head"))
+              assert data["root"] == str(Path("product").resolve())
+              assert data["clean"] is True and data["truncated"] is False, shell
+          PY
+          ./product/install.sh uninstall --prefix "$prefix" --revision "$pin" > reports/consumer/uninstall.json
+          test ! -e "$prefix"
+          {
+            echo '### Actual pinned agent shell consumer execution'
+            echo 'Verified SHA, manifest hash/mode parity, fresh Bash/Zsh workspace identity,'
+            echo 'complete native Git identity match, namespace deactivation and uninstall.'
+            echo 'No host startup files, global tools, release or network installer changed.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish cold-consumer receipts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cold-consumer-evidence-20261011
+          path: reports/consumer/
+          if-no-files-found: warn
+          retention-days: 14
+^[ABC][12]\t0\t0
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: owner-learning-inventory-20261011
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 14
+
+  fresh-owner-dream:
+    name: Fresh scaffold owner validation and Dream
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Pin immutable product source
+        uses: actions/checkout@v7
+        with:
+          repository: voku/agent-dotfiles
+          ref: 1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14
+          path: product
+          persist-credentials: false
+      - name: Pin actual agent-loop Dream owner
+        uses: actions/checkout@v7
+        with:
+          repository: voku/agent-loop
+          ref: 38e71bf8c4dbc0702d26b235bfaea6726e33c12e
+          path: owner
+          persist-credentials: false
+      - name: Prepare PHP 8.4 and Composer
+        uses: shivammathur/setup-php@2.37.2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+      - name: Install pinned owner dependencies
+        working-directory: owner
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = 38e71bf8c4dbc0702d26b235bfaea6726e33c12e
+          composer install --no-dev --no-interaction --prefer-dist --no-progress
+          test -f vendor/autoload.php
+      - name: Create isolated genuine scaffold, validate, and invoke Dream
+        run: |
+          set -euo pipefail
+          test "$(git -C product rev-parse HEAD)" = 1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14
+          mkdir -p reports/fresh-owner "$RUNNER_TEMP/fresh-product"
+          # Copy the pinned source only. This is an independent temporary project
+          # with a real Git repository; it does not rewrite the product checkout.
+          git -C product archive HEAD | tar -xf - -C "$RUNNER_TEMP/fresh-product"
+          git -C "$RUNNER_TEMP/fresh-product" init -q
+          git -C "$RUNNER_TEMP/fresh-product" add -A
+          git -C "$RUNNER_TEMP/fresh-product" -c user.name=Evidence \
+            -c user.email=evidence@example.invalid commit -qm 'fixture: reviewed dotfiles source'
+          owner="$GITHUB_WORKSPACE/owner/bin/agent-loop"
+          fresh="$RUNNER_TEMP/fresh-product"
+          (cd "$fresh" && php "$owner" init scaffold --prefix=DOTFILES) \
+            > reports/fresh-owner/scaffold.log 2>&1
+          test -d "$fresh/.agent-loop/tasks"
+          test -d "$fresh/.agent-loop/learning/findings"
+          (cd "$fresh" && php "$owner" learn validate) \
+            > reports/fresh-owner/validate.log 2>&1
+          # Dream is read-only with respect to Learning-owned source files.
+          find "$fresh/.agent-loop/learning" -type f -print0 |
+            sort -z | xargs -0r sha256sum > reports/fresh-owner/before.sha256
+          (cd "$fresh" && php "$owner" learn dream --dry-run --format=json \
+            --report "$GITHUB_WORKSPACE/reports/fresh-owner/dream.json") \
+            > reports/fresh-owner/stdout.json 2> reports/fresh-owner/dream.stderr
+          find "$fresh/.agent-loop/learning" -type f -print0 |
+            sort -z | xargs -0r sha256sum > reports/fresh-owner/after.sha256
+          cmp reports/fresh-owner/before.sha256 reports/fresh-owner/after.sha256
+          python3 -m json.tool reports/fresh-owner/dream.json > /dev/null
+          python3 -m json.tool reports/fresh-owner/stdout.json > /dev/null
+          {
+            echo '### Real fresh owner Dream execution'
+            echo 'Product 1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14'
+            echo 'Loop owner 38e71bf8c4dbc0702d26b235bfaea6726e33c12e'
+            echo 'A new repository was scaffolded through the pinned owner CLI.'
+            echo 'Owner validate and Dream --dry-run succeeded; Learning source hashes unchanged.'
+            echo 'This proves the runtime path, not historical findings validation or productive learning.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish exact Dream execution evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fresh-owner-dream-20261011
+          path: reports/fresh-owner/
+          if-no-files-found: warn
+          retention-days: 14
+
+  cold-tool-consumer:
+    name: Pinned install and real Bash-Zsh consumer
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Pin reviewed product source
+        uses: actions/checkout@v7
+        with:
+          repository: voku/agent-dotfiles
+          ref: 1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14
+          path: product
+          persist-credentials: false
+      - name: Prepare independent runner capabilities
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq zsh ripgrep
+      - name: Preview install, exercise consumers, and remove pinned prefix
+        run: |
+          set -euo pipefail
+          pin=1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14
+          test "$(git -C product rev-parse HEAD)" = "$pin"
+          prefix="$RUNNER_TEMP/agent-dotfiles-consumer"
+          mkdir -p reports/consumer
+          ./product/install.sh plan --prefix "$prefix" --revision "$pin" > reports/consumer/plan.json
+          test ! -e "$prefix"
+          ./product/install.sh install --prefix "$prefix" --revision "$pin" > reports/consumer/install.json
+          ./product/install.sh verify --prefix "$prefix" --revision "$pin" > reports/consumer/verify.json
+          if ! "$prefix/bin/agent-dotfiles" doctor --strict > reports/consumer/doctor.json; then
+            cat reports/consumer/doctor.json
+            exit 2
+          fi
+          cp "$prefix/installation.json" reports/consumer/manifest.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path("reports/consumer/plan.json").read_text())
+          m = json.loads(Path("reports/consumer/manifest.json").read_text())
+          assert p["source_revision"] == m["source_revision"]
+          assert p["entries"] == m["files"], "plan must be byte-identical to installed manifest"
+          assert len(p["entries"]) > 5
+          PY
+          env -u BASH_ENV bash --noprofile --norc -c \
+            '. "$1/.bashrc" || exit $?; agent_dotfiles workspace --root "$2" > "$3"; agent_rc=$?; agent_deactivate || exit $?; exit "$agent_rc"' \
+            runner "$prefix" "$GITHUB_WORKSPACE/product" "$GITHUB_WORKSPACE/reports/consumer/bash.json"
+          zsh -f -c \
+            '. "$1/.zshrc" || exit $?; agent_dotfiles workspace --root "$2" > "$3"; agent_rc=$?; agent_deactivate || exit $?; exit "$agent_rc"' \
+            runner "$prefix" "$GITHUB_WORKSPACE/product" "$GITHUB_WORKSPACE/reports/consumer/zsh.json"
+          python3 - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+          expected = subprocess.check_output(["git", "-C", "product", "rev-parse", "HEAD"], text=True).strip()
+          for shell in ("bash", "zsh"):
+              data = json.loads(Path(f"reports/consumer/{shell}.json").read_text())
+              assert data["head"] == expected, (shell, data.get("head"))
+              assert data["root"] == str(Path("product").resolve())
+              assert data["clean"] is True and data["truncated"] is False, shell
+          PY
+          ./product/install.sh uninstall --prefix "$prefix" --revision "$pin" > reports/consumer/uninstall.json
+          test ! -e "$prefix"
+          {
+            echo '### Actual pinned agent shell consumer execution'
+            echo 'Verified SHA, manifest hash/mode parity, fresh Bash/Zsh workspace identity,'
+            echo 'complete native Git identity match, namespace deactivation and uninstall.'
+            echo 'No host startup files, global tools, release or network installer changed.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish cold-consumer receipts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cold-consumer-evidence-20261011
+          path: reports/consumer/
+          if-no-files-found: warn
+          retention-days: 14
+ reports/restored-context/outcomes.tsv; then
+            echo 'Not all original records passed reconstructed baseline validation/Dream' >&2
+            exit 1
+          fi
       - name: Retain inventory for independent selection of validated roots
         if: always()
         uses: actions/upload-artifact@v7
