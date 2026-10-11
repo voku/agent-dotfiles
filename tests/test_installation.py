@@ -1,6 +1,7 @@
 """Pinned, isolated installation and fail-closed rollback contracts."""
 
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -25,6 +26,8 @@ class InstallationTest(unittest.TestCase):
             shutil.copytree(PROJECT / name, self.source / name,
                             ignore=shutil.ignore_patterns("__pycache__"))
         shutil.copyfile(PROJECT / "LICENSE", self.source / "LICENSE")
+        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"):
+            (self.source / name).write_text(f"# independently known fixture: {name}\n")
         self.git("init", "-q")
         self.git("add", ".")
         self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
@@ -169,6 +172,101 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.command("verify")[0], 2)
         self.assertEqual(self.command("uninstall")[0], 2)
         self.assertTrue(executable.exists())
+
+    def test_profiles_are_pinned_copied_hashed_not_executed(self):
+        profile = self.source / ".shellrc"
+        marker = self.root / "must-not-exist"
+        profile.write_text(f"touch '{marker}'\n")
+        self.git("add", ".shellrc")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", "profile fixture")
+        self.revision = self.git("rev-parse", "HEAD").strip()
+        self.assertEqual(self.install()[0], 0)
+        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"):
+            self.assertEqual((self.prefix / name).read_bytes(), (self.source / name).read_bytes())
+        self.assertFalse(marker.exists())
+        self.assertEqual(self.command("verify")[0], 0)
+        (self.prefix / ".exports").write_text("# consumer changes\n")
+        self.assertEqual(self.command("verify")[0], 2)
+        self.assertEqual(self.command("uninstall")[0], 2)
+        self.assertEqual((self.prefix / ".exports").read_text(), "# consumer changes\n")
+
+    def test_all_profiles_required_for_new_installations(self):
+        self.git("rm", ".zshrc")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", "missing profile")
+        self.revision = self.git("rev-parse", "HEAD").strip()
+        self.assertEqual(self.install()[0], 2)
+        self.assertFalse(self.prefix.exists())
+
+    def test_cli_only_legacy_manifest_still_verifies_and_uninstalls(self):
+        self.assertEqual(self.install()[0], 0)
+        manifest = self.prefix / "installation.json"
+        data = json.loads(manifest.read_text())
+        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"):
+            (self.prefix / name).unlink()
+            del data["files"][name]
+        manifest.write_text(json.dumps(data))
+        self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
+        self.assertEqual(self.command("uninstall", "--revision", self.revision)[0], 0)
+
+    def test_partial_profile_manifest_refused(self):
+        self.assertEqual(self.install()[0], 0)
+        manifest = self.prefix / "installation.json"
+        data = json.loads(manifest.read_text())
+        (self.prefix / ".bashrc").unlink()
+        del data["files"][".bashrc"]
+        manifest.write_text(json.dumps(data))
+        self.assertEqual(self.command("verify")[0], 2)
+        self.assertEqual(self.command("uninstall")[0], 2)
+
+    def frontend(self, *arguments):
+        return subprocess.run([str(self.source / "install.sh"), *arguments],
+                              capture_output=True, text=True, timeout=15)
+
+    def frontend_fixture(self):
+        shutil.copyfile(PROJECT / "install.sh", self.source / "install.sh")
+        (self.source / "install.sh").chmod(0o755)
+        (self.source / "tools").mkdir()
+        shutil.copyfile(INSTALLER, self.source / "tools/install.py")
+        self.git("add", ".")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", "frontend fixture")
+        self.revision = self.git("rev-parse", "HEAD").strip()
+
+    def test_frontend_default_install_and_explicit_lifecycle_unusual_root(self):
+        self.frontend_fixture()
+        original = self.source
+        self.source = original.with_name("source with space 雪\n")
+        original.rename(self.source)
+        arguments = ("--prefix", str(self.prefix), "--revision", self.revision)
+        result = self.frontend(*arguments)
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertEqual(json.loads(result.stdout)["operation"], "install")
+        result = self.frontend("verify", *arguments)
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        result = self.frontend("uninstall", *arguments)
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        self.assertFalse(self.prefix.exists())
+
+    def test_frontend_refuses_relative_prefix_and_requires_explicit_pin(self):
+        self.frontend_fixture()
+        result = self.frontend("--prefix", "relative-prefix", "--revision", self.revision)
+        self.assertEqual(result.returncode, 2)
+        self.assertFalse((self.source / "relative-prefix").exists())
+        result = self.frontend("--prefix", str(self.prefix))
+        self.assertEqual(result.returncode, 2)
+        self.assertFalse(self.prefix.exists())
+
+    def test_frontend_missing_python_has_visible_error(self):
+        self.frontend_fixture()
+        empty_path = self.root / "no-executables"
+        empty_path.mkdir()
+        result = subprocess.run([str(self.source / "install.sh"), "verify", "--prefix", str(self.prefix)],
+                                env={**os.environ, "PATH": str(empty_path)}, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("python3 is required", result.stderr)
+        self.assertFalse(self.prefix.exists())
 
 
 if __name__ == "__main__":

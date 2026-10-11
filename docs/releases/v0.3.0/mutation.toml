@@ -1,9 +1,0 @@
-# Bounded mutation experiment: path containment and CLI limit guards.
-[cosmic-ray]
-module-path = "agent_dotfiles/validation.py"
-timeout = 8.0
-excluded-modules = []
-test-command = "python -m unittest discover -s tests -p test_validation.py -q"
-
-[cosmic-ray.distributor]
-name = "local"

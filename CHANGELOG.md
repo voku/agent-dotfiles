@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Add explicit agent-owned Bash/Zsh profiles, shared exports and namespaced
+  context helpers without changing user startup files, PATH or shell options.
+- Add root `install.sh` for pinned private installation, verification and removal;
+  include the shell assets in the verified installation manifest.
+- Remove generated release and benchmark payloads from the working tree;
+  preserve immutable historical evidence links.
+
 ## 0.3.0
 
 - Integrate targeted mutation testing with summaries retained on nonzero reports.
@@ -33,7 +42,7 @@
 
 At the original bootstrap checkpoint, no release tag or GitHub repository had been published.
 
-## Unreleased bootstrap
+## Earlier bootstrap notes
 
 - Import the v0.2.0 candidate with original GitHub LICENSE preserved.
 - Add pinned Bashunit integration tests for source fidelity, Git evidence and executable status codes, alongside the existing Python contracts.

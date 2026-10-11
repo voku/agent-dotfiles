@@ -5,7 +5,9 @@ CLI profile, not an authority source for `agent-loop` workflows.
 
 ## Safe defaults
 
-- Never source interactive Bash/Zsh profiles or `.redpill` plugins.
+- Never source user/upstream interactive Bash/Zsh profiles or `.redpill` plugins.
+  The reviewed agent-owned profiles here may be explicitly activated in a fresh
+  consumer shell; never install them into user startup files automatically.
 - Never install binaries, change login shells, alter global Git configuration,
   or launch background daemons from the CLI.
 - Keep filesystem and search commands read-only; invoke external binaries with

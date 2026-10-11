@@ -1,3 +1,0 @@
-α β
-	第二
-last without LF

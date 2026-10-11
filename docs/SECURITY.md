@@ -1,6 +1,12 @@
 # Security and operational contract
 
-- **Read-only** operations: no external installer, network fetch, `sudo`, `chsh`, `eval`, `source`, or changes to shell/git configuration.
+- **Read-only CLI** operations: no external installer, network fetch, `sudo`,
+  `chsh`, `eval`, startup-file loading, or changes to shell/Git configuration.
+- Shell activation is separate and explicit: source only the reviewed agent-owned
+  `.bashrc` or `.zshrc` from a trusted checkout or verified private prefix. These
+  load their adjacent shared files, never user/upstream profiles or repository
+  content. Activation defines namespaced helpers and exports their location;
+  it does not change PATH, prompts, shell options or user startup files.
 - Subprocess invocation is always a **list of arguments**, never a concatenated shell command.
 - Patterns beginning with `-` are passed after `--` to `rg`. The default search mode treats user input as literal text; regex must be requested explicitly.
 - Child stdout is bounded to 2 MiB, record output to the caller's `--limit` (1-1000), and time to 20 seconds. On overflow the child process is killed and the response carries `truncated: true` with exit code 3.
