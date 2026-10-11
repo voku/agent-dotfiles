@@ -27,9 +27,11 @@ staging directory.
 ```
 
 A successful JSON result has `operation: "plan"`, the exact source revision,
-a file count and `entries` mapping installed paths to SHA-256 hashes and octal
-modes (represented as integers). The plan includes the generated launcher and
-all fixed shell modules. Review it before installation; it is not an approval
+a file count and `entries` mapping manifest-tracked payload paths to SHA-256
+hashes and numeric Unix permission modes (493 means 0755, 420 means 0644).
+The generated `installation.json` is written only during installation; it is
+not counted among these payload entries. The plan includes the generated launcher
+and all fixed shell modules. Review it before installation; it is not an approval
 token. The later installation repeats provenance checks against the same
 approved full commit and may refuse if the source or destination changed.
 Plan never installs packages, sources profiles or alters user configuration.

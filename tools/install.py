@@ -48,8 +48,10 @@ def safe_path(value: str) -> Path:
 
 
 def git(source: Path, *arguments: str) -> bytes:
+    # Git status may otherwise refresh its index during a read-only preview.
     result = subprocess.run(["git", "-C", str(source), *arguments],
-                            capture_output=True, check=False, timeout=30)
+                            capture_output=True, check=False, timeout=30,
+                            env={**os.environ, "GIT_OPTIONAL_LOCKS": "0"})
     if result.returncode:
         raise SetupError("Git source verification failed")
     return result.stdout

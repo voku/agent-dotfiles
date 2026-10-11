@@ -59,6 +59,7 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(report["operation"], "plan")
         self.assertEqual(report["source_revision"], self.revision)
         self.assertEqual(report["files"], len(report["entries"]))
+        self.assertNotIn("installation.json", report["entries"])
         for name in ("bin/agent-dotfiles", ".bashrc", ".zshrc", ".shellrc",
                      "shell/modules/context.sh", "shell/modules/git.sh"):
             self.assertIn(name, report["entries"])
