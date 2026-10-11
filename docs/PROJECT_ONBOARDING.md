@@ -24,17 +24,19 @@ agent-loop installation to project the identical source into the coding host's
 project-local skill directory:
 
 ```sh
-vendor/bin/agent-loop init sync-skills --agent=codex \
+CODEX_SKILLS_DIR="$PWD/.codex/skills" vendor/bin/agent-loop init sync-skills --agent=codex \
   --skills-root=/absolute/approved-agent-dotfiles-prefix/skills
-vendor/bin/agent-loop init sync-skills --agent=claude \
+CLAUDE_SKILLS_DIR="$PWD/.claude/skills" vendor/bin/agent-loop init sync-skills --agent=claude \
   --skills-root=/absolute/approved-agent-dotfiles-prefix/skills
 ```
 
 The first command targets `.codex/skills/project-onboarding/SKILL.md`; the
-second targets `.claude/skills/project-onboarding/SKILL.md`. `agent-loop` owns
-that projection, including its managed-asset manifest and conflict handling.
-Run the command only for the host you want to use. Start a fresh agent session
-after projection; an already-running host need not rediscover a new skill.
+second targets `.claude/skills/project-onboarding/SKILL.md`. The command-scoped
+environment variables keep the projection project-local even when a host has a
+global skill directory configured. `agent-loop` owns that projection, including
+its managed-asset manifest and conflict handling. Run the command only for the
+host you want to use. Start a fresh agent session after projection; an
+already-running host need not rediscover a new skill.
 
 If agent-loop is unavailable, copy the reviewed source manually only into an
 empty project-local target. This is an explicit fallback, not a bootstrap

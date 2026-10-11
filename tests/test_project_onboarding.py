@@ -39,6 +39,11 @@ class ProjectOnboardingSkillTest(unittest.TestCase):
             self.assertFalse((root / "codex/.claude").exists())
             self.assertFalse((root / "claude/.codex").exists())
 
+    def test_documentation_forces_project_local_host_targets(self):
+        documentation = (PROJECT / "docs/PROJECT_ONBOARDING.md").read_text()
+        self.assertIn('CODEX_SKILLS_DIR="$PWD/.codex/skills"', documentation)
+        self.assertIn('CLAUDE_SKILLS_DIR="$PWD/.claude/skills"', documentation)
+
 
 if __name__ == "__main__":
     unittest.main()
