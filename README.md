@@ -6,8 +6,9 @@ Inspired by [voku/dotfiles](https://github.com/voku/dotfiles), reworked for
 non-interactive coding workflows: explicit activation, namespaced functions,
 exact source evidence and no prompt hooks or startup-file edits. Python 3.10+
 standard-library code supplies stable JSON; Git and ripgrep supply native evidence.
-Version **0.4.0** includes the Bash/Zsh setup. Install from an independently
-approved full commit; see [published releases](https://github.com/voku/agent-dotfiles/releases).
+The latest published release is **0.3.0**. The Bash/Zsh setup is included
+in the **unreleased 0.4.0 development changes**. For either version, install
+only from an independently approved full commit; see [published releases](https://github.com/voku/agent-dotfiles/releases).
 
 Use native tools for simple, known-location questions; select these helpers when
 source identity, literal scope or explicit completeness improves the evidence.
