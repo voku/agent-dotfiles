@@ -1,0 +1,78 @@
+name: Evidence-only owner Dream checkpoint
+
+on:
+  push:
+    branches:
+      - proof/owner-dream-20261011
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-and-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Pin reviewed dotfiles source
+        uses: actions/checkout@v7
+        with:
+          repository: voku/agent-dotfiles
+          ref: 1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14
+          path: product
+          persist-credentials: false
+      - name: Pin historical validated Learning evidence
+        uses: actions/checkout@v7
+        with:
+          repository: voku/agent-dotfiles
+          ref: 67c55b0940ba3e136032560d669870a16c3442b3
+          path: historical
+          persist-credentials: false
+      - name: Pin current agent-loop owner runtime source
+        uses: actions/checkout@v7
+        with:
+          repository: voku/agent-loop
+          ref: 38e71bf8c4dbc0702d26b235bfaea6726e33c12e
+          path: owner
+          persist-credentials: false
+      - name: Setup PHP owner runtime
+        uses: shivammathur/setup-php@2.37.2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+      - name: Verify immutable sources and archive hash
+        run: |
+          set -euo pipefail
+          test "$(git -C product rev-parse HEAD)" = 1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14
+          test "$(git -C historical rev-parse HEAD)" = 67c55b0940ba3e136032560d669870a16c3442b3
+          test "$(git -C owner rev-parse HEAD)" = 38e71bf8c4dbc0702d26b235bfaea6726e33c12e
+          cd historical
+          sha256sum --check QUALITY-CYCLE-17-SHA256SUMS
+      - name: Extract historical owner evidence without modifying the product
+        run: |
+          set -euo pipefail
+          mkdir -p reports "$RUNNER_TEMP/learning-corpus"
+          tar -tzf historical/quality-cycle-17.tar.gz > reports/archive-paths.txt
+          tar -xzf historical/quality-cycle-17.tar.gz -C "$RUNNER_TEMP/learning-corpus"
+          find "$RUNNER_TEMP/learning-corpus" -type f \( -name config.json -o -name 'finding.*.json' \) | sort > reports/corpus-candidates.txt
+          printf 'Archive entries: '; wc -l < reports/archive-paths.txt
+          printf 'Learning-like files: '; wc -l < reports/corpus-candidates.txt
+          grep -Ei 'learning|dream|finding' reports/archive-paths.txt | head -80 || true
+          printf '\nOwner root configurations:\n'
+          grep '/learning/config.json$' reports/corpus-candidates.txt || true
+          {
+            echo '### Evidence inventory, not a Dream result'
+            echo 'Product: 1a4b388fbd6e50e2ecb5a4f001c1b254f7e46f14'
+            echo 'Owner: 38e71bf8c4dbc0702d26b235bfaea6726e33c12e'
+            echo 'Archive hash: ba65b00703026679099f801b660f9266c3a04c24d0a747cfd899485bd59717fb'
+            echo "Archive members: $(wc -l < reports/archive-paths.txt)"
+            echo "Learning-like candidate files: $(wc -l < reports/corpus-candidates.txt)"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Retain inventory for independent selection of validated roots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: owner-learning-inventory-20261011
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 14
