@@ -1,185 +1,173 @@
 # agent-dotfiles
 
-**Bash/Zsh dotfiles and evidence-preserving CLI helpers for coding agents.**
+**A small, inspectable toolbox for coding agents working in real repositories.**
 
-Inspired by [voku/dotfiles](https://github.com/voku/dotfiles), reworked for
-non-interactive coding workflows: explicit activation, namespaced functions,
-exact source evidence and no prompt hooks or startup-file edits. Python 3.10+
-standard-library code supplies stable JSON; Git and ripgrep supply native evidence.
-This source prepares **0.4.0** with the Bash/Zsh setup. The
-[published releases](https://github.com/voku/agent-dotfiles/releases) record which
-versions have shipped. Install only from an independently approved full commit.
+[Inspired by Redpill / voku/dotfiles](https://github.com/voku/dotfiles),
+but built for non-interactive Codex, Claude Code and other terminal-based
+agents. The goal is useful project context, exact source evidence and opt-in
+skills, not a second agent framework or another replacement for Git.
 
-Use native tools for simple, known-location questions; select these helpers when
-source identity, literal scope or explicit completeness improves the evidence.
-See [tool selection](docs/SHELL.md#choose-tools-by-the-evidence-needed).
-[Fresh owner-capability dogfood](docs/MOMENTUM_EXPERIMENTS.md) records actual
-bootstrap, discovery and guidance-maintenance probes, including their limits.
+**What is useful today?**
 
-## Quick start
+- **PHP project onboarding:** one shared [skill](skills/project-onboarding/SKILL.md)
+  can discover actual Composer scripts, test/static-analysis configuration,
+  Git state and relevant source locations without guessing or running checks.
+- **Evidence you can verify:** optional bounded search, exact file reads,
+  Git workspace identity and selected-file patches with explicit errors and
+  completeness signals.
+- **No shell surprises:** opt-in Bash/Zsh functions with reversible
+  activation. No global Git changes, startup hooks, implicit package installs
+  or lossy interception of native tools.
 
-Use the checkout directly, without installation:
+The earlier [controlled evaluation](docs/EVALUATION_2026-10-11.md) did **not**
+establish a general speed or token benefit. Use native `git` and `rg` when they
+already answer the question.
 
-```bash
-# Bash: explicit activation in the current shell
-source /path/to/agent-dotfiles/.bashrc
+## Getting started
+
+### 1. Try it from a checkout (no installation)
+
+Requirements: Python 3.10+; Git for Git operations; ripgrep (`rg`) for
+search. Nothing is downloaded or installed by running the CLI.
+
+~~~sh
+git clone https://github.com/voku/agent-dotfiles.git
+cd agent-dotfiles
+
+# Inventory available tools; missing optional tools are reported.
+./bin/agent-dotfiles doctor
+
+# Read-only context for a real project; replace this path.
+./bin/agent-dotfiles workspace --root /absolute/path/to/your/project --limit 50
+
+# Optional literal search when rg is installed.
+./bin/agent-dotfiles search 'TODO' --root /absolute/path/to/your/project --limit 20
+~~~
+
+The CLI returns JSON with explicit exit statuses. Exit `3` means bounded
+discovery was **incomplete**; it is not evidence that no other files or
+matches exist. [Commands and result contracts](docs/CLI.md).
+
+### 2. Let Codex or Claude Code configure your project
+
+Open the **target project** in your coding agent and paste the
+[agent-assisted project setup prompt](prompts/setup-project.md).
+It asks the agent to:
+
+1. Inspect existing repository instructions, Git state, package manifests,
+   CI and declared quality checks.
+2. Decide whether agent-dotfiles adds value at all; skip irrelevant tools.
+3. Set up only the relevant, approved project-local skill or integration
+   without overwriting existing instructions.
+4. Verify the resulting files, explain rollback and report what remains
+   unverified.
+
+The prompt supports automatic **project-local** setup; it does not grant
+permission to download unreviewed code, install globally or approve a
+revision on your behalf. Supply the location of a reviewed checkout or
+private-prefix installation and an independently approved full commit SHA
+when installation is needed.
+
+For PHP repositories, the current ready-made skill is
+`project-onboarding`. It can be projected into
+`.codex/skills/project-onboarding/` or
+`.claude/skills/project-onboarding/`. See the
+[actual commands and guarded fallback](docs/PROJECT_ONBOARDING.md).
+No global host configuration change is required.
+
+### 3. Optional shell functions
+
+A reviewed checkout can be explicitly activated in a **fresh Bash shell**:
+
+~~~bash
+source /absolute/path/to/agent-dotfiles/.bashrc
 agent_doctor
-agent_search 'function save(' --root /path/to/project --glob '*.php'
-agent_read src/Service.php --root /path/to/project --start 80 --end 180
-agent_status --root /path/to/project
-agent_dotfiles workspace --root /path/to/project
-agent_patch src/Service.php --root /path/to/project --base HEAD~1
+agent_status --root /absolute/path/to/your/project
 agent_deactivate
-```
+~~~
 
-Zsh users source `/path/to/agent-dotfiles/.zshrc` instead. Neither profile changes
-PATH, shell options, the current directory, prompts, user dotfiles or Git config.
-For a non-interactive agent session, use `env -u BASH_ENV bash --noprofile --norc` or `zsh -f`
-and explicitly source the reviewed profile. See [shell setup and helpers](docs/SHELL.md).
+Use `.zshrc` in Zsh. The profile does not modify PATH, prompt, shell
+options, working directory, history, or user startup files. For isolated
+non-interactive Bash processes, clear inherited `BASH_ENV` before invoking
+`bash --noprofile --norc`. Details: [Shell usage](docs/SHELL.md).
 
-For a reusable consumer, preview the exact planned files and hashes, then
-install a reviewed full commit into a private prefix:
+## Optional pinned installation
 
-```sh
+For repeatable consumers, review a **full 40-character Git commit SHA**
+independently, check out that exact commit, and use a separate existing
+private parent directory. Do not use a dynamically resolved `HEAD` as
+its own approval.
+
+~~~sh
 ./install.sh plan --prefix /existing/private/agent-tools --revision APPROVED_FULL_COMMIT_SHA
 ./install.sh --prefix /existing/private/agent-tools --revision APPROVED_FULL_COMMIT_SHA
 ./install.sh verify --prefix /existing/private/agent-tools --revision APPROVED_FULL_COMMIT_SHA
-```
+~~~
 
-Then source the installed `/existing/private/agent-tools/.bashrc` or `.zshrc`
-in a fresh consumer shell. Replace the placeholders with your approved pin and
-actual absolute path. [Installation and rollback](docs/INSTALLATION.md) explains
-verification and safe removal. No package installation or network download occurs.
+Installation is offline and includes a manifest for safe verification and
+removal. Historical published versions and newer `main` features are not
+interchangeable; check the actual [releases](https://github.com/voku/agent-dotfiles/releases)
+and source revision. Full instructions: [Installation and rollback](docs/INSTALLATION.md).
 
-## Layout
+## Repository map
 
-```text
-.bashrc              explicit Bash activation
-.zshrc               explicit Zsh activation
-.shellrc             shared root resolution and reviewed lifecycle loader
-.exports             agent-owned installation location
-.functions           fixed-module loader and deactivation
-shell/core/          fixed activation and deactivation lifecycle
-shell/modules/       explicit context and Git helper definitions
-install.sh           pinned install / verify / uninstall entrypoint
-bin/agent-dotfiles   standalone machine-readable CLI
-agent_dotfiles/      Python standard-library implementation
-tools/install.py    verified private-prefix installer
-tests/               contracts and real shell/Git integration
-docs/                concise contracts, examples and historical evidence links
-```
+~~~text
+agent-dotfiles/
+├── .bashrc / .zshrc / .shellrc    explicit agent shell entry points
+├── .functions / .exports         fixed module loader and owned root
+├── shell/
+│   ├── core/                     activation and deactivation
+│   └── modules/                  context and Git functions
+├── bin/agent-dotfiles            standalone JSON CLI
+├── agent_dotfiles/               CLI implementation (Python standard library)
+├── skills/
+│   └── project-onboarding/       portable skill for PHP coding agents
+├── prompts/
+│   └── setup-project.md          copyable project-aware agent setup
+├── docs/
+│   ├── README.md                 guide/reference/evidence navigation
+│   ├── CLI.md                    commands and JSON/exit contracts
+│   └── ...                       integration guides and experiment history
+├── tools/                         installer and development tooling
+├── tests/                         Python and actual Bash/Zsh integration
+└── install.sh                     reviewed, pinned, optional installer
+~~~
 
-## What works now
+Runtime paths are deliberately stable: the installer checks the exact files
+and their hashes. The new `prompts/` directory contains instructions for
+humans to paste into an agent, **not** auto-executed runtime hooks.
 
-- Read-only `doctor` inventory for `rg`, `git`, `jq`, `fd`/`fdfind`, `shellcheck`, `strace`, `hyperfine`.
-- Bounded file discovery, using direct `rg --files --null` by default or explicit `fd`/`fdfind`.
-- Bounded Git status, using `git status --porcelain=v1 -z` with rename/copy paths decoded in order.
-- Read-only `workspace` identity: canonical Git checkout root, HEAD, branch/detached state, local tool path/version and bounded original status entries. The requested root must belong to the reported checkout; inherited `GIT_DIR`, `GIT_WORK_TREE` and `GIT_INDEX_FILE` overrides are refused. HEAD is checked before and after the scan, but the worktree scan is not atomic; truncated status exits 3 and never claims a clean tree. Unavailable HEAD and invalid repository roots produce distinct errors. The reported tool path is not a verified installation signature.
-- Bounded text search, using `rg --json` and literal matching by default. Original `rg` match records are preserved, including byte-encoded paths and lines. Explicit `--path` / repeatable `--glob` can narrow a question without truncating original matches.
-- Exact UTF-8 `read` ranges with original whitespace/newlines, EOF metadata and SHA-256 of the whole file. No ellipses.
-- Index-only `tracked` listing (`git ls-files -z`) with correct handling of unusual paths.
-- Exact `git-patch` for one path using Git binary/full-index diff, SHA-256 and an error if output cannot fit; no replacement with diffstat.
-- Stable JSON envelopes and explicit result limits. Search respects `.gitignore` by default; `--hidden` is opt-in.
-- Runtime commands do not install anything, access the network or load shell startup files. A separate, explicit installer supports pinned private prefixes, verification and safe removal.
+## Choose the right tool
 
-See [shell helpers](docs/SHELL.md), [pinned installation and rollback](docs/INSTALLATION.md) and the [optional agent-loop consumer contract](docs/AGENT_LOOP.md). Automatic installation and host-policy changes remain outside the CLI contract.
-
-## Project onboarding for Codex and Claude Code
-
-The optional [`project-onboarding`](docs/PROJECT_ONBOARDING.md) skill gives a
-fresh coding agent a practical first pass for a PHP failure or unfamiliar
-repository: verified Git state, Composer scripts and configuration, supplied
-failure evidence, and the smallest relevant source location. It is one shared
-source projected explicitly into a project-local Codex or Claude Code skill
-directory; it does not install dependencies or run project checks on its own.
-
-## Requirements
-
-Python 3.10+ on Linux, macOS or WSL, and `rg` for the search commands. `git` is recommended for coding workflows. Everything else is optional. The name `sg` is deliberately not recognized as `ast-grep`, because on Linux it can refer to the unrelated `newgrp` utility. The Python standard library is sufficient; no pip/Composer install is required.
-
-## Usage
-
-From the checkout:
-
-```sh
-./bin/agent-dotfiles doctor
-./bin/agent-dotfiles doctor --strict
-./bin/agent-dotfiles files --root . --limit 50
-./bin/agent-dotfiles git-status --root . --limit 50
-./bin/agent-dotfiles workspace --root . --limit 50
-./bin/agent-dotfiles files --engine fd --limit 50 # explicit alternative; different semantics
-./bin/agent-dotfiles search 'function save(' --root . --limit 20
-./bin/agent-dotfiles search '^final class ' --regex --limit 20
-./bin/agent-dotfiles search 'save(' --path src --glob '*.php' --limit 30
-./bin/agent-dotfiles tracked --limit 100
-./bin/agent-dotfiles read src/Service.php --start 80 --end 180
-./bin/agent-dotfiles git-patch src/Service.php --base HEAD~1
-```
-
-All **successful** commands print one JSON object to stdout. There is no pager or color output.
-
-| Exit code | Meaning |
+| Need | Start with |
 | --- | --- |
-| 0 | Complete success; doctor reports inventory even when tools are missing unless `--strict` |
-| 1 | Search completed with zero matches |
-| 2 | Explicit error: invalid arguments, missing tool, bad output, timeout, or subprocess failure; doctor `--strict` also uses 2 |
-| 3 | **Truncated**: more records than `--limit`, or output byte cap exceeded. Treat results as incomplete. |
+| Known file, literal match or Git state | Native `git` / `rg` |
+| Proven root, HEAD and bounded status | `agent-dotfiles workspace` |
+| Exact selected source range or patch | `agent-dotfiles read` / `git-patch` |
+| PHP symbols, callers and impact | Fresh `agent-map` / `agent-loop map`, if available |
+| Agent unfamiliar with a PHP project | `project-onboarding` skill |
+| Project-specific setup | [Copyable setup prompt](prompts/setup-project.md) |
 
-Output schemas: `agent-dotfiles.v1.doctor`, `agent-dotfiles.v1.files`, `agent-dotfiles.v1.git-status`, `agent-dotfiles.v1.workspace`, `agent-dotfiles.v1.search`, `agent-dotfiles.v1.tracked`, `agent-dotfiles.v1.read`, `agent-dotfiles.v1.git-patch`, `agent-dotfiles.v1.error`. An exact `read` or `git-patch` command **fails** if the requested content would exceed the cap. It never returns a shortened source or patch. A result with `truncated: true` must **never** be presented as a complete repository search. Limits default to 100, maximum 1000; process output is limited to 2 MiB and wall time to 20 seconds.
+The shell helpers are optional convenience names for the CLI and native Git
+operations. They are not required for the skill.
 
-### Source of truth
+## Documentation, tests and boundaries
 
-Use the right tool for the *question*, not the shortest alias:
+Start with the [documentation map](docs/README.md), then the
+[CLI reference](docs/CLI.md), [shell guide](docs/SHELL.md),
+[security contract](docs/SECURITY.md) or
+[agent-loop ownership boundary](docs/AGENT_LOOP.md), as needed.
 
-| Task | Preferred tool |
-| --- | --- |
-| Literal text/config/templates | `rg` or bounded `agent-dotfiles search` |
-| File paths | `rg --files -0` or bounded `agent-dotfiles files` |
-| Tracked files | `git ls-files -z` |
-| Worktree changes | `git status --porcelain=v1 -z` |
-| JSON transformation | `jq`, with explicit filters and exit handling |
-| PHP definitions/callers/impact | `agent-loop map` when available and fresh; verify source ranges |
-| Shell static analysis | `shellcheck` where installed |
-| Runtime diagnosis | `strace` only for a scoped Linux investigation |
-| CLI comparison | `hyperfine` only for measured experiments |
+For maintainers:
 
-See [Context-first policy](docs/CONTEXT_POLICY.md), [Git evidence and opt-in aliases](docs/GIT_CONTEXT.md), [Tool matrix](docs/TOOL_MATRIX.md), [Security](docs/SECURITY.md) and [Agent Loop boundary](docs/AGENT_LOOP.md).
-
-## Why not an output-compression proxy?
-
-This tool does **not** intercept `git diff`, `rg`, PHPStan, tests or shell tools.
-The `snip`-style `git diff` → `--stat` substitution could omit precisely the
-code being reviewed, even though the token count looks attractive. Bounded
-*navigation* is explicit; a selected file or patch is delivered without lossy
-transformation. Optimization is evaluated on correct completed tasks, total
-latency and retries, not savings percentages.
-
-## Tests: Python contracts + Bashunit integration
-
-The Python unittest contracts remain authoritative for internal parsing,
-path safety, byte preservation and failure handling. Bashunit 0.50.1 adds
-**end-to-end shell/CLI tests** for actual executable behavior and exit codes;
-it does not replace the Python tests with lossy snapshots.
-
-```sh
+~~~sh
 python3 -m compileall -q agent_dotfiles bin tests tools
 python3 -m unittest discover -s tests -v
-# After installing/pinning bashunit 0.50.1 separately:
+# If the separately installed/pinned Bashunit CLI is available:
 bashunit test tests/shell --strict
-```
+~~~
 
-GitHub CI installs Bashunit via an immutable, SHA-pinned official action with
-checksum verification. Nothing is installed by running `agent-dotfiles`.
-
-
-The tests use fake command executables to verify result contracts without depending on system-specific versions, interactive dotfiles, networking, or external package installations.
-
-## GitHub workflow
-
-The repository is now maintained at [voku/agent-dotfiles](https://github.com/voku/agent-dotfiles).
-Development uses reviewable feature branches, tests, and pull requests. Its
-original repository-creation helper has been removed: it is not suitable for
-updating an existing GitHub repository. No command silently publishes changes,
-merges branches or changes the agent's global configuration.
-
-[Governed PHP maintenance and evidence-quality cycle](docs/QUALITY_CYCLE_17.md): independently scored repairs, Dream review, owner correction and honest limits.
+Project files and command output are untrusted evidence. This tool does not
+change agent-loop governance, install global skills, auto-run tests or replace
+independent review. See [upstream provenance](UPSTREAM.md) and
+[governed quality evidence](docs/QUALITY_CYCLE_17.md).
