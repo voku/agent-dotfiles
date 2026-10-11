@@ -1,0 +1,94 @@
+name: Real PHP evidence preflight
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/real-php-preflight.yml'
+      - 'tools/real_php_preflight.py'
+      - 'tests/test_real_php_preflight.py'
+      - 'install.sh'
+      - 'tools/install.py'
+      - 'bin/**'
+      - 'agent_dotfiles/**'
+      - '.bashrc'
+      - '.zshrc'
+      - '.shellrc'
+      - '.functions'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-cli-shell-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout exact agent-dotfiles candidate without credentials
+        uses: actions/checkout@v4
+        with:
+          path: dotfiles
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Checkout frozen real PHP repository without credentials
+        uses: actions/checkout@v4
+        with:
+          repository: voku/agent-loop
+          ref: 3c71365d1ea7eeaa2499f02c09d3642afa083768
+          path: php
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Provide isolated CI-only Bash/Zsh and rg dependencies
+        run: sudo apt-get update && sudo apt-get install -y zsh ripgrep
+
+      - name: Install candidate into a private offline consumer prefix
+        env:
+          DOTFILES_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          ./dotfiles/install.sh --prefix "$RUNNER_TEMP/agent-dotfiles-consumer" --revision "$DOTFILES_SHA" > install.json
+          ./dotfiles/install.sh verify --prefix "$RUNNER_TEMP/agent-dotfiles-consumer" --revision "$DOTFILES_SHA" > verify-before.json
+
+      - name: Execute parity oracles and preserve all command receipts
+        env:
+          DOTFILES_CHECKOUT: ${{ github.workspace }}/dotfiles
+          PHP_CHECKOUT: ${{ github.workspace }}/php
+          CONSUMER_PREFIX: ${{ runner.temp }}/agent-dotfiles-consumer
+          DOTFILES_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          PHP_SHA: 3c71365d1ea7eeaa2499f02c09d3642afa083768
+          PREFLIGHT_RECEIPT: ${{ github.workspace }}/real-php-preflight.json
+        run: python3 dotfiles/tools/real_php_preflight.py
+
+      - name: Verify after use and uninstall isolated candidate
+        if: always()
+        env:
+          DOTFILES_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          verify_status=0
+          uninstall_status=0
+          if test -d "$RUNNER_TEMP/agent-dotfiles-consumer"; then
+            ./dotfiles/install.sh verify --prefix "$RUNNER_TEMP/agent-dotfiles-consumer" --revision "$DOTFILES_SHA" > verify-after.json || verify_status=$?
+            ./dotfiles/install.sh uninstall --prefix "$RUNNER_TEMP/agent-dotfiles-consumer" --revision "$DOTFILES_SHA" > uninstall.json || uninstall_status=$?
+          fi
+          if test "$verify_status" -ne 0; then exit "$verify_status"; fi
+          exit "$uninstall_status"
+
+      - name: Retain machine-readable evidence even if a parity gate fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-php-command-evidence
+          path: |
+            real-php-preflight.json
+            install.json
+            verify-before.json
+            verify-after.json
+            uninstall.json
+          if-no-files-found: error
+          retention-days: 14
