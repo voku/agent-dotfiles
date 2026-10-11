@@ -165,3 +165,5 @@ Development uses reviewable feature branches, tests, and pull requests. Its
 original repository-creation helper has been removed: it is not suitable for
 updating an existing GitHub repository. No command silently publishes changes,
 merges branches or changes the agent's global configuration.
+
+[Governed PHP maintenance and evidence-quality cycle](docs/QUALITY_CYCLE_17.md): independently scored repairs, Dream review, owner correction and honest limits.
