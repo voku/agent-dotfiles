@@ -31,7 +31,7 @@ jobs:
       - name: Capability diagnostics
         if: always()
         run: python bin/agent-dotfiles doctor > capabilities.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: python-${{ matrix.python-version }}-diagnostics
