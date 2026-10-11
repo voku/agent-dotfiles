@@ -174,8 +174,8 @@ class WorkspaceTest(unittest.TestCase):
                 raise
             # Some filesystems (including macOS APFS) cannot store invalid
             # UTF-8 names; still test the lossless byte decoder itself.
-            self.assertEqual(cli_module._filesystem_path(b"byte-\\xff.txt"), {
-                "base64": base64.b64encode(b"byte-\\xff.txt").decode("ascii"),
+            self.assertEqual(cli_module._filesystem_path(b"byte-\xff.txt"), {
+                "base64": base64.b64encode(b"byte-\xff.txt").decode("ascii"),
             })
             self.skipTest("filesystem refuses non-UTF8 path bytes")
         else:
