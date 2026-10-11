@@ -121,6 +121,59 @@ jobs:
             python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["schema"] == "agent-dotfiles.v1.doctor"' "$report"
           done
 
+          # Exercise pinned workspace CLI through fresh, installed Bash/Zsh profiles.
+          repo="$root/checkout [雪]"
+          mkdir -p "$repo"
+          git init -q "$repo"
+          printf 'initial\n' > "$repo/tracked.txt"
+          git -C "$repo" add -- tracked.txt
+          git -C "$repo" -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm baseline
+          head="$(git -C "$repo" rev-parse HEAD)"
+          for phase in clean dirty truncated; do
+            case "$phase" in
+              dirty) printf 'modified\n' >> "$repo/tracked.txt" ;;
+              truncated) printf 'new\n' > "$repo/untracked.txt" ;;
+            esac
+            for profile in .bashrc .zshrc; do
+              result_status=0
+              case "$profile" in
+                .bashrc)
+                  result="$(env -u BASH_ENV bash --noprofile --norc -c '. "$1/$2" || exit $?; agent_dotfiles workspace --root "$3" --limit 1' workspace-consumer "$prefix" "$profile" "$repo")" || result_status=$?
+                  ;;
+                .zshrc)
+                  result="$(env -u ZDOTDIR zsh -f -c '. "$1/$2" || exit $?; agent_dotfiles workspace --root "$3" --limit 1' workspace-consumer "$prefix" "$profile" "$repo")" || result_status=$?
+                  ;;
+              esac
+              python3 - "$phase" "$result_status" "$result" "$repo" "$head" "$prefix" <<'PY'
+import json
+import sys
+
+phase, raw_status, payload, repo, head, prefix = sys.argv[1:]
+report = json.loads(payload)
+status = int(raw_status)
+assert report["schema"] == "agent-dotfiles.v1.workspace", report
+assert report["requested_root"] == repo and report["root"] == repo, report
+assert report["tool_home"] == prefix and report["head"] == head, report
+assert report["detached"] is False and isinstance(report["branch"], str), report
+assert report["worktree_atomic"] is False, report
+assert report["head_unchanged_during_probe"] is True, report
+assert report["limit"] == 1, report
+if phase == "clean":
+    assert status == 0 and report["clean"] is True, report
+    assert report["truncated"] is False and report["changes"] == [], report
+elif phase == "dirty":
+    assert status == 0 and report["clean"] is False, report
+    assert report["truncated"] is False, report
+    assert report["changes"] == [{"xy": " M", "path": "tracked.txt"}], report
+else:
+    assert phase == "truncated" and status == 3, (phase, status, report)
+    assert report["truncated"] is True and report["clean"] is None, report
+    assert len(report["changes"]) == 1, report
+PY
+            done
+          done
+          test ! -e "$repo/.git/index.lock"
+
           ./install.sh verify --prefix "$prefix" --revision "$CANDIDATE_SHA" > "$root/verify-after.json"
           ./install.sh uninstall --prefix "$prefix" --revision "$CANDIDATE_SHA" > "$root/uninstall.json"
           python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["ok"] is True and r["operation"] == "uninstall" and r["source_revision"] == sys.argv[2]' "$root/uninstall.json" "$CANDIDATE_SHA"
