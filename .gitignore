@@ -9,3 +9,7 @@ build/
 mutation.sqlite
 mutation-results.jsonl
 mutation-summary.md
+
+# Generated evaluations and release payloads belong in CI artifacts or pinned history.
+docs/benchmarks/
+docs/releases/

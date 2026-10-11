@@ -38,4 +38,16 @@ paths for `read`. `read` paths are relative to its own supplied root. Never blin
 join a tracked path to the selected subdirectory or infer completeness from a
 bounded inventory.
 
-The comparison and known limitations are recorded in [the full-cycle report](FULL_CYCLE.md).
+Before host implementation, inspect the actual approved scope returned by
+`agent-loop enter`. In the evaluated Loop runtime, explicit `workflow plan
+--scope` replaces the file list as the allowed scope; `--file` does not add an
+extra allowed implementation path. Stop source mutation if the required file
+is excluded, and resolve authority through the owner workflow. Passing tests or
+`complete/none` do not retrospectively establish scope compliance.
+
+The historical comparison is in [the full-cycle report](FULL_CYCLE.md).
+Completed three-way maintenance, independent held-out grades, scope failures and
+remaining publication gates are recorded in
+[the shell evaluation](EVALUATION_2026-10-11.md) and
+[issue #12](https://github.com/voku/agent-dotfiles/issues/12).
+General productivity improvement remains inconclusive; no default routing follows.

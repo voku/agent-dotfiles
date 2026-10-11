@@ -64,3 +64,65 @@ jobs:
           verify-checksum: 'true'
       - name: Bashunit real-CLI integration tests
         run: bashunit test tests/shell --strict
+
+  shell-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install independent shell validators
+        run: sudo apt-get update && sudo apt-get install -y zsh shellcheck
+      - name: ShellCheck and Bash/Zsh syntax
+        run: |
+          shellcheck --severity=warning -s sh install.sh
+          shellcheck --severity=warning -s bash .bashrc .shellrc .functions .exports
+          for file in .bashrc .shellrc .functions .exports; do bash -n "$file"; done
+          for file in .zshrc .shellrc .functions .exports; do zsh -n "$file"; done
+      - name: Actual Bash and Zsh activation contracts
+        env:
+          REQUIRE_ZSH: "1"
+        run: python -m unittest discover -s tests -p test_shell_profiles.py -v
+
+  candidate-cold-install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # PR checks should test the reviewed PR source, not GitHub's synthetic merge ref.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Zsh for a fresh consumer
+        run: sudo apt-get update && sudo apt-get install -y zsh
+      - name: Verify candidate source, install, activate, verify and uninstall
+        env:
+          CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          root="$(mktemp -d)"
+          trap 'rm -rf -- "$root"' EXIT
+          prefix="$root/consumer"
+
+          ./install.sh --prefix "$prefix" --revision "$CANDIDATE_SHA" > "$root/install.json"
+          python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["ok"] is True and r["operation"] == "install" and r["source_revision"] == sys.argv[2]' "$root/install.json" "$CANDIDATE_SHA"
+          ./install.sh verify --prefix "$prefix" --revision "$CANDIDATE_SHA" > "$root/verify-before.json"
+          "$prefix/bin/agent-dotfiles" doctor > "$root/direct-doctor.json"
+
+          env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc" || exit $?; agent_doctor || exit $?; agent_deactivate' fresh-bash "$prefix" > "$root/bash-doctor.json"
+          env -u ZDOTDIR zsh -f -c 'source "$1/.zshrc" || exit $?; agent_doctor || exit $?; agent_deactivate' fresh-zsh "$prefix" > "$root/zsh-doctor.json"
+          for report in "$root/direct-doctor.json" "$root/bash-doctor.json" "$root/zsh-doctor.json"; do
+            python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["schema"] == "agent-dotfiles.v1.doctor"' "$report"
+          done
+
+          ./install.sh verify --prefix "$prefix" --revision "$CANDIDATE_SHA" > "$root/verify-after.json"
+          ./install.sh uninstall --prefix "$prefix" --revision "$CANDIDATE_SHA" > "$root/uninstall.json"
+          python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["ok"] is True and r["operation"] == "uninstall" and r["source_revision"] == sys.argv[2]' "$root/uninstall.json" "$CANDIDATE_SHA"
+          test ! -e "$prefix"
+          echo "Verified candidate $CANDIDATE_SHA: isolated install, Bash/Zsh doctor, post-use manifest, uninstall" >> "$GITHUB_STEP_SUMMARY"

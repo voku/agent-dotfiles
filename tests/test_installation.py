@@ -258,6 +258,18 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertFalse(self.prefix.exists())
 
+    def test_frontend_rejects_abbreviated_source_override(self):
+        """A full valid alternate checkout must not bypass the root installer owner."""
+        self.frontend_fixture()
+        alternate = self.root / "other valid checkout"
+        shutil.copytree(self.source, alternate)
+        for source_option in ("--source", "--sour", "--sourc"):
+            with self.subTest(option=source_option):
+                result = self.frontend("--prefix", str(self.prefix), "--revision",
+                                       self.revision, source_option, str(alternate))
+                self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+                self.assertFalse(self.prefix.exists())
+
     def test_frontend_missing_python_has_visible_error(self):
         self.frontend_fixture()
         empty_path = self.root / "no-executables"
