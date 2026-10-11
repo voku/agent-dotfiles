@@ -25,14 +25,14 @@ jobs:
     timeout-minutes: 12
     steps:
       - name: Checkout exact agent-dotfiles candidate without credentials
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: dotfiles
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
 
       - name: Checkout frozen real PHP repository without credentials
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: voku/agent-loop
           ref: 3c71365d1ea7eeaa2499f02c09d3642afa083768
