@@ -72,7 +72,7 @@ jobs:
         working-directory: owner
         run: |
           set -euo pipefail
-          composer install --no-dev --no-interaction --prefer-dist --no-progress --no-audit
+          composer install --no-dev --no-interaction --prefer-dist --no-progress
           test -f vendor/autoload.php
           test -f composer.lock
           cp composer.lock ../reports/owner-composer.lock
