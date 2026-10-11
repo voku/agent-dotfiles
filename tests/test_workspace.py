@@ -21,7 +21,7 @@ class WorkspaceTest(unittest.TestCase):
             self.skipTest("Git is required for workspace integration tests")
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
+        self.root = Path(self.temp.name).resolve()
         self.repo = self.root / "checkout space [雪]\n"
         self.repo.mkdir()
         self.git("init", "-q")
