@@ -17,7 +17,7 @@ _agent_dotfiles_source_profile() {
     }
     _agent_home=${_agent_home%.}
     _agent_home=${_agent_home%$'\n'}
-    if [ ! -r "$_agent_home/.shellrc" ]; then
+    if [ ! -f "$_agent_home/.shellrc" ] || [ ! -r "$_agent_home/.shellrc" ]; then
         printf 'agent-dotfiles: required .shellrc is missing or unreadable\n' >&2
         unset -f _agent_dotfiles_source_profile
         return 2

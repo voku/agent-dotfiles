@@ -17,7 +17,7 @@ _agent_dotfiles_bootstrap() {
     }
     _agent_home=${_agent_home%.}
     _agent_home=${_agent_home%$'\n'}
-    if [ ! -r "$_agent_home/shell/core/activation.sh" ]; then
+    if [ ! -f "$_agent_home/shell/core/activation.sh" ] || [ ! -r "$_agent_home/shell/core/activation.sh" ]; then
         printf 'agent-dotfiles: required shell/core/activation.sh is missing or unreadable\n' >&2
         unset -f _agent_dotfiles_bootstrap
         return 2

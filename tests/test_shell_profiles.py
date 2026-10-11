@@ -141,6 +141,36 @@ agent_source_status=$?
             finally:
                 target.write_bytes(content)
 
+    def test_directory_assets_refuse_without_partial_namespace(self):
+        # Readable/searchable directories are not source files or executables.
+        for name in ('.shellrc', '.exports', '.functions',
+                     'shell/core/activation.sh', 'shell/core/deactivation.sh',
+                     'shell/modules/context.sh', 'shell/modules/git.sh',
+                     'bin/agent-dotfiles'):
+            target = self.home / name
+            content, mode = target.read_bytes(), target.stat().st_mode & 0o777
+            target.unlink()
+            try:
+                target.mkdir()
+                for shell, profile in self.shells():
+                    with self.subTest(asset=name, shell=shell):
+                        result = self.run_shell(shell, profile, """
+. "$1"
+activation_result=$?
+[ "$activation_result" = 2 ] || exit 10
+[ "${AGENT_DOTFILES_HOME+x}" != x ] || exit 11
+for helper in agent_dotfiles agent_doctor agent_files agent_search agent_read agent_tracked agent_status agent_patch agent_history agent_blame agent_deactivate; do
+    ! typeset -f "$helper" >/dev/null 2>&1 || exit 12
+done
+""")
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        self.assertEqual(result.stdout, '')
+                        self.assertIn(name, result.stderr)
+            finally:
+                target.rmdir()
+                target.write_bytes(content)
+                target.chmod(mode)
+
     def test_removed_executable_is_visible_failure(self):
         for shell, profile in self.shells():
             result = self.run_shell(shell, profile, '. "$1"; command rm -- "$AGENT_DOTFILES_HOME/bin/agent-dotfiles"; agent_read example')
