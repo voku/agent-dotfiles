@@ -31,7 +31,7 @@ a file count and `entries` mapping manifest-tracked payload paths to SHA-256
 hashes and numeric Unix permission modes (493 means 0755, 420 means 0644).
 The generated `installation.json` is written only during installation; it is
 not counted among these payload entries. The plan includes the generated launcher
-and all fixed shell modules. Review it before installation; it is not an approval
+and all fixed shell modules and lifecycle files. Review it before installation; it is not an approval
 token. The later installation repeats provenance checks against the same
 approved full commit and may refuse if the source or destination changed.
 Plan never installs packages, sources profiles or alters user configuration.
@@ -54,7 +54,7 @@ the checkout, and without symlinks or `..` components. All tracked checkout file
 must be clean; untracked and ignored files are excluded. The installer reads the
 pinned Git objects and checks the runtime files against the working copy. It copies
 only tracked Python package files, the original entry point, the five agent-owned
-shell profiles/shared files, the two fixed `shell/modules/` helper files and the license, plus
+shell profiles/shared files, the two fixed `shell/modules/` helper files, the two `shell/core/` lifecycle files and the license, plus
 a small generated launcher and a versioned installation manifest. It refuses
 tracked runtime symlinks. Installation is staged beside the prefix and renamed
 only after validation, leaving an existing installation untouched on failure.
@@ -89,8 +89,9 @@ has `ok: true`, operation, source revision and file count; failure has `ok: fals
 and an error. Exit status 0 means success, 2 means refusal or operational failure.
 Argument syntax errors use standard argparse diagnostics and exit status 2.
 Verification checks every file, mode, symlink, missing entry and unknown file or
-directory. Modular installations must include both modules; older pre-modular
-manifests remain verifiable and safely removable. The optional `--revision` asserts the independently recorded pin.
+directory. New installations must include both modules and both lifecycle files; partial
+lifecycle manifests fail closed. Older pre-core and pre-modular manifests
+remain verifiable and safely removable. The optional `--revision` asserts the independently recorded pin.
 
 The manifest is integrity and provenance bookkeeping, **not a digital signature**.
 An attacker who can rewrite the installation and manifest can falsify them.
