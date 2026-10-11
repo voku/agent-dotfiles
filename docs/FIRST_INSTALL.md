@@ -18,6 +18,12 @@ Profiles are fixed inventories, not shell startup scripts:
 - `php`: minimal plus PHP and Composer (detected only: no assumed correct system PHP packages).
 - `debug`: minimal plus fd/fdfind, ShellCheck, hyperfine and Linux-only strace.
 
+The wrapper requires Python 3.10 or newer and exits with status `2` and a
+clear diagnostic if Python is missing, too old or unusable. It starts only the
+Python runtime for its version check and planner; it does not invoke the
+probed developer tools. A machine without a working Python must provision that
+prerequisite independently.
+
 The command shows `available`, chosen executable name/path, `version: null`
 (versions are intentionally not inferred or obtained by executing code), and
 `package_command_argv` only for missing known packages on detected Debian/Ubuntu

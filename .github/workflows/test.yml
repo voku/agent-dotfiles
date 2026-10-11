@@ -39,11 +39,36 @@ jobs:
             contract-tests.log
             capabilities.json
 
+  bootstrap-legacy-python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.9'
+      - name: Reject unsupported Python 3.9 without executing planner
+        run: |
+          set -euo pipefail
+          python3 -c 'import sys; assert sys.version_info[:2] == (3, 9)'
+          cd "$RUNNER_TEMP"
+          status=0
+          "$GITHUB_WORKSPACE/firstInstall.sh" plan > bootstrap.json 2> bootstrap.err || status=$?
+          test "$status" -eq 2
+          test ! -s bootstrap.json
+          grep -F 'Python 3.10+ is required' bootstrap.err
+
   macos-installation:
     runs-on: macos-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
       - uses: actions/setup-python@v7
         with:
           python-version: '3.15'
@@ -51,6 +76,21 @@ jobs:
         env:
           REQUIRE_ZSH: "1"
         run: python -m unittest discover -s tests -v
+      - name: Verify real macOS bootstrap capability plan
+        run: |
+          ./firstInstall.sh plan --profile php > "$RUNNER_TEMP/bootstrap-macos.json"
+          python3 - "$RUNNER_TEMP/bootstrap-macos.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          report = json.loads(Path(sys.argv[1]).read_text())
+          assert report["schema"] == "agent-dotfiles.v1.bootstrap-plan"
+          assert report["system"] == "Darwin"
+          assert report["profile"] == "php" and report["operation"] == "plan"
+          assert report["manager"] in ("brew", None)
+          argv = report["package_command_argv"]
+          assert argv is None or (argv[:2] == ["brew", "install"] and report["package_command_requires_approval"])
+          PY
 
   bashunit-integration:
     runs-on: ubuntu-latest
