@@ -41,7 +41,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.15'
 
       - name: Provide isolated CI-only Bash/Zsh and rg dependencies
         run: sudo apt-get update && sudo apt-get install -y zsh ripgrep
