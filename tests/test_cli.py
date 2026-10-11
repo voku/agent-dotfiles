@@ -201,6 +201,27 @@ class AgentDotfilesCliTest(unittest.TestCase):
                 self.assertEqual(report["complete_file"], start == 1 and end >= 3)
                 self.assertFalse(report["truncated"])
 
+    def test_read_uses_only_lf_boundaries_and_preserves_all_other_separators(self) -> None:
+        import hashlib
+        for suffix in (b"", b"\n"):
+            with self.subTest(trailing_lf=bool(suffix)):
+                first = "comment \r \v \f \x1c \x1d \x1e \x85 \u2028 \u2029\r\n".encode("utf-8")
+                second = b"target" + suffix
+                raw = first + second
+                (self.project / "separators.php").write_bytes(raw)
+                for start, end, expected in ((1, 1, first), (2, 2, second), (1, 2, raw)):
+                    code, report = self.cli("read", "separators.php", "--start", str(start), "--end", str(end))
+                    self.assertEqual(code, 0)
+                    self.assertEqual(report["content"].encode("utf-8"), expected)
+                    self.assertEqual(report["content_bytes"], len(expected))
+                    self.assertEqual(report["total_lines"], 2)
+                    self.assertEqual(report["actual_end"], end)
+                    self.assertEqual(report["sha256"], hashlib.sha256(raw).hexdigest())
+                    self.assertEqual(report["complete_file"], start == 1 and end == 2)
+                code, report = self.cli("read", "separators.php", "--start", "3", "--end", "3")
+                self.assertEqual(code, 2)
+                self.assertEqual(report["error"], "invalid_range")
+
     def test_read_short_file_reports_eof_instead_of_hidden_truncation(self) -> None:
         (self.project / "one.php").write_text("hello\n", encoding="utf-8")
         code, report = self.cli("read", "one.php")

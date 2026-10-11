@@ -1,11 +1,15 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
 
 - Require Linux Bash/Zsh activation tests and ShellCheck validation of the root
   shell layout; preserve source paths and caller shell state.
-- Add cross-range whole-source digest regression coverage and evidence-driven
-  guidance for selecting native tools versus optional structured helpers.
+- Add cross-range whole-source digest and LF-only source-coordinate regression
+  coverage, plus evidence-driven native/structured tool selection guidance.
+- Preserve activation failures in documented fresh-shell invocations; require
+  exact-revision citations and actual approved-scope checks before mutation.
+- Record three-way maintenance results, independent oracles and workflow setup
+  failures without claiming a general productivity or token saving.
 
 - Add explicit agent-owned Bash/Zsh profiles, shared exports and namespaced
   context helpers without changing user startup files, PATH or shell options.

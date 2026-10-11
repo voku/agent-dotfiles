@@ -20,7 +20,7 @@ source /absolute/agent-dotfiles/.zshrc
 For hosts that run each tool call in a new shell, activate in that call explicitly:
 
 ```sh
-env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc"; shift; agent_search "$@"' \
+env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc" || exit $?; shift; agent_search "$@"' \
   consumer /absolute/agent-dotfiles 'function save(' --root /project --glob '*.php'
 ```
 
@@ -52,7 +52,9 @@ agent_search 'sha256' --root /project --path agent_dotfiles --glob '*.py'
 agent_read agent_dotfiles/cli.py --root /project --start 220 --end 285
 ```
 
-Check the exit status and completeness fields. Exit 3 means the search is
+Keep activation failures and search statuses visible; a trailing successful
+command must not replace the status of the evidence command. Check completeness
+fields too. Exit 3 means the search is
 incomplete: narrow its scope or retrieve the missing evidence before drawing a
 conclusion. A short result that omits the implementation costs another search.
 Loop lifecycle and Learning syntax must come from the pinned owner's help and
@@ -98,6 +100,14 @@ means a completed search found no matches, and exit 2 means a CLI error.
 Untracked/ignored files need explicit `agent_read` evidence; they cannot supply
 tracked patch evidence. Structural PHP questions remain owned by agent-map and
 agent-loop's investigation workflow.
+
+## Verify the citation as well as the content
+
+Record the worktree or exact Git commit that produced a source finding. Use the
+original path and source positions, not line numbers from a JSON display or a
+different revision. A structured read does not prevent a manually misquoted
+citation: verify the cited declaration or statement in that exact source before
+recording the conclusion. Keep independent review in the governed workflow.
 
 ## Rollback
 
