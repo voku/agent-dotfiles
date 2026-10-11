@@ -1,0 +1,677 @@
+{
+  "schema_version": 1,
+  "task": "DOTFILES-15",
+  "pr": 18,
+  "head": "b417dc72150032d44d0160ec6a9e901ed213c373",
+  "merge": {
+    "mergeCommit": {
+      "oid": "4c6fdd2c61d31789451f6675e7f2cdf0f209124b"
+    },
+    "mergedAt": "2026-10-11T12:31:39Z",
+    "state": "MERGED"
+  },
+  "merged_source_ci": {
+    "conclusion": "success",
+    "headSha": "4c6fdd2c61d31789451f6675e7f2cdf0f209124b",
+    "jobs": [
+      {
+        "completedAt": "2026-10-11T12:31:57Z",
+        "conclusion": "success",
+        "databaseId": 114470533474,
+        "name": "python-contracts (3.12)",
+        "startedAt": "2026-10-11T12:31:44Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Compile",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Contract tests",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Capability diagnostics",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 13,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 14,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 15,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/voku/agent-dotfiles/actions/runs/38139600001/job/114470533474"
+      },
+      {
+        "completedAt": "2026-10-11T12:31:57Z",
+        "conclusion": "success",
+        "databaseId": 114470533699,
+        "name": "python-contracts (3.10)",
+        "startedAt": "2026-10-11T12:31:44Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Compile",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Contract tests",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Capability diagnostics",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 13,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 14,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 15,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/voku/agent-dotfiles/actions/runs/38139600001/job/114470533699"
+      },
+      {
+        "completedAt": "2026-10-11T12:32:04Z",
+        "conclusion": "success",
+        "databaseId": 114470533706,
+        "name": "macos-installation",
+        "startedAt": "2026-10-11T12:31:49Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Installation, Bash and Zsh source contracts on macOS",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 9,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/voku/agent-dotfiles/actions/runs/38139600001/job/114470533706"
+      },
+      {
+        "completedAt": "2026-10-11T12:31:58Z",
+        "conclusion": "success",
+        "databaseId": 114470533710,
+        "name": "shell-contracts",
+        "startedAt": "2026-10-11T12:31:44Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Install independent shell validators",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "ShellCheck and Bash/Zsh syntax",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Actual Bash and Zsh activation contracts",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 11,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 12,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/voku/agent-dotfiles/actions/runs/38139600001/job/114470533710"
+      },
+      {
+        "completedAt": "2026-10-11T12:31:57Z",
+        "conclusion": "success",
+        "databaseId": 114470533752,
+        "name": "python-contracts (3.13)",
+        "startedAt": "2026-10-11T12:31:44Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Compile",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Contract tests",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Capability diagnostics",
+            "number": 6,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/upload-artifact@v4",
+            "number": 7,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 13,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 14,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 15,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/voku/agent-dotfiles/actions/runs/38139600001/job/114470533752"
+      },
+      {
+        "completedAt": "2026-10-11T12:31:51Z",
+        "conclusion": "success",
+        "databaseId": 114470533753,
+        "name": "bashunit-integration",
+        "startedAt": "2026-10-11T12:31:44Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run TypedDevs/bashunit@28ea63c467f1f461a6368c93e5c264051b141c6f",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Bashunit real-CLI integration tests",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 8,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 9,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/voku/agent-dotfiles/actions/runs/38139600001/job/114470533753"
+      },
+      {
+        "completedAt": "2026-10-11T12:32:03Z",
+        "conclusion": "success",
+        "databaseId": 114470533766,
+        "name": "candidate-cold-install",
+        "startedAt": "2026-10-11T12:31:45Z",
+        "status": "completed",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run actions/setup-python@v5",
+            "number": 3,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Install Zsh for a fresh consumer",
+            "number": 4,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Verify candidate source, install, activate, verify and uninstall",
+            "number": 5,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/setup-python@v5",
+            "number": 9,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 10,
+            "status": "completed"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 11,
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/voku/agent-dotfiles/actions/runs/38139600001/job/114470533766"
+      }
+    ],
+    "status": "completed"
+  },
+  "canonical_closeout": {
+    "schema_version": "1.0",
+    "command": "finish",
+    "task_id": "DOTFILES-15",
+    "complete": true,
+    "next_action": "none",
+    "next_action_kind": "none",
+    "next_action_invocation": null,
+    "manifest": {
+      "schema_version": "1.0",
+      "task_id": "DOTFILES-15",
+      "run_id": "run:DOTFILES-15:e030f17d57397bc2",
+      "mode": "governed",
+      "state": "complete",
+      "references": {
+        "board": {
+          "owner": "agent-kanban",
+          "state": "not_configured",
+          "observation_mode": "checked"
+        },
+        "session": {
+          "owner": "agent-session",
+          "state": "done",
+          "observation_mode": "checked",
+          "session_id": "2026-10-11-dotfiles-15-r1-5f4dbfe5",
+          "task_id": "DOTFILES-15",
+          "ephemeral": false,
+          "base_commit": null,
+          "source": {
+            "path": ".agent-loop/sessions/2026-10-11-dotfiles-15-r1-5f4dbfe5/session.json",
+            "sha256": "sha256:2705b36aafbc99debfa3ab5d2c50ba63cec05e5a6fcaa64e495e644027470cb3"
+          }
+        },
+        "contract": {
+          "owner": "agent-loop",
+          "state": "approved",
+          "observation_mode": "checked",
+          "revision": 1,
+          "run_revision": 1,
+          "goal": "Dogfood existing owner capabilities on fresh consumers: verify independently merged Learning bootstrap; probe unplanned discovery and guidance-consistency on the agent shell project; improve only source guidance justified by measured facts.",
+          "acceptance_criteria": [
+            "Record exact source/dependency and fixture identities, individual exits, current owner states and honest bounded outcomes; preserve invalid/stale/missing signals and no-auto-authority boundaries.",
+            "Any documentation change follows independent review, exact-head CI and owner Learning; prove candidate reports were semantically inspected before changes."
+          ],
+          "source": {
+            "path": ".agent-loop/contracts/DOTFILES-15/contract.json",
+            "sha256": "sha256:2357b702105efdf635322505f5b9fe093c752e56a55cf283efae5fe1e77aba83"
+          }
+        },
+        "approval": {
+          "owner": "agent-loop",
+          "state": "current",
+          "observation_mode": "checked",
+          "contract_revision": 1,
+          "approved_by": "user",
+          "approved_at": "2026-10-11T12:14:29+00:00",
+          "source": {
+            "path": ".agent-loop/contracts/DOTFILES-15/contract.json",
+            "sha256": "sha256:2357b702105efdf635322505f5b9fe093c752e56a55cf283efae5fe1e77aba83"
+          }
+        },
+        "map": {
+          "owner": "agent-map",
+          "state": "missing",
+          "observation_mode": "checked",
+          "path": ".agent-loop/map/php-symbols.json"
+        },
+        "search_index": {
+          "owner": "agent-map",
+          "state": "unavailable",
+          "observation_mode": "checked",
+          "path": ".agent-loop/map/search.sqlite"
+        },
+        "recall": {
+          "owner": "agent-recall-compiler",
+          "state": "compiled",
+          "observation_mode": "checked",
+          "compilation_id": "compilation.DOTFILES-15.2026-10-11-121429.4d1e6af7",
+          "bundle_sha256": "e698c33c78713ef478ba7b79f35b1d18d30e3f2bdc8f4a6f064fb6b8f1e485fd",
+          "snapshot_sha256": "7fcdb6433cf7a64a38fe3bb131f49c8ab589d78b97a3660b5be5b5f9fc21f40e",
+          "source": {
+            "path": ".agent-loop/recall/DOTFILES-15/meta.json",
+            "sha256": "sha256:bb7c11bdd2d6e16e2a6b4b75c700a7b1518b5c3f818eb5ed8cec0a3b60188c66"
+          }
+        },
+        "execution_contract": {
+          "owner": "agent-loop",
+          "state": "not_required",
+          "required": false,
+          "observation_mode": "checked",
+          "contract_revision": 1,
+          "contract_source": {
+            "path": ".agent-loop/contracts/DOTFILES-15/contract.json",
+            "sha256": "sha256:2357b702105efdf635322505f5b9fe093c752e56a55cf283efae5fe1e77aba83"
+          }
+        },
+        "edit": {
+          "owner": "agent-loop",
+          "state": "none",
+          "observation_mode": "checked"
+        },
+        "verification": {
+          "owner": "agent-loop",
+          "state": "passed",
+          "observation_mode": "checked",
+          "run_id": "run:DOTFILES-15:e030f17d57397bc2",
+          "contract_revision": 1,
+          "implementation_snapshot": "sha256:6da0fac65b62544b4373169b2612f11f1c05ec97473de33ff5712e17f637daa8",
+          "source_session_id": "2026-10-11-dotfiles-15-r1-5f4dbfe5",
+          "source": {
+            "path": ".agent-loop/runs/DOTFILES-15/verification.json",
+            "sha256": "sha256:6b1c9468c17fb9266c2fb5e9add3bba3dd77324c9fc83a0701edbd76f5c484bf"
+          }
+        },
+        "review": {
+          "owner": "agent-recall-compiler",
+          "state": "warn",
+          "observation_mode": "checked",
+          "source": {
+            "path": ".agent-loop/recall/DOTFILES-15/reviews/DOTFILES-15.blindspots.json",
+            "sha256": "sha256:7c932b82bcffa20c8e8cc72d15ae00f073c15d6caf23893c96b89b711e071431"
+          }
+        },
+        "learning": {
+          "owner": "agent-learning",
+          "state": "decided",
+          "decision": "findings_recorded",
+          "observation_mode": "checked",
+          "run_id": "run:DOTFILES-15:e030f17d57397bc2",
+          "decided_by": "codex",
+          "decided_at": "2026-10-11T12:31:18+00:00",
+          "source": {
+            "path": ".agent-loop/learning/history/run-learning/0bf820b9b54e55f2a18f37b5d1f2685f56b681542c05d46034e116eec937b904.json",
+            "sha256": "sha256:deec474c5d45d104ed383b94eee1b9cf520a609ad8e32b40fc1c4b2eb8396f1e"
+          }
+        },
+        "outcome_lineage": {
+          "owner": "agent-learning",
+          "state": "run_bound",
+          "observation_mode": "checked",
+          "run_id": "run:DOTFILES-15:e030f17d57397bc2"
+        }
+      },
+      "disagreements": [],
+      "next_action": "none",
+      "next_action_kind": "none",
+      "next_action_invocation": null
+    },
+    "mutation_status": "accepted",
+    "optional_follow_ups": []
+  },
+  "validated_finding": {
+    "id": "finding.2026-10-11.aafaa8",
+    "task_id": "DOTFILES-15",
+    "session": "2026-10-11-dotfiles-15-r1-5f4dbfe5",
+    "created_at": "2026-10-11T12:31:04+00:00",
+    "created_by": "codex",
+    "scope": [],
+    "observation": "Guidance-consistency reported a bare Loop-owned source path as missing in the dotfiles checkout; semantic owner inspection found the exact original file in Loop. Owner-qualified pinned GitHub links remove that navigation ambiguity.",
+    "evidence": [
+      {
+        "type": "human_report",
+        "summary": "docs/MOMENTUM_EXPERIMENTS.md"
+      }
+    ],
+    "hypothesis": "Source guidance should identify the repository and revision before an unresolved-path candidate is treated as a defect; zero candidates alone is not semantic consistency proof.",
+    "validated_conclusion": "Independent review and preserved before/after checker receipts verify owner qualification fixes this concrete navigation ambiguity. Raw zero-candidate result is bounded and is not a semantic audit or automatic promotion.",
+    "confidence": "low",
+    "validation_status": "validated",
+    "status": "validated",
+    "sensitivity": "internal",
+    "validated_by": "codex",
+    "validated_at": "2026-10-11T12:31:18+00:00"
+  },
+  "independent_review": {
+    "review": "PASS",
+    "report_sha256": "900eb01fa488fb61f2117a6e2773d8ebd28d0a53bc436401ca14fab0f4648559",
+    "tracked_diff_sha256": "dea3126174094ce8b6a0708de3ab68ac5c8994042272eb52ffef02cfb062c3cf",
+    "contract_task": "DOTFILES-15",
+    "contract_revision": 1,
+    "outside_machine_scope": [],
+    "findings": [],
+    "verified": [
+      "first15canonicalbootstrapcommands0threefreshpaths; Findingscandidate+unverifiednotpromoted",
+      "ownerregression1test12assertions0",
+      "preplannedenterboth1 PLANtemplate/mutationfalse/ContractSessionmissing; no lifecycleauthoritycreated",
+      "Map543files45710relations8diagnostics19.366s; context39-138sixexplicitomissionsnotexhaustive",
+      "Learningcheckerinitialonecrossownerpath thenownerqualifiedexactlinkzero; draftbarecitationreplayretained",
+      "released1e6coldinstall+strictdoctorBashZshbyte/hashoriginalownerreadverified; trackedpatch0untrackedpatchrefusal2+explicitsource valid",
+      "GitHubAPI#767closed/#771mergedexactfad403confirmed",
+      "GitHubAPIv0.4.0tag1e6 andmergedsource38138706443+mutation38138778302successconfirmed"
+    ],
+    "assessment": "Docs-onlyownerqualification removesnavigationambiguity andrecordsboundedcapabilityexperiments. No fabricatedA/Bbenefit, incompletecontextclaims, Guidancepromotion or#637/#742orchestrationimplementation. Oldbuilder155remainsunchanged.",
+    "pending": "FreshdocumentationPRexactheadCI/publicrawprobelinks ifpublished; no release-mutationnecessary."
+  },
+  "local_validation": {
+    "unit": {
+      "exit": 0,
+      "tests": 89,
+      "log_sha256": "8820ca3213e8835077e6a42614173c468afa7d343a9d19c5953c57efb73c77f7"
+    },
+    "compileall": {
+      "exit": 0
+    },
+    "bashunit": {
+      "exit": 0,
+      "tests": 9,
+      "log_sha256": "3a65388e4b3d004de1805104a88ab02d9308e6f7055c9b97ffffc1d23ca775a8"
+    }
+  },
+  "limits": [
+    "CodeRabbit marked status success but reported review quota exhaustion; independent evaluator review supplied the actual code/document review.",
+    "Archive source snapshot precedes publication-link addition.",
+    "General task productivity INCONCLUSIVE; model token telemetry unavailable."
+  ],
+  "owner_issue_comments": [
+    "https://github.com/voku/agent-loop/issues/637#issuecomment-6109053637",
+    "https://github.com/voku/agent-loop/issues/742#issuecomment-6109053776",
+    "https://github.com/voku/agent-loop/issues/767#issuecomment-6109053946"
+  ]
+}
