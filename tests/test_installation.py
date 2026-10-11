@@ -51,6 +51,40 @@ class InstallationTest(unittest.TestCase):
         return self.command("install", "--source", str(self.source),
                             "--revision", revision or self.revision)
 
+    def test_plan_is_read_only_and_matches_exact_install_manifest(self):
+        status, report = self.command("plan", "--source", str(self.source),
+                                      "--revision", self.revision)
+        self.assertEqual(status, 0, report)
+        self.assertTrue(report["ok"])
+        self.assertEqual(report["operation"], "plan")
+        self.assertEqual(report["source_revision"], self.revision)
+        self.assertEqual(report["files"], len(report["entries"]))
+        for name in ("bin/agent-dotfiles", ".bashrc", ".zshrc", ".shellrc",
+                     "shell/modules/context.sh", "shell/modules/git.sh"):
+            self.assertIn(name, report["entries"])
+        self.assertEqual(report["entries"]["bin/agent-dotfiles"]["mode"], 0o755)
+        self.assertFalse(self.prefix.exists())
+        self.assertEqual(list(self.root.glob(".agent-dotfiles-install-*")), [])
+        self.assertEqual(self.install()[0], 0)
+        manifest = json.loads((self.prefix / "installation.json").read_text())
+        self.assertEqual(report["entries"], manifest["files"])
+        self.assertEqual(self.command("uninstall")[0], 0)
+
+    def test_plan_refuses_bad_pin_dirty_checkout_and_occupied_prefix(self):
+        self.assertEqual(self.command("plan", "--source", str(self.source),
+                                      "--revision", self.revision[:8])[0], 2)
+        changed = self.source / "agent_dotfiles/__init__.py"
+        changed.write_text(changed.read_text() + "# dirty\n")
+        self.assertEqual(self.command("plan", "--source", str(self.source),
+                                      "--revision", self.revision)[0], 2)
+        self.assertFalse(self.prefix.exists())
+        changed.write_text(changed.read_text().removesuffix("# dirty\n"))
+        self.prefix.mkdir()
+        (self.prefix / "unrelated").write_text("keep")
+        self.assertEqual(self.command("plan", "--source", str(self.source),
+                                      "--revision", self.revision)[0], 2)
+        self.assertEqual((self.prefix / "unrelated").read_text(), "keep")
+
     def test_install_doctor_verify_and_uninstall(self):
         self.assertEqual(self.install()[0], 0)
         result = subprocess.run([str(self.prefix / "bin/agent-dotfiles"), "doctor"],
@@ -278,6 +312,20 @@ class InstallationTest(unittest.TestCase):
         self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
                  "commit", "-qm", "frontend fixture")
         self.revision = self.git("rev-parse", "HEAD").strip()
+
+    def test_frontend_plan_is_read_only_from_unusual_root(self):
+        self.frontend_fixture()
+        original = self.source
+        self.source = original.with_name("source with space 雪\n")
+        original.rename(self.source)
+        args = ("--prefix", str(self.prefix), "--revision", self.revision)
+        result = self.frontend("plan", *args)
+        self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+        plan = json.loads(result.stdout)
+        self.assertEqual(plan["operation"], "plan")
+        self.assertEqual(plan["source_revision"], self.revision)
+        self.assertIn("shell/modules/context.sh", plan["entries"])
+        self.assertFalse(self.prefix.exists())
 
     def test_frontend_default_install_and_explicit_lifecycle_unusual_root(self):
         self.frontend_fixture()

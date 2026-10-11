@@ -67,7 +67,7 @@ def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def install(source: Path, revision: str, prefix: Path) -> dict:
+def install(source: Path, revision: str, prefix: Path, *, preview: bool = False) -> dict:
     if not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise SetupError("revision must be a full 40-character Git commit SHA")
     if not source.is_dir() or git(source, "rev-parse", "--show-toplevel").removesuffix(b"\n") != os.fsencode(source):
@@ -104,6 +104,10 @@ def install(source: Path, revision: str, prefix: Path) -> dict:
     manifest = {"schema": SCHEMA, "source_revision": revision,
                 "files": {name: {"sha256": digest(data), "mode": mode}
                           for name, (data, mode) in sorted(contents.items())}}
+    if preview:
+        # Resolve the exact candidate bytes first, without creating a prefix.
+        # A later install must repeat all checks against its approved SHA.
+        return {"source_revision": revision, "files": len(contents), "entries": manifest["files"]}
     staging = Path(tempfile.mkdtemp(prefix=".agent-dotfiles-install-", dir=prefix.parent))
     try:
         for name, (data, mode) in contents.items():
@@ -178,18 +182,19 @@ def verify(prefix: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     commands = parser.add_subparsers(dest="command", required=True)
-    for name in ("install", "verify", "uninstall"):
+    for name in ("install", "plan", "verify", "uninstall"):
         command = commands.add_parser(name, allow_abbrev=False)
         command.add_argument("--prefix", required=True)
-        command.add_argument("--revision", required=name == "install",
+        command.add_argument("--revision", required=name in ("install", "plan"),
                              help="full source commit; optionally assert the installed pin")
-        if name == "install":
+        if name in ("install", "plan"):
             command.add_argument("--source", required=True)
     args = parser.parse_args()
     try:
         prefix = safe_path(args.prefix)
-        if args.command == "install":
-            result = install(safe_path(args.source), args.revision, prefix)
+        if args.command in ("install", "plan"):
+            result = install(safe_path(args.source), args.revision, prefix,
+                             preview=args.command == "plan")
         else:
             manifest = verify(prefix)
             if args.revision is not None and args.revision != manifest["source_revision"]:
