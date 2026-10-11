@@ -29,11 +29,11 @@ configuration, or run a project's test/static-analysis commands automatically.
 1. Read the exact `composer.json` at the confirmed root. Record its SHA-256
    when an evidence-preserving reader is available; otherwise record the path
    and that a digest was unavailable.
-2. Treat the `scripts` object as declared capability, not proof that a command
-   will pass. If `composer` is available, `composer run --list --format=json --no-plugins --no-scripts`
-   may enumerate its view of scripts without running
-   plugins or scripts. If that inventory is unavailable, use the already-read
-   raw `composer.json` scripts object and report the limitation. Do not run
+2. Treat the `scripts` object in the exact, already-read `composer.json` as the
+   canonical declared capability, not proof that a command will pass. Record
+   whether the `composer` executable is available, but do not invoke Composer
+   merely to rediscover those scripts: supported listing options vary by
+   Composer version and plugins are executable package code. Do not run
    `composer test`, `composer ci`, `phpstan`, PHPUnit, or install/update
    commands until the task asks for a verification command and its scope is
    understood.

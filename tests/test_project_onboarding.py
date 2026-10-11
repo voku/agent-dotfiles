@@ -19,11 +19,11 @@ class ProjectOnboardingSkillTest(unittest.TestCase):
         self.assertTrue(content.startswith("---\nname: project-onboarding\n"))
         for marker in ("git rev-parse --show-toplevel",
                        "git status --porcelain=v1 -z --untracked-files=all",
-                       "composer run --list --format=json --no-plugins --no-scripts",
+                       "canonical declared capability",
                        "agent-loop map", "VERIFIED:", "UNAVAILABLE", "INCOMPLETE"):
             self.assertIn(marker, content)
-        self.assertIn("`composer test`, `composer ci`, `phpstan`, PHPUnit, or install/update",
-                      content)
+        self.assertIn("`composer test`, `composer ci`, `phpstan`, PHPUnit, or install/update", content)
+        self.assertNotIn("composer run --list", content)
         for forbidden in ("composer install", "composer update", "eval ", "PATH="):
             self.assertNotIn(forbidden, content)
 
