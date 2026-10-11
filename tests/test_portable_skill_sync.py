@@ -41,6 +41,7 @@ class PortableSkillSyncTest(unittest.TestCase):
         unselected.mkdir()
         (unselected / "SKILL.md").write_text("unselected\n")
         self.git("init", "-q")
+        self.git("remote", "add", "origin", "https://github.com/voku/agent-skills.git")
         self.git("add", ".")
         self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
                  "commit", "-qm", "fixture")
@@ -100,6 +101,18 @@ class PortableSkillSyncTest(unittest.TestCase):
         self.source = linked
         self.assertEqual(self.sync()[0], 2)
         self.source = original
+
+    def test_sync_refuses_a_symlinked_source_ancestor(self):
+        linked_parent = self.root / "linked-parent"
+        linked_parent.symlink_to(self.root, target_is_directory=True)
+        original = self.source
+        self.source = linked_parent / "agent-skills"
+        self.assertEqual(self.sync()[0], 2)
+        self.source = original
+
+    def test_sync_refuses_a_noncanonical_source_origin(self):
+        self.git("remote", "set-url", "origin", "https://github.com/example/other-skills.git")
+        self.assertEqual(self.sync()[0], 2)
 
 
 if __name__ == "__main__":

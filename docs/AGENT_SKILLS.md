@@ -23,8 +23,11 @@ prefix installation, and host projection details here.
 
 Only a maintainer preparing a reviewed agent-dotfiles change runs the local
 synchronizer. It downloads nothing. It requires a separate clean local
-`agent-skills` checkout at the exact reviewed full commit and refuses a dirty,
-mismatched, missing, symlinked, or changed source file.
+`agent-skills` checkout at the exact reviewed full commit and canonical
+`origin` URL. It refuses a dirty, mismatched, missing, symlinked, changed, or
+wrong-origin source file. The origin check is provenance metadata, not a
+cryptographic remote attestation: use an independently trusted local checkout
+and approved commit as the authority.
 
 ```sh
 python3 tools/sync_portable_skills.py \

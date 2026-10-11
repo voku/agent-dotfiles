@@ -22,6 +22,11 @@ SKILLS: Final = (
     "language-onboarding-authoring",
 )
 MANIFEST: Final = "skills/portable-skills.json"
+CANONICAL_SOURCE_URLS: Final = {
+    "https://github.com/voku/agent-skills",
+    "ssh://git@github.com/voku/agent-skills",
+    "git@github.com:voku/agent-skills",
+}
 
 
 class SyncError(Exception):
@@ -34,11 +39,19 @@ def digest(data: bytes) -> str:
 
 def regular_directory(value: Path, label: str) -> Path:
     raw = Path(os.path.abspath(value.expanduser()))
-    if ".." in raw.parts or raw.is_symlink() or not raw.is_dir():
+    if ".." in raw.parts or not raw.is_dir():
         raise SyncError(f"{label} must be an existing directory without traversal")
-    # macOS commonly exposes the same temporary directory through /var and
-    # /private/var. Resolve that system-level alias once, then operate only on
-    # the canonical directory while still refusing a supplied symlink root.
+    for ancestor in (raw, *raw.parents):
+        if not ancestor.is_symlink():
+            continue
+        # macOS commonly exposes the same temporary directory through /var and
+        # /private/var. This is the sole system alias accepted before operating
+        # on the canonical path; supplied symlinked roots and ancestors remain
+        # refused.
+        if (sys.platform == "darwin" and ancestor == Path("/var")
+                and ancestor.resolve(strict=True) == Path("/private/var")):
+            continue
+        raise SyncError(f"{label} must not use a symlinked path")
     candidate = raw.resolve(strict=True)
     return candidate
 
@@ -65,6 +78,9 @@ def source_files(source: Path, revision: str) -> dict[str, bytes]:
         raise SyncError("source HEAD does not match the pinned revision")
     if git(source, "status", "--porcelain=v1", "-z", "--untracked-files=no"):
         raise SyncError("tracked source files must be clean")
+    origin = git(source, "remote", "get-url", "origin").decode("utf-8").strip().removesuffix(".git")
+    if origin not in CANONICAL_SOURCE_URLS:
+        raise SyncError("source origin must identify voku/agent-skills")
 
     files: dict[str, bytes] = {}
     for skill in SKILLS:
