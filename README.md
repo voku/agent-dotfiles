@@ -13,6 +13,8 @@ versions have shipped. Install only from an independently approved full commit.
 Use native tools for simple, known-location questions; select these helpers when
 source identity, literal scope or explicit completeness improves the evidence.
 See [tool selection](docs/SHELL.md#choose-tools-by-the-evidence-needed).
+[Fresh owner-capability dogfood](docs/MOMENTUM_EXPERIMENTS.md) records actual
+bootstrap, discovery and guidance-maintenance probes, including their limits.
 
 ## Quick start
 
