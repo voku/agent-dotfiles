@@ -229,6 +229,14 @@ def _git_status_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
 def _workspace_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
     """Identify the exact Git checkout and return bounded, non-atomic status."""
     requested_root = _require_root(args.root)
+    # An inherited Git override can make rev-parse report an ancestor checkout
+    # even when --root explicitly selects a nested, independent repository.
+    # Refuse ambiguity rather than silently sampling a different worktree.
+    if "GIT_DIR" in os.environ or "GIT_WORK_TREE" in os.environ:
+        raise CommandFailure(
+            "invalid_repository",
+            "Explicit workspace identity cannot use inherited GIT_DIR/GIT_WORK_TREE overrides",
+        )
     git = _require_executable("git")
     try:
         top = _capture_exact([git, "rev-parse", "--show-toplevel"], cwd=requested_root)

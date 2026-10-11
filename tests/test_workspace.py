@@ -187,6 +187,21 @@ class WorkspaceTest(unittest.TestCase):
             "path": {"base64": base64.b64encode(b"byte-\xff.txt").decode("ascii")},
         }])
 
+    def test_inherited_git_override_cannot_mask_nested_repository(self) -> None:
+        nested = self.repo / "independent checkout"
+        nested.mkdir()
+        self.git("init", "-q", cwd=nested)
+        (nested / "child.txt").write_text("child", encoding="utf-8")
+        self.git("add", "child.txt", cwd=nested)
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", "child", cwd=nested)
+        code, report = self.workspace("--root", str(nested), environment={
+            "GIT_DIR": str(self.repo / ".git"),
+            "GIT_WORK_TREE": str(self.repo),
+        })
+        self.assertEqual(code, 2, report)
+        self.assertEqual(report["error"], "invalid_repository")
+
     def test_inherited_git_worktree_override_cannot_redirect_requested_root(self) -> None:
         alternate = self.root / "other checkout"
         alternate.mkdir()
