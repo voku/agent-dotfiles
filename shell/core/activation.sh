@@ -2,12 +2,12 @@
 _agent_dotfiles_activate() {
     local _agent_home="$1" _agent_name
     for _agent_name in .exports .functions shell/core/deactivation.sh shell/modules/context.sh shell/modules/git.sh; do
-        if [ ! -r "$_agent_home/$_agent_name" ]; then
+        if [ ! -f "$_agent_home/$_agent_name" ] || [ ! -r "$_agent_home/$_agent_name" ]; then
             printf 'agent-dotfiles: required %s is missing or unreadable\n' "$_agent_name" >&2
             return 2
         fi
     done
-    if [ ! -x "$_agent_home/bin/agent-dotfiles" ]; then
+    if [ ! -f "$_agent_home/bin/agent-dotfiles" ] || [ ! -x "$_agent_home/bin/agent-dotfiles" ]; then
         printf 'agent-dotfiles: required bin/agent-dotfiles is missing or not executable\n' >&2
         return 2
     fi
