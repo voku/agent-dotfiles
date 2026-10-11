@@ -1,0 +1,16 @@
+{
+  "review": "PASS",
+  "scope": "Onlypublicationappend afterpreviousreviewedDOTFILES15report",
+  "evidence_commit": "2b623876f2774f3a2aadac20fe4295dc3f8ed9d0",
+  "merged_source": "4c6fdd2c61d31789451f6675e7f2cdf0f209124b",
+  "archive_sha256": "1594fd16decfe4cf38f6d9477191d845afc0d1f8d91b8ae0fe22a5d4d50b9675",
+  "archive_source": "IndependentdownloadfromimmutableGitHubrawURL",
+  "indexed_payload_files": 23,
+  "actual_archive_files": 24,
+  "manifest_all_byte_hashes": "PASS",
+  "previous_report_body_sha256": "900eb01fa488fb61f2117a6e2773d8ebd28d0a53bc436401ca14fab0f4648559",
+  "current_report_sha256": "4ca03ca7baf2ce5ae2c8db3f24cc7f67dfef97501c008420b951b2844f506dfa",
+  "body_unchanged_except_publication_append": true,
+  "findings": [],
+  "assessment": "23payload+manifest countandpublishedSHAaccurate. Linkimmutableactualartifactretrievable; oldsnapshothashcorrectlyidentifiedhistoricalpreappend, no claimlatereditedreportidentity. No runtimescopeorclaimextension."
+}
