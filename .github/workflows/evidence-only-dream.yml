@@ -68,6 +68,59 @@ jobs:
             echo "Archive members: $(wc -l < reports/archive-paths.txt)"
             echo "Learning-like candidate files: $(wc -l < reports/corpus-candidates.txt)"
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Install pinned agent-loop source dependencies in isolated owner checkout
+        working-directory: owner
+        run: |
+          set -euo pipefail
+          composer install --no-dev --no-interaction --prefer-dist --no-progress --no-audit
+          test -f vendor/autoload.php
+          test -f composer.lock
+          cp composer.lock ../reports/owner-composer.lock
+          php -v | head -1 > ../reports/owner-php-version.txt
+          composer --version >> ../reports/owner-php-version.txt
+      - name: Run Learning owner validation and read-only Dream on historical consumers
+        run: |
+          set -euo pipefail
+          mkdir -p reports/owner-dream
+          owner="$GITHUB_WORKSPACE/owner/bin/agent-loop"
+          corpus="$RUNNER_TEMP/learning-corpus/consumers"
+          : > reports/owner-dream/outcomes.tsv
+          for arm in A1 A2 B1 B2 C1 C2; do
+            project="$corpus/$arm"
+            learning="$project/.agent-loop/learning"
+            test -f "$learning/config.json"
+            # Preserve every file byte in the archived Learning owner tree.
+            find "$learning" -type f -print0 | sort -z | xargs -0 sha256sum > "reports/owner-dream/$arm.before"
+            set +e
+            (cd "$project" && php "$owner" learn validate) > "reports/owner-dream/$arm.validate.log" 2>&1
+            validated=$?
+            if test "$validated" -eq 0; then
+              (cd "$project" && php "$owner" learn dream --dry-run --format=json --report "$GITHUB_WORKSPACE/reports/owner-dream/$arm.report.json") > "reports/owner-dream/$arm.stdout.json" 2> "reports/owner-dream/$arm.stderr.txt"
+              dream=$?
+            else
+              dream=125
+            fi
+            set -e
+            find "$learning" -type f -print0 | sort -z | xargs -0 sha256sum > "reports/owner-dream/$arm.after"
+            if ! cmp -s "reports/owner-dream/$arm.before" "reports/owner-dream/$arm.after"; then
+              echo "Read-only invariant failed for $arm" >&2
+              exit 1
+            fi
+            printf '%s\t%s\t%s\n' "$arm" "$validated" "$dream" >> reports/owner-dream/outcomes.tsv
+          done
+          cat reports/owner-dream/outcomes.tsv
+          {
+            echo '### Read-only owner preview over six archived, independently governed arms'
+            echo 'Source: exact pinned voku/agent-loop checkout'
+            echo 'Inputs: SHA-verified historical quality-cycle-17 corpus'
+            echo 'Each arm is validated before Dream; file SHA-256 manifests are compared afterward'
+            echo 'This audit does not synthesize new findings or approve proposals'
+            echo 'See outcomes.tsv and per-arm logs in the downloadable artifact'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if awk -F '\t' '$2 != 0 || $3 != 0 { bad=1 } END { exit !bad }' reports/owner-dream/outcomes.tsv; then
+            echo 'At least one owner validator or Dream preview rejected historical data' >&2
+            exit 1
+          fi
       - name: Retain inventory for independent selection of validated roots
         if: always()
         uses: actions/upload-artifact@v7
