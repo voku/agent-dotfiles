@@ -93,6 +93,14 @@ class PortableSkillSyncTest(unittest.TestCase):
         self.assertEqual(self.sync()[0], 2)
         self.assertEqual(target.read_text(), "local change\n")
 
+    def test_sync_refuses_a_supplied_symlink_root(self):
+        linked = self.root / "linked-source"
+        linked.symlink_to(self.source, target_is_directory=True)
+        original = self.source
+        self.source = linked
+        self.assertEqual(self.sync()[0], 2)
+        self.source = original
+
 
 if __name__ == "__main__":
     unittest.main()

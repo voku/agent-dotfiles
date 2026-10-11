@@ -33,12 +33,13 @@ def digest(data: bytes) -> str:
 
 
 def regular_directory(value: Path, label: str) -> Path:
-    candidate = Path(os.path.abspath(value.expanduser()))
-    if ".." in candidate.parts or not candidate.is_dir():
+    raw = Path(os.path.abspath(value.expanduser()))
+    if ".." in raw.parts or raw.is_symlink() or not raw.is_dir():
         raise SyncError(f"{label} must be an existing directory without traversal")
-    for component in (candidate, *candidate.parents):
-        if component.is_symlink():
-            raise SyncError(f"symlink {label} paths are not permitted")
+    # macOS commonly exposes the same temporary directory through /var and
+    # /private/var. Resolve that system-level alias once, then operate only on
+    # the canonical directory while still refusing a supplied symlink root.
+    candidate = raw.resolve(strict=True)
     return candidate
 
 
