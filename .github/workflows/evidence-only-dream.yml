@@ -201,17 +201,18 @@ jobs:
             project="$corpus/$arm"
             learning="$project/.agent-loop/learning"
             find "$learning" -type f -print0 | sort -z | xargs -0r sha256sum > "reports/custom-task-proof/$arm.before"
-            # Exact approved source fixture identity from agent-learning#164,
-            # not a fabricated replacement task id or altered original file.
+            # Preserve both the package's default task shapes and the exact
+            # PHP17-[ABC][12] fixture shape documented by agent-learning#164.
+            # No Finding or original project record is rewritten.
             set +e
             (cd "$project" && php "$owner" learn validate \
-              --task-id-pattern '/^PHP17-[ABC][12]$/') \
+              --task-id-pattern '/^(?:[A-Z][A-Z0-9_-]*-[0-9]+|TODO@[A-Za-z0-9_:/.\\-]+|[A-Za-z0-9][A-Za-z0-9._]*(?:-[A-Za-z0-9._]+){2,}|PHP17-[ABC][12])$/') \
               > "reports/custom-task-proof/$arm.validate.log" 2>&1
             status=$?
             dream=125
             if test "$status" -eq 0; then
               (cd "$project" && php "$owner" learn dream \
-                --task-id-pattern '/^PHP17-[ABC][12]$/' --dry-run --format=json \
+                --task-id-pattern '/^(?:[A-Z][A-Z0-9_-]*-[0-9]+|TODO@[A-Za-z0-9_:/.\\-]+|[A-Za-z0-9][A-Za-z0-9._]*(?:-[A-Za-z0-9._]+){2,}|PHP17-[ABC][12])$/' --dry-run --format=json \
                 --report "$GITHUB_WORKSPACE/reports/custom-task-proof/$arm.dream.json") \
                 > "reports/custom-task-proof/$arm.stdout.json" \
                 2> "reports/custom-task-proof/$arm.stderr.txt"
