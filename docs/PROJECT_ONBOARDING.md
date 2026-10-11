@@ -26,13 +26,13 @@ project's existing desired skills instead of replacing that set:
 
 ```sh
 CODEX_SKILLS_DIR="$PWD/.codex/skills" vendor/bin/agent-loop init install-assets --agent=codex \
-  --extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills --dry-run
+  --extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills --skip-git-config --dry-run
 CODEX_SKILLS_DIR="$PWD/.codex/skills" vendor/bin/agent-loop init install-assets --agent=codex \
-  --extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills
+  --extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills --skip-git-config
 CLAUDE_SKILLS_DIR="$PWD/.claude/skills" vendor/bin/agent-loop init install-assets --agent=claude \
-  --extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills --dry-run
+  --extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills --skip-git-config --dry-run
 CLAUDE_SKILLS_DIR="$PWD/.claude/skills" vendor/bin/agent-loop init install-assets --agent=claude \
-  --extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills
+  --extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills --skip-git-config
 ```
 
 The first command targets `.codex/skills/project-onboarding/SKILL.md`; the

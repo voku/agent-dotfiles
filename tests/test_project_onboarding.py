@@ -45,8 +45,9 @@ class ProjectOnboardingSkillTest(unittest.TestCase):
         self.assertIn('CODEX_SKILLS_DIR="$PWD/.codex/skills"', documentation)
         self.assertIn('CLAUDE_SKILLS_DIR="$PWD/.claude/skills"', documentation)
         self.assertIn("init install-assets --agent=codex", documentation)
-        self.assertIn("--extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills --dry-run",
+        self.assertIn("--extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills --skip-git-config --dry-run",
                       documentation)
+        self.assertIn("--skip-git-config", documentation)
         self.assertNotIn("init sync-skills --agent=codex", documentation)
         self.assertNotIn("--skills-root=", documentation)
 
