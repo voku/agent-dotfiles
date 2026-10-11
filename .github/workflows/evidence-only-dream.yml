@@ -68,6 +68,40 @@ jobs:
             echo "Archive members: $(wc -l < reports/archive-paths.txt)"
             echo "Learning-like candidate files: $(wc -l < reports/corpus-candidates.txt)"
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Audit archived task reference syntax and project context
+        run: |
+          set -euo pipefail
+          mkdir -p reports/owner-dream
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          corpus = Path(os.environ["RUNNER_TEMP"]) / "learning-corpus" / "consumers"
+          samples = {
+              "A1": ("validated", "finding.2026-10-11.c5ce5e"),
+              "B1": ("candidate", "finding.2026-10-11.6657bc"),
+              "C1": ("candidate", "finding.2026-10-11.c51ea2"),
+          }
+          report = {}
+          for arm, (state, finding) in samples.items():
+              project = corpus / arm
+              source = project / ".agent-loop/learning/findings" / state / (finding + ".json")
+              assert source.is_file(), source
+              obj = json.loads(source.read_text())
+              report[arm] = {
+                  "finding_id": obj.get("id"),
+                  "task_id": obj.get("task_id"),
+                  "task_id_type": type(obj.get("task_id")).__name__,
+                  "session": obj.get("session"),
+                  "task_files_present": len(list((project / ".agent-loop/tasks").glob("*")))
+                      if (project / ".agent-loop/tasks").is_dir() else None,
+                  "memory_exists": (project / "MEMORY.md").is_file(),
+              }
+          target = Path("reports/owner-dream/task-reference-inventory.json")
+          target.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n")
+          print(target.read_text())
+          PY
       - name: Install pinned agent-loop source dependencies in isolated owner checkout
         working-directory: owner
         run: |
