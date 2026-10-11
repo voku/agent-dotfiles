@@ -130,8 +130,8 @@ agent_deactivate
                     with self.subTest(missing=name, shell=shell):
                         result = self.run_shell(shell, profile, '''
 . "$1"
-status=$?
-[ "$status" -eq 2 ] &&
+agent_source_status=$?
+[ "$agent_source_status" -eq 2 ] &&
 [ "${AGENT_DOTFILES_HOME+x}" != x ] &&
 ! typeset -f agent_search >/dev/null 2>&1
 ''')
