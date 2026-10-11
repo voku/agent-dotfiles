@@ -74,6 +74,21 @@ class BootstrapPlanTest(unittest.TestCase):
             self.assertIn("Python 3.10+ is required", res.stderr)
             self.assertFalse(tuple(Path(dirname).iterdir()))
 
+    def test_unusable_python_has_actionable_error_without_mutation(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        script = root / "firstInstall.sh"
+        with tempfile.TemporaryDirectory() as dirname:
+            fake_python = Path(dirname) / "python3"
+            fake_python.write_text("#!/bin/sh\nexit 1\n", encoding="utf-8")
+            fake_python.chmod(0o755)
+            res = subprocess.run(["/bin/sh", str(script), "plan"], cwd=dirname,
+                                 env={"PATH": dirname}, capture_output=True,
+                                 text=True, check=False)
+            self.assertEqual(res.returncode, 2)
+            self.assertIn("Python 3.10+ is required", res.stderr)
+            self.assertNotIn("Traceback", res.stderr)
+            self.assertEqual([p.name for p in Path(dirname).iterdir()], ["python3"])
+
     def test_main_does_not_invoke_subprocesses(self) -> None:
         with patch("tools.bootstrap_plan.platform.system", return_value="Linux"), \
              patch("tools.bootstrap_plan.platform.freedesktop_os_release", return_value={"ID": "debian"}), \
