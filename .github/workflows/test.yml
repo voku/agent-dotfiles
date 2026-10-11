@@ -58,7 +58,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       # Commit and release verified against the official annotated 0.50.1 tag.
-      - uses: TypedDevs/bashunit@28ea63c467f1f461a6368c93e5c264051b141c6f # 0.50.1
+      - uses: TypedDevs/bashunit@860c797a48e34be20b019a70f58c0e06d15c8d33 # 0.51.0
         with:
           version: '0.50.1'
           verify-checksum: 'true'
