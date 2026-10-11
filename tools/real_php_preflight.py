@@ -20,6 +20,11 @@ from typing import Any
 PATTERN = "final readonly class InitToolsCommand"
 SOURCE = "src/Init/InitToolsCommand.php"
 START, END = 1, 8
+PROJECT_ONBOARDING_SKILL = "skills/project-onboarding/SKILL.md"
+ONBOARDING_CONFIGS = (
+    "phpunit.xml", "phpunit.xml.dist", "phpstan.neon", "phpstan.neon.dist",
+    "psalm.xml", "infection.json", "infection.json5", "rector.php", "Makefile",
+)
 
 
 def execute(
@@ -94,6 +99,36 @@ def check_read(raw: bytes, original: bytes, root: Path) -> None:
         raise AssertionError("Read bytes, line coordinates or full-file hash differ from original")
 
 
+def project_onboarding(root: Path, skill: bytes) -> dict[str, Any]:
+    """Collect read-only facts that the onboarding skill requires before a check."""
+    if not skill.startswith(b"---\nname: project-onboarding\n"):
+        raise AssertionError("installed project onboarding skill is not the reviewed source")
+    composer_path = root / "composer.json"
+    composer_bytes = composer_path.read_bytes()
+    composer = json.loads(composer_bytes)
+    if not isinstance(composer, dict) or not isinstance(composer.get("name"), str):
+        raise AssertionError("real PHP composer manifest has no package identity")
+    scripts = composer.get("scripts", {})
+    if not isinstance(scripts, dict) or not all(isinstance(key, str) for key in scripts):
+        raise AssertionError("Composer scripts must be an object for onboarding")
+    return {
+        "skill": {
+            "path": PROJECT_ONBOARDING_SKILL,
+            "sha256": hashlib.sha256(skill).hexdigest(),
+        },
+        "composer": {
+            "path": "composer.json",
+            "sha256": hashlib.sha256(composer_bytes).hexdigest(),
+            "package": composer["name"],
+            "scripts": sorted(scripts),
+        },
+        "verification_configurations": [
+            path for path in ONBOARDING_CONFIGS if (root / path).is_file()
+        ],
+        "composer_executable": shutil.which("composer"),
+    }
+
+
 def shell_call(
     name: str, dotfiles: Path, command: str, args: list[str]
 ) -> list[str]:
@@ -159,6 +194,9 @@ def main() -> int:
             raise AssertionError("Installed candidate doctor reported missing requirements")
         report["installed_version"] = doctor.get("version")
         report["checks"].append("installed-cli-doctor")
+        skill = (consumer / PROJECT_ONBOARDING_SKILL).read_bytes()
+        report["project_onboarding"] = project_onboarding(php_repo, skill)
+        report["checks"].append("project-onboarding-real-php-discovery")
         search_args = ["search", PATTERN, "--root", str(php_repo),
                        "--path", SOURCE, "--limit", "10"]
         read_args = ["read", SOURCE, "--root", str(php_repo),

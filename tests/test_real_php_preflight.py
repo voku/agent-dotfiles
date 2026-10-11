@@ -54,6 +54,13 @@ class RealPhpPreflightTest(unittest.TestCase):
             self.assertEqual((root / "calls").read_text().splitlines(),
                              ["verify", "uninstall"])
 
+    def test_project_onboarding_rejects_non_object_composer_scripts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "composer.json").write_text('{"name":"fixture","scripts":[]}')
+            with self.assertRaises(AssertionError):
+                preflight.project_onboarding(root, b"skill")
+
 
 if __name__ == "__main__":
     unittest.main()

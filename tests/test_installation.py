@@ -22,7 +22,7 @@ class InstallationTest(unittest.TestCase):
         self.root = Path(temporary.name).resolve()
         self.source = self.root / "source"
         self.source.mkdir()
-        for name in ("agent_dotfiles", "bin", "shell"):
+        for name in ("agent_dotfiles", "bin", "shell", "skills"):
             shutil.copytree(PROJECT / name, self.source / name,
                             ignore=shutil.ignore_patterns("__pycache__"))
         shutil.copyfile(PROJECT / "LICENSE", self.source / "LICENSE")
@@ -62,7 +62,8 @@ class InstallationTest(unittest.TestCase):
         self.assertNotIn("installation.json", report["entries"])
         for name in ("bin/agent-dotfiles", ".bashrc", ".zshrc", ".shellrc",
                      "shell/modules/context.sh", "shell/modules/git.sh",
-                     "shell/core/activation.sh", "shell/core/deactivation.sh"):
+                     "shell/core/activation.sh", "shell/core/deactivation.sh",
+                     "skills/project-onboarding/SKILL.md"):
             self.assertIn(name, report["entries"])
         self.assertEqual(report["entries"]["bin/agent-dotfiles"]["mode"], 0o755)
         self.assertFalse(self.prefix.exists())
@@ -220,7 +221,8 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.install()[0], 0)
         for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports",
                      "shell/modules/context.sh", "shell/modules/git.sh",
-                     "shell/core/activation.sh", "shell/core/deactivation.sh"):
+                     "shell/core/activation.sh", "shell/core/deactivation.sh",
+                     "skills/project-onboarding/SKILL.md"):
             self.assertEqual((self.prefix / name).read_bytes(), (self.source / name).read_bytes())
         self.assertFalse(marker.exists())
         self.assertEqual(self.command("verify")[0], 0)
@@ -289,6 +291,18 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.command("verify")[0], 2)
         self.assertEqual(self.command("uninstall")[0], 2)
 
+    def test_skill_is_pinned_and_modified_skill_refuses_verify_and_uninstall(self):
+        self.assertEqual(self.install()[0], 0)
+        skill = "skills/project-onboarding/SKILL.md"
+        self.assertEqual((self.prefix / skill).read_bytes(),
+                         (self.source / skill).read_bytes())
+        manifest = json.loads((self.prefix / "installation.json").read_text())
+        self.assertIn(skill, manifest["files"])
+        (self.prefix / skill).write_text("# changed skill\n")
+        self.assertEqual(self.command("verify")[0], 2)
+        self.assertEqual(self.command("uninstall")[0], 2)
+        self.assertEqual((self.prefix / skill).read_text(), "# changed skill\n")
+
     def test_pre_core_modular_manifest_still_verifies_and_uninstalls(self):
         # Older v1 profiles had modules but no shell/core lifecycle files.
         self.assertEqual(self.install()[0], 0)
@@ -298,6 +312,10 @@ class InstallationTest(unittest.TestCase):
             (self.prefix / name).unlink()
             del data["files"][name]
         (self.prefix / "shell/core").rmdir()
+        (self.prefix / "skills/project-onboarding/SKILL.md").unlink()
+        del data["files"]["skills/project-onboarding/SKILL.md"]
+        (self.prefix / "skills/project-onboarding").rmdir()
+        (self.prefix / "skills").rmdir()
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
         self.assertEqual(self.command("uninstall", "--revision", self.revision)[0], 0)
@@ -314,6 +332,10 @@ class InstallationTest(unittest.TestCase):
         (self.prefix / "shell/modules").rmdir()
         (self.prefix / "shell/core").rmdir()
         (self.prefix / "shell").rmdir()
+        (self.prefix / "skills/project-onboarding/SKILL.md").unlink()
+        del data["files"]["skills/project-onboarding/SKILL.md"]
+        (self.prefix / "skills/project-onboarding").rmdir()
+        (self.prefix / "skills").rmdir()
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
         self.assertEqual(self.command("uninstall", "--revision", self.revision)[0], 0)
@@ -331,6 +353,10 @@ class InstallationTest(unittest.TestCase):
         (self.prefix / "shell/modules").rmdir()
         (self.prefix / "shell/core").rmdir()
         (self.prefix / "shell").rmdir()
+        (self.prefix / "skills/project-onboarding/SKILL.md").unlink()
+        del data["files"]["skills/project-onboarding/SKILL.md"]
+        (self.prefix / "skills/project-onboarding").rmdir()
+        (self.prefix / "skills").rmdir()
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
         self.assertEqual(self.command("uninstall", "--revision", self.revision)[0], 0)

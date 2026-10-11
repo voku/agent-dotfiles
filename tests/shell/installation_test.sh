@@ -9,7 +9,7 @@ from pathlib import Path
 import shutil, sys
 source, fixture = map(Path, sys.argv[1:])
 fixture.mkdir()
-for name in ('agent_dotfiles', 'bin', 'shell'):
+for name in ('agent_dotfiles', 'bin', 'shell', 'skills'):
     shutil.copytree(source / name, fixture / name, ignore=shutil.ignore_patterns('__pycache__'))
 for name in ('LICENSE', '.bashrc', '.zshrc', '.shellrc', '.functions', '.exports'):
     shutil.copyfile(source / name, fixture / name)
