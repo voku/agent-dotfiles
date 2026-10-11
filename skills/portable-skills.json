@@ -1,0 +1,54 @@
+{
+  "schema": "agent-dotfiles.v1.portable-skills",
+  "skills": {
+    "coding-simplicity": {
+      "files": {
+        "SKILL.md": "ebd12ad75111b0327047c28ae410cdbecec15736d40bdd1f20d028db83c7900c"
+      }
+    },
+    "language-onboarding-authoring": {
+      "files": {
+        "SKILL.md": "5b9ee95fcf9fe2b4c91f4ff53374bda9d59a21ec8934170a7ef97ec88cf0b966"
+      }
+    },
+    "php-static-analysis": {
+      "files": {
+        "AGENTS.md": "0c5c2c1b86cfe906928495e41297d6bf466c11a208e14a02d4badfcddd4ba921",
+        "README.md": "9ede5ea645927eb4a6093c3b9a9a668d67bec54979c86dffa3cc5e52f0c475ed",
+        "SKILL.md": "d578040beb1c1b6e8437e44b8dc47f948ffcb120fce6a10778d912bd67c9823c",
+        "metadata.json": "c1e052c9d595f685c5c4ca408cef9efecdd0c8c4dd41db65106b6f2ec99f08b1",
+        "rules/_sections.md": "063934d0d17b37e8e312882d72a0daceecf85662d8979ed66ac8b3ba660c8170",
+        "rules/sa-contract-honesty.md": "9de4db56c1879c55df844807feb7987101a962fe9776c3e5103f137e9b65e48e",
+        "rules/sa-native-types-first.md": "7c2647d883f97e4925ceb63d33ba23d81271eccd22cac0534e2ca7b151ba3afb",
+        "rules/sa-root-cause-typing.md": "489544b84a0520fe9af0e9a84ad31fccc846cbea0b2728a3566a3b0b9981b69d",
+        "rules/sa-scoped-ignores-extensions.md": "c5720a59db93d70f4abf5c79f1dfb2edd558303310e0c51bb5818e63ba598c0b",
+        "rules/sa-shape-precision.md": "4cafb6347f7d3183fa59eda347aa863ba650c907d738bc038ba4dc1db1e2a1a9"
+      }
+    },
+    "testing-best-practices": {
+      "files": {
+        "AGENTS.md": "0e9c61eacba49f2a155b8c4a7a367f60e1aaf96549e60aa3c1a8af3fc6703ed6",
+        "README.md": "76a44ae0a188c51cd2ebc78a14d74eb11750cae3213df3271102df622a5f8a56",
+        "SKILL.md": "5b1e58da4bd0b27bc249f657cb861b7f090550c87b15b44b4c3abfab8074e670",
+        "metadata.json": "217e2c34bac72f8743a7555b56d7735f989238344d3cbacfcd05b57ec9c46516",
+        "rules/_sections.md": "d1c8a9b7c181f9ca3cda419db6f3e7c98ee117e3baf4860e76ac79433022bffb",
+        "rules/_template.md": "8398d2f067b3fb12f522cb08964a7ade4b1de28c8105597544dc5fe5a3a2af07",
+        "rules/assert-specific.md": "749e3f2a46ebd8b0798a7103f5da5100196d2e957d11c698ccd89337d5bfcd67",
+        "rules/cov-edge-cases.md": "ac8540a0fab8795c837677d2fb15cb52489b941dcaea7794f94d444b0a0cd76d",
+        "rules/cov-regression-first.md": "71dad647132178eba500456f9a088cd5b0658445a905a2e39f36b697d8c16acb",
+        "rules/data-factories.md": "d5fe6fe138a5a30586e7e42120245a736617102b46e6246f9fc14150a8bf469b",
+        "rules/data-minimal.md": "5e1d3068858313383df1562af1ac02ed27017205ce948418d5c8eccaccaf3047",
+        "rules/iso-cleanup.md": "531f91f4916d7490aadb961c7b9c161eb061bf66567d0214a3a83d9e057e2313",
+        "rules/iso-independence.md": "14be2f16ba0ff25180689ffa22629de32f8f130c0c310c9e9ed45fea731251e3",
+        "rules/mock-boundaries.md": "a5f16cdff2ba2e56f8ba98c5a9cac633d162c2c7c9c544b55c118ced3481f730",
+        "rules/perf-fast-unit.md": "743d2b640a48817c21c87d1affe4cc18f4bd05732ea01f11fba66fc10b1e1334",
+        "rules/struct-aaa-pattern.md": "5f0d09fb6b8afd7a9c71060386683d4478d54e04f349f7e30dc50b2106bfa91b",
+        "rules/struct-lifecycle.md": "67c03ec7505b346dde7eb55b0f99fd19153a1c08ee08004f3fddebe208709433"
+      }
+    }
+  },
+  "source": {
+    "repository": "voku/agent-skills",
+    "revision": "e4d1aff0a6beab574476dccfc955f0f656aa141c"
+  }
+}

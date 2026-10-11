@@ -65,6 +65,8 @@ install.sh           pinned install / verify / uninstall entrypoint
 bin/agent-dotfiles   standalone machine-readable CLI
 agent_dotfiles/      Python standard-library implementation
 tools/install.py    verified private-prefix installer
+tools/sync_portable_skills.py  maintainer-only local source synchronizer
+skills/              project adapter plus pinned portable skill selection
 tests/               contracts and real shell/Git integration
 docs/                concise contracts, examples and historical evidence links
 ```
@@ -92,6 +94,15 @@ repository: verified Git state, Composer scripts and configuration, supplied
 failure evidence, and the smallest relevant source location. It is one shared
 source projected explicitly into a project-local Codex or Claude Code skill
 directory; it does not install dependencies or run project checks on its own.
+
+## Selected agent-skills guidance
+
+The pinned installation also carries a compact selection of portable guidance:
+coding simplicity, testing, PHP static analysis, and authoring a language-specific
+onboarding skill. [Selected portable skills](docs/AGENT_SKILLS.md) records the
+exact upstream provenance and maintainer-only local synchronization contract.
+They are optional guidance for a fresh consumer, not a replacement for project
+instructions, agent-loop lifecycle authority, or native tools.
 
 ## Requirements
 
