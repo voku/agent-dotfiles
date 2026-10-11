@@ -36,6 +36,28 @@ Activation refuses existing owned names or `AGENT_DOTFILES_HOME` rather than
 replacing custom definitions. Run `agent_deactivate` before activating another
 version. No eval-based restoration or command interception is involved.
 
+## Choose tools by the evidence needed
+
+Use native `rg -n` and a source read when the file or symbol location is already
+known. The profile is optional; do not repeat a successful native search simply
+to use a helper. Use `agent_search` for structured match coordinates and explicit
+completeness, `agent_read` for byte-exact ranges tied to a whole-file digest, and
+`agent_patch` when a complete literal-file patch is the required evidence. PHP
+symbols and callers still belong to agent-map and the Loop investigation skill.
+
+Scope discovery before reducing its output limit:
+
+```bash
+agent_search 'sha256' --root /project --path agent_dotfiles --glob '*.py'
+agent_read agent_dotfiles/cli.py --root /project --start 220 --end 285
+```
+
+Check the exit status and completeness fields. Exit 3 means the search is
+incomplete: narrow its scope or retrieve the missing evidence before drawing a
+conclusion. A short result that omits the implementation costs another search.
+Loop lifecycle and Learning syntax must come from the pinned owner's help and
+current structured next action; shell helpers do not replace those contracts.
+
 ## Helpers
 
 All helpers preserve argument boundaries, stdout, stderr and exit status. The

@@ -181,6 +181,26 @@ class AgentDotfilesCliTest(unittest.TestCase):
         self.assertFalse(report["complete_file"])
         self.assertFalse(report["truncated"])
 
+    def test_read_digest_identifies_source_across_ranges(self) -> None:
+        import hashlib
+        raw = b"first\r\nsecond \xe2\x80\xa8 unicode\nthird without newline"
+        (self.project / "ranges.txt").write_bytes(raw)
+        lines = ["first\r\n", "second \u2028 unicode\n", "third without newline"]
+        for start, end in ((1, 1), (2, 2), (3, 10), (1, 10)):
+            with self.subTest(start=start, end=end):
+                code, report = self.cli("read", "ranges.txt", "--start", str(start), "--end", str(end))
+                content = "".join(lines[start - 1:min(end, 3)])
+                self.assertEqual(code, 0)
+                self.assertEqual(report["sha256"], hashlib.sha256(raw).hexdigest())
+                self.assertEqual(report["content"], content)
+                self.assertEqual(report["content_bytes"], len(content.encode("utf-8")))
+                self.assertEqual(report["start"], start)
+                self.assertEqual(report["requested_end"], end)
+                self.assertEqual(report["actual_end"], min(end, 3))
+                self.assertEqual(report["total_lines"], 3)
+                self.assertEqual(report["complete_file"], start == 1 and end >= 3)
+                self.assertFalse(report["truncated"])
+
     def test_read_short_file_reports_eof_instead_of_hidden_truncation(self) -> None:
         (self.project / "one.php").write_text("hello\n", encoding="utf-8")
         code, report = self.cli("read", "one.php")

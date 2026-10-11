@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Require Linux Bash/Zsh activation tests and ShellCheck validation of the root
+  shell layout; preserve source paths and caller shell state.
+- Add cross-range whole-source digest regression coverage and evidence-driven
+  guidance for selecting native tools versus optional structured helpers.
+
 - Add explicit agent-owned Bash/Zsh profiles, shared exports and namespaced
   context helpers without changing user startup files, PATH or shell options.
 - Add root `install.sh` for pinned private installation, verification and removal;

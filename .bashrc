@@ -11,7 +11,7 @@ _agent_dotfiles_source_profile() {
         *) _agent_parent=. ;;
     esac
     [ -n "$_agent_parent" ] || _agent_parent=/
-    _agent_home=$(CDPATH= builtin cd -- "$_agent_parent" && builtin pwd -P && printf '.') || {
+    _agent_home=$(CDPATH='' builtin cd -- "$_agent_parent" && builtin pwd -P && printf '.') || {
         unset -f _agent_dotfiles_source_profile
         return 2
     }

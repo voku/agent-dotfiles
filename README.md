@@ -8,6 +8,10 @@ exact source evidence and no prompt hooks or startup-file edits. Python 3.10+
 standard-library code supplies stable JSON; Git and ripgrep supply native evidence.
 The latest published version is **0.3.0**; shell setup below is currently unreleased.
 
+Use native tools for simple, known-location questions; select these helpers when
+source identity, literal scope or explicit completeness improves the evidence.
+See [tool selection](docs/SHELL.md#choose-tools-by-the-evidence-needed).
+
 ## Quick start
 
 Use the checkout directly, without installation:
