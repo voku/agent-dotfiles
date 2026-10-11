@@ -106,6 +106,7 @@ def shell_call(
 def main() -> int:
     dotfiles = Path(os.environ["DOTFILES_CHECKOUT"]).resolve(strict=True)
     php_repo = Path(os.environ["PHP_CHECKOUT"]).resolve(strict=True)
+    consumer = Path(os.environ["CONSUMER_PREFIX"]).resolve(strict=True)
     artifact = Path(os.environ["PREFLIGHT_RECEIPT"])
     trace: list[dict[str, Any]] = []
     report: dict[str, Any] = {
@@ -115,6 +116,7 @@ def main() -> int:
         "expected_dotfiles_sha": os.environ["DOTFILES_SHA"],
         "expected_php_sha": os.environ["PHP_SHA"],
         "model_tokens": None,
+        "installed_prefix": str(consumer),
         "trace": trace,
         "checks": [],
         "result": "fail",
@@ -148,7 +150,12 @@ def main() -> int:
         report["oracle_match_count"] = len(oracle)
         report["checks"].append("native-literal-oracle")
 
-        binary = str(dotfiles / "bin/agent-dotfiles")
+        binary = str(consumer / "bin/agent-dotfiles")
+        doctor = json_object(execute([binary, "doctor"], consumer, trace))
+        if doctor.get("schema") != "agent-dotfiles.v1.doctor" or doctor.get("missing_required"):
+            raise AssertionError("Installed candidate doctor reported missing requirements")
+        report["installed_version"] = doctor.get("version")
+        report["checks"].append("installed-cli-doctor")
         search_args = ["search", PATTERN, "--root", str(php_repo),
                        "--path", SOURCE, "--limit", "10"]
         read_args = ["read", SOURCE, "--root", str(php_repo),
@@ -158,8 +165,8 @@ def main() -> int:
         report["checks"].append("direct-cli-search-and-read")
 
         for name in ("bash", "zsh"):
-            search = shell_call(name, dotfiles, "agent_search", search_args[1:])
-            read = shell_call(name, dotfiles, "agent_read", read_args[1:])
+            search = shell_call(name, consumer, "agent_search", search_args[1:])
+            read = shell_call(name, consumer, "agent_read", read_args[1:])
             check_search(execute(search, dotfiles, trace), oracle)
             check_read(execute(read, dotfiles, trace), source)
             report["checks"].append(name + "-fresh-shell-search-and-read")
