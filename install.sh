@@ -2,9 +2,9 @@
 # Offline private-prefix setup; never modifies startup files or installs tools.
 case "${1-}" in
     -h|--help|'')
-        printf '%s\n' 'Usage: ./install.sh [install|verify|uninstall] --prefix ABSOLUTE_PATH [--revision FULL_COMMIT_SHA]' 'Install requires an independently approved full commit SHA and a clean checkout.' 'Default operation: install. Python 3.10+ and Git are required; no downloads occur.'
+        printf '%s\n' 'Usage: ./install.sh [plan|install|verify|uninstall] --prefix ABSOLUTE_PATH [--revision FULL_COMMIT_SHA]' 'Install requires an independently approved full commit SHA and a clean checkout.' 'Default operation: install. Python 3.10+ and Git are required; no downloads occur.'
         exit 0 ;;
-    install|verify|uninstall) operation=$1; shift ;;
+    plan|install|verify|uninstall) operation=$1; shift ;;
     *) operation=install ;;
 esac
 # Validate prefix here: the lower-level API also supports resolved local paths.
@@ -27,7 +27,7 @@ if ! command -v python3 >/dev/null 2>&1; then
     printf '%s\n' 'agent-dotfiles: python3 is required (Python 3.10+)' >&2
     exit 2
 fi
-if [ "$operation" = install ]; then
-    exec python3 "$script_root/tools/install.py" install --source "$script_root" "$@"
+if [ "$operation" = install ] || [ "$operation" = plan ]; then
+    exec python3 "$script_root/tools/install.py" "$operation" --source "$script_root" "$@"
 fi
 exec python3 "$script_root/tools/install.py" "$operation" "$@"

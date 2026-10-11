@@ -16,8 +16,8 @@ jobs:
       matrix:
         python-version: ['3.10', '3.12', '3.13']
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
       - name: Compile
@@ -43,8 +43,8 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.15'
       - name: Installation, Bash and Zsh source contracts on macOS
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Commit and release verified against the official annotated 0.50.1 tag.
       - uses: TypedDevs/bashunit@860c797a48e34be20b019a70f58c0e06d15c8d33 # 0.51.0
         with:
@@ -69,8 +69,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.15'
       - name: Install independent shell validators
@@ -78,9 +78,9 @@ jobs:
       - name: ShellCheck and Bash/Zsh syntax
         run: |
           shellcheck --severity=warning -s sh install.sh
-          shellcheck --severity=warning -s bash .bashrc .shellrc .functions .exports shell/modules/context.sh shell/modules/git.sh
-          for file in .bashrc .shellrc .functions .exports shell/modules/context.sh shell/modules/git.sh; do bash -n "$file"; done
-          for file in .zshrc .shellrc .functions .exports shell/modules/context.sh shell/modules/git.sh; do zsh -n "$file"; done
+          shellcheck --severity=warning -s bash .bashrc .shellrc .functions .exports shell/modules/context.sh shell/modules/git.sh shell/core/activation.sh shell/core/deactivation.sh
+          for file in .bashrc .shellrc .functions .exports shell/modules/context.sh shell/modules/git.sh shell/core/activation.sh shell/core/deactivation.sh; do bash -n "$file"; done
+          for file in .zshrc .shellrc .functions .exports shell/modules/context.sh shell/modules/git.sh shell/core/activation.sh shell/core/deactivation.sh; do zsh -n "$file"; done
       - name: Actual Bash and Zsh activation contracts
         env:
           REQUIRE_ZSH: "1"
@@ -90,12 +90,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # PR checks should test the reviewed PR source, not GitHub's synthetic merge ref.
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.15'
       - name: Install Zsh for a fresh consumer

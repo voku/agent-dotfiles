@@ -36,9 +36,11 @@ PATH, shell options, the current directory, prompts, user dotfiles or Git config
 For a non-interactive agent session, use `env -u BASH_ENV bash --noprofile --norc` or `zsh -f`
 and explicitly source the reviewed profile. See [shell setup and helpers](docs/SHELL.md).
 
-For a reusable consumer, install a reviewed full commit into a private prefix:
+For a reusable consumer, preview the exact planned files and hashes, then
+install a reviewed full commit into a private prefix:
 
 ```sh
+./install.sh plan --prefix /existing/private/agent-tools --revision APPROVED_FULL_COMMIT_SHA
 ./install.sh --prefix /existing/private/agent-tools --revision APPROVED_FULL_COMMIT_SHA
 ./install.sh verify --prefix /existing/private/agent-tools --revision APPROVED_FULL_COMMIT_SHA
 ```
@@ -53,9 +55,10 @@ verification and safe removal. No package installation or network download occur
 ```text
 .bashrc              explicit Bash activation
 .zshrc               explicit Zsh activation
-.shellrc             shared activation and validation
+.shellrc             shared root resolution and reviewed lifecycle loader
 .exports             agent-owned installation location
 .functions           fixed-module loader and deactivation
+shell/core/          fixed activation and deactivation lifecycle
 shell/modules/       explicit context and Git helper definitions
 install.sh           pinned install / verify / uninstall entrypoint
 bin/agent-dotfiles   standalone machine-readable CLI
