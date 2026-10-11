@@ -14,6 +14,28 @@ by the current CI matrix. Windows is not supported by this installation contract
 On macOS use a canonical parent path (for example `/private/var/...` rather than
 the `/var` symlink). Symlink ancestors are refused on every platform.
 
+## Preview the exact installation without writing files
+
+The upstream human-oriented dotfiles bootstrap includes a dry run. This agent
+environment provides a stricter equivalent: a pinned, read-only installation
+plan. It validates the same checked-out source, revision, tracked-file integrity
+and private-prefix preconditions as installation, but creates no prefix or
+staging directory.
+
+```sh
+./install.sh plan --prefix /existing/private/agent-tools --revision APPROVED_FULL_COMMIT_SHA
+```
+
+A successful JSON result has `operation: "plan"`, the exact source revision,
+a file count and `entries` mapping manifest-tracked payload paths to SHA-256
+hashes and numeric Unix permission modes (493 means 0755, 420 means 0644).
+The generated `installation.json` is written only during installation; it is
+not counted among these payload entries. The plan includes the generated launcher
+and all fixed shell modules and lifecycle files. Review it before installation; it is not an approval
+token. The later installation repeats provenance checks against the same
+approved full commit and may refuse if the source or destination changed.
+Plan never installs packages, sources profiles or alters user configuration.
+
 ## Install from an approved checkout
 
 Obtain the checkout through your existing trusted Git access, review the desired
