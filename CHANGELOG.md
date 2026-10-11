@@ -8,8 +8,8 @@
   coverage, plus evidence-driven native/structured tool selection guidance.
 - Preserve activation failures in documented fresh-shell invocations; require
   exact-revision citations and actual approved-scope checks before mutation.
-- Record three-way maintenance results, independent oracles and workflow setup
-  failures without claiming a general productivity or token saving.
+- Document governed maintenance scope and evidence requirements for the planned
+  three-way evaluation; its independent oracles and results remain pending in #12.
 
 - Add explicit agent-owned Bash/Zsh profiles, shared exports and namespaced
   context helpers without changing user startup files, PATH or shell options.
