@@ -10,7 +10,8 @@ import unittest
 
 PROJECT = Path(__file__).resolve().parent.parent
 ASSETS = ('.bashrc', '.zshrc', '.shellrc', '.exports', '.functions',
-          'shell/modules/context.sh', 'shell/modules/git.sh')
+          'shell/modules/context.sh', 'shell/modules/git.sh',
+          'shell/core/activation.sh', 'shell/core/deactivation.sh')
 
 
 class ShellProfilesTest(unittest.TestCase):
@@ -118,6 +119,27 @@ agent_deactivate
             result = self.run_shell(shell, profile, '. "$1"')
             self.assertEqual(result.returncode, 2)
             self.assertIn('shell/modules/context.sh', result.stderr)
+
+    def test_missing_core_refuses_without_partial_namespace(self):
+        for name in ('shell/core/activation.sh', 'shell/core/deactivation.sh'):
+            target = self.home / name
+            content = target.read_bytes()
+            try:
+                target.unlink()
+                for shell, profile in self.shells():
+                    with self.subTest(missing=name, shell=shell):
+                        result = self.run_shell(shell, profile, '''
+. "$1"
+status=$?
+[ "$status" -eq 2 ] &&
+[ "${AGENT_DOTFILES_HOME+x}" != x ] &&
+! typeset -f agent_search >/dev/null 2>&1
+''')
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        self.assertEqual(result.stdout, '')
+                        self.assertIn(name, result.stderr)
+            finally:
+                target.write_bytes(content)
 
     def test_removed_executable_is_visible_failure(self):
         for shell, profile in self.shells():

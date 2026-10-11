@@ -183,7 +183,8 @@ class InstallationTest(unittest.TestCase):
         self.revision = self.git("rev-parse", "HEAD").strip()
         self.assertEqual(self.install()[0], 0)
         for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports",
-                     "shell/modules/context.sh", "shell/modules/git.sh"):
+                     "shell/modules/context.sh", "shell/modules/git.sh",
+                     "shell/core/activation.sh", "shell/core/deactivation.sh"):
             self.assertEqual((self.prefix / name).read_bytes(), (self.source / name).read_bytes())
         self.assertFalse(marker.exists())
         self.assertEqual(self.command("verify")[0], 0)
@@ -208,6 +209,22 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.install()[0], 2)
         self.assertFalse(self.prefix.exists())
 
+    def test_all_core_files_required_for_new_installations(self):
+        self.git("rm", "shell/core/deactivation.sh")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", "missing shell core")
+        self.revision = self.git("rev-parse", "HEAD").strip()
+        self.assertEqual(self.install()[0], 2)
+        self.assertFalse(self.prefix.exists())
+
+    def test_modified_core_refuses_verify_and_uninstall(self):
+        self.assertEqual(self.install()[0], 0)
+        target = self.prefix / "shell/core/activation.sh"
+        target.write_text("# modified\n")
+        self.assertEqual(self.command("verify")[0], 2)
+        self.assertEqual(self.command("uninstall")[0], 2)
+        self.assertEqual(target.read_text(), "# modified\n")
+
     def test_modified_module_refuses_verify_and_uninstall(self):
         self.assertEqual(self.install()[0], 0)
         target = self.prefix / "shell/modules/git.sh"
@@ -215,6 +232,16 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.command("verify")[0], 2)
         self.assertEqual(self.command("uninstall")[0], 2)
         self.assertEqual(target.read_text(), "# modified\n")
+
+    def test_partial_core_manifest_refused(self):
+        self.assertEqual(self.install()[0], 0)
+        manifest = self.prefix / "installation.json"
+        data = json.loads(manifest.read_text())
+        (self.prefix / "shell/core/deactivation.sh").unlink()
+        del data["files"]["shell/core/deactivation.sh"]
+        manifest.write_text(json.dumps(data))
+        self.assertEqual(self.command("verify")[0], 2)
+        self.assertEqual(self.command("uninstall")[0], 2)
 
     def test_partial_module_manifest_refused(self):
         self.assertEqual(self.install()[0], 0)
@@ -226,15 +253,30 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.command("verify")[0], 2)
         self.assertEqual(self.command("uninstall")[0], 2)
 
+    def test_pre_core_modular_manifest_still_verifies_and_uninstalls(self):
+        # Older v1 profiles had modules but no shell/core lifecycle files.
+        self.assertEqual(self.install()[0], 0)
+        manifest = self.prefix / "installation.json"
+        data = json.loads(manifest.read_text())
+        for name in ("shell/core/activation.sh", "shell/core/deactivation.sh"):
+            (self.prefix / name).unlink()
+            del data["files"][name]
+        (self.prefix / "shell/core").rmdir()
+        manifest.write_text(json.dumps(data))
+        self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
+        self.assertEqual(self.command("uninstall", "--revision", self.revision)[0], 0)
+
     def test_pre_modular_shell_manifest_still_verifies_and_uninstalls(self):
         # Model v0.4.0: all five profiles exist, but no shell/modules/ tree.
         self.assertEqual(self.install()[0], 0)
         manifest = self.prefix / "installation.json"
         data = json.loads(manifest.read_text())
-        for name in ("shell/modules/context.sh", "shell/modules/git.sh"):
+        for name in ("shell/modules/context.sh", "shell/modules/git.sh",
+                     "shell/core/activation.sh", "shell/core/deactivation.sh"):
             (self.prefix / name).unlink()
             del data["files"][name]
         (self.prefix / "shell/modules").rmdir()
+        (self.prefix / "shell/core").rmdir()
         (self.prefix / "shell").rmdir()
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
@@ -246,10 +288,12 @@ class InstallationTest(unittest.TestCase):
         manifest = self.prefix / "installation.json"
         data = json.loads(manifest.read_text())
         for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports",
-                     "shell/modules/context.sh", "shell/modules/git.sh"):
+                     "shell/modules/context.sh", "shell/modules/git.sh",
+                     "shell/core/activation.sh", "shell/core/deactivation.sh"):
             (self.prefix / name).unlink()
             del data["files"][name]
         (self.prefix / "shell/modules").rmdir()
+        (self.prefix / "shell/core").rmdir()
         (self.prefix / "shell").rmdir()
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)

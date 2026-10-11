@@ -3,7 +3,5 @@
 . "$AGENT_DOTFILES_HOME/shell/modules/context.sh"
 # shellcheck source=shell/modules/git.sh
 . "$AGENT_DOTFILES_HOME/shell/modules/git.sh"
-agent_deactivate() {
-    unset AGENT_DOTFILES_HOME
-    unset -f agent_dotfiles agent_doctor agent_files agent_search agent_read agent_tracked agent_status agent_patch agent_history agent_blame agent_deactivate
-}
+# shellcheck source=shell/core/deactivation.sh
+. "$AGENT_DOTFILES_HOME/shell/core/deactivation.sh"
