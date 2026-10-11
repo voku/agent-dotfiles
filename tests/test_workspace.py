@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import errno
 import json
 import os
 from pathlib import Path
@@ -166,8 +167,19 @@ class WorkspaceTest(unittest.TestCase):
     def test_non_utf8_untracked_filename_preserves_original_bytes(self) -> None:
         import base64
         path = os.fsencode(self.repo) + b"/byte-\xff.txt"
-        descriptor = os.open(path, os.O_CREAT | os.O_WRONLY, 0o600)
-        os.close(descriptor)
+        try:
+            descriptor = os.open(path, os.O_CREAT | os.O_WRONLY, 0o600)
+        except OSError as exc:
+            if exc.errno != errno.EILSEQ:
+                raise
+            # Some filesystems (including macOS APFS) cannot store invalid
+            # UTF-8 names; still test the lossless byte decoder itself.
+            self.assertEqual(cli_module._filesystem_path(b"byte-\\xff.txt"), {
+                "base64": base64.b64encode(b"byte-\\xff.txt").decode("ascii"),
+            })
+            self.skipTest("filesystem refuses non-UTF8 path bytes")
+        else:
+            os.close(descriptor)
         code, report = self.workspace()
         self.assertEqual(code, 0, report)
         self.assertEqual(report["changes"], [{
