@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.15'
       - name: Installation, Bash and Zsh source contracts on macOS
         env:
           REQUIRE_ZSH: "1"
@@ -72,7 +72,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.15'
       - name: Install independent shell validators
         run: sudo apt-get update && sudo apt-get install -y zsh shellcheck
       - name: ShellCheck and Bash/Zsh syntax
@@ -97,7 +97,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.15'
       - name: Install Zsh for a fresh consumer
         run: sudo apt-get update && sudo apt-get install -y zsh
       - name: Verify candidate source, install, activate, verify and uninstall
