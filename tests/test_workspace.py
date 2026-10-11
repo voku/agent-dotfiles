@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 from pathlib import Path
@@ -10,6 +11,10 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
+
+from agent_dotfiles import cli as cli_module
+from agent_dotfiles.validation import CommandFailure
 
 PROJECT = Path(__file__).resolve().parent.parent
 CLI = PROJECT / "bin" / "agent-dotfiles"
@@ -87,6 +92,59 @@ class WorkspaceTest(unittest.TestCase):
         self.assertTrue(report["truncated"])
         self.assertIsNone(report["clean"])
         self.assertEqual(len(report["changes"]), 1)
+
+    def test_git_rename_keeps_original_path_and_bounded_record(self) -> None:
+        renamed = "renamed [雪]\\n.txt"
+        self.git("mv", "tracked.txt", renamed)
+        code, report = self.workspace("--limit", "1")
+        self.assertEqual(code, 0, report)
+        self.assertFalse(report["clean"])
+        self.assertFalse(report["truncated"])
+        self.assertEqual(report["changes"],
+                         [{"xy": "R ", "path": renamed, "original_path": "tracked.txt"}])
+
+        (self.repo / "additional.txt").write_text("untracked", encoding="utf-8")
+        code, limited = self.workspace("--limit", "1")
+        self.assertEqual(code, 3, limited)
+        self.assertTrue(limited["truncated"])
+        self.assertIsNone(limited["clean"])
+        self.assertEqual(len(limited["changes"]), 1)
+        self.assertEqual(limited["changes"][0]["original_path"], "tracked.txt")
+
+    def test_linked_git_worktree_resolves_its_own_root(self) -> None:
+        linked = self.root / "linked worktree [雪]"
+        self.git("worktree", "add", "-q", "--detach", str(linked), "HEAD")
+        self.assertTrue((linked / ".git").is_file())
+        nested = linked / "nested"
+        nested.mkdir()
+        (linked / "only-in-worktree.txt").write_text("untracked", encoding="utf-8")
+        code, report = self.workspace("--root", str(nested))
+        self.assertEqual(code, 0, report)
+        self.assertEqual(report["root"], str(linked.resolve()))
+        self.assertEqual(report["requested_root"], str(nested.resolve()))
+        self.assertEqual(report["head"], self.git("rev-parse", "HEAD"))
+        self.assertIsNone(report["branch"])
+        self.assertTrue(report["detached"])
+        self.assertEqual(report["changes"],
+                         [{"xy": "??", "path": "only-in-worktree.txt"}])
+        self.assertFalse(report["clean"])
+
+    def test_identity_changes_during_status_refuse_snapshot(self) -> None:
+        original = cli_module._git_status_command
+
+        def change_branch_during_status(args: argparse.Namespace):
+            result = original(args)
+            # Real Git operation between the two identity probes, not a
+            # mocked or fabricated identity response.
+            self.git("checkout", "-q", "--detach", "HEAD")
+            return result
+
+        with mock.patch.object(cli_module, "_git_status_command",
+                               side_effect=change_branch_during_status):
+            with self.assertRaises(CommandFailure) as failure:
+                cli_module._workspace_command(argparse.Namespace(
+                    root=str(self.repo), limit=100))
+        self.assertEqual(failure.exception.reason, "snapshot_changed")
 
     def test_outside_checkout_and_unborn_head_fail_explicitly(self) -> None:
         plain = self.root / "plain"
