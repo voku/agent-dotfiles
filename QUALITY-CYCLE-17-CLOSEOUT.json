@@ -1,0 +1,2239 @@
+{
+  "schema_version": 1,
+  "kind": "Final exact-source publication/owner closeout; historical archive remains unchanged",
+  "evidence_archive_commit": "67c55b0940ba3e136032560d669870a16c3442b3",
+  "archive_sha256": "ba65b00703026679099f801b660f9266c3a04c24d0a747cfd899485bd59717fb",
+  "no_new_release": true,
+  "no_default_activation": true,
+  "running_loop_unchanged": "15507c3a313693eed45e2b1c98eda9c3aae7a7ef",
+  "report_head": "332c19c7e3a431f34ae24e0832b7f8ac63cb3de6",
+  "report_sha256": "0a8d1a9d4a32582338eb14be06700d3de4bd4df935d98f0ba0ae8e241d8a4973",
+  "receipts": {
+    "pr17-merged": {
+      "mergeCommit": {
+        "oid": "79356188418c3cdb0d32f0d990e199f659e0666b"
+      },
+      "mergedAt": "2026-10-11T12:48:59Z",
+      "state": "MERGED"
+    },
+    "merged-tests": {
+      "conclusion": "success",
+      "headSha": "79356188418c3cdb0d32f0d990e199f659e0666b",
+      "jobs": [
+        {
+          "completedAt": "2026-10-11T12:49:17Z",
+          "conclusion": "success",
+          "databaseId": 114473830411,
+          "name": "shell-contracts",
+          "startedAt": "2026-10-11T12:49:04Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Install independent shell validators",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "ShellCheck and Bash/Zsh syntax",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Actual Bash and Zsh activation contracts",
+              "number": 6,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 11,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 12,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 13,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38140710056/job/114473830411"
+        },
+        {
+          "completedAt": "2026-10-11T12:49:20Z",
+          "conclusion": "success",
+          "databaseId": 114473830504,
+          "name": "candidate-cold-install",
+          "startedAt": "2026-10-11T12:49:04Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Install Zsh for a fresh consumer",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Verify candidate source, install, activate, verify and uninstall",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 9,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 10,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 11,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38140710056/job/114473830504"
+        },
+        {
+          "completedAt": "2026-10-11T12:49:16Z",
+          "conclusion": "success",
+          "databaseId": 114473830506,
+          "name": "python-contracts (3.13)",
+          "startedAt": "2026-10-11T12:49:03Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Compile",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Contract tests",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Capability diagnostics",
+              "number": 6,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@v4",
+              "number": 7,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 13,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 14,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 15,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38140710056/job/114473830506"
+        },
+        {
+          "completedAt": "2026-10-11T12:49:17Z",
+          "conclusion": "success",
+          "databaseId": 114473830517,
+          "name": "python-contracts (3.12)",
+          "startedAt": "2026-10-11T12:49:03Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Compile",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Contract tests",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Capability diagnostics",
+              "number": 6,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@v4",
+              "number": 7,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 13,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 14,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 15,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38140710056/job/114473830517"
+        },
+        {
+          "completedAt": "2026-10-11T12:49:16Z",
+          "conclusion": "success",
+          "databaseId": 114473830530,
+          "name": "python-contracts (3.10)",
+          "startedAt": "2026-10-11T12:49:03Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Compile",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Contract tests",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Capability diagnostics",
+              "number": 6,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@v4",
+              "number": 7,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 13,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 14,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 15,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38140710056/job/114473830530"
+        },
+        {
+          "completedAt": "2026-10-11T12:49:11Z",
+          "conclusion": "success",
+          "databaseId": 114473830565,
+          "name": "bashunit-integration",
+          "startedAt": "2026-10-11T12:49:04Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run TypedDevs/bashunit@28ea63c467f1f461a6368c93e5c264051b141c6f",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Bashunit real-CLI integration tests",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 8,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 9,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38140710056/job/114473830565"
+        },
+        {
+          "completedAt": "2026-10-11T12:49:24Z",
+          "conclusion": "success",
+          "databaseId": 114473830575,
+          "name": "macos-installation",
+          "startedAt": "2026-10-11T12:49:08Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Installation, Bash and Zsh source contracts on macOS",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 7,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 8,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 9,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38140710056/job/114473830575"
+        }
+      ],
+      "status": "completed"
+    },
+    "merged-parity": {
+      "conclusion": "success",
+      "headSha": "79356188418c3cdb0d32f0d990e199f659e0666b",
+      "jobs": [
+        {
+          "completedAt": "2026-10-11T12:52:06Z",
+          "conclusion": "success",
+          "databaseId": 114474352370,
+          "name": "native-cli-shell-parity",
+          "startedAt": "2026-10-11T12:51:49Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Checkout exact agent-dotfiles candidate without credentials",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Checkout frozen real PHP repository without credentials",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Provide isolated CI-only Bash/Zsh and rg dependencies",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Install candidate into a private offline consumer prefix",
+              "number": 6,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Execute parity oracles and preserve all command receipts",
+              "number": 7,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Verify after use and uninstall isolated candidate",
+              "number": 8,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Retain machine-readable evidence even if a parity gate fails",
+              "number": 9,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 16,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Checkout frozen real PHP repository without credentials",
+              "number": 17,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Checkout exact agent-dotfiles candidate without credentials",
+              "number": 18,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 19,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38140887008/job/114474352370"
+        }
+      ],
+      "status": "completed"
+    },
+    "learning-pr-merged": {
+      "mergeCommit": {
+        "oid": "d1df4e9085527af63427b9861054c83427e09d28"
+      },
+      "mergedAt": "2026-10-11T13:00:05Z",
+      "state": "MERGED"
+    },
+    "learning-merged-ci": {
+      "conclusion": "success",
+      "headSha": "d1df4e9085527af63427b9861054c83427e09d28",
+      "jobs": [
+        {
+          "completedAt": "2026-10-11T13:00:23Z",
+          "conclusion": "success",
+          "databaseId": 114475925292,
+          "name": "installed-skill-consumer",
+          "startedAt": "2026-10-11T13:00:10Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v7",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run shivammathur/setup-php@v2",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Install package into clean copied consumer",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v7",
+              "number": 8,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 9,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-learning/actions/runs/38141429131/job/114475925292"
+        },
+        {
+          "completedAt": "2026-10-11T13:00:30Z",
+          "conclusion": "success",
+          "databaseId": 114475925371,
+          "name": "tests (8.3)",
+          "startedAt": "2026-10-11T13:00:10Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v7",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run shivammathur/setup-php@v2",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run composer install --no-interaction --prefer-dist",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run composer ci",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v7",
+              "number": 10,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 11,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-learning/actions/runs/38141429131/job/114475925371"
+        },
+        {
+          "completedAt": "2026-10-11T13:00:29Z",
+          "conclusion": "success",
+          "databaseId": 114475925459,
+          "name": "tests (8.4)",
+          "startedAt": "2026-10-11T13:00:09Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v7",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run shivammathur/setup-php@v2",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run composer install --no-interaction --prefer-dist",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run composer ci",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v7",
+              "number": 10,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 11,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-learning/actions/runs/38141429131/job/114475925459"
+        },
+        {
+          "completedAt": "2026-10-11T13:00:35Z",
+          "conclusion": "success",
+          "databaseId": 114475925521,
+          "name": "tests (8.5)",
+          "startedAt": "2026-10-11T13:00:10Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v7",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run shivammathur/setup-php@v2",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run composer install --no-interaction --prefer-dist",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run composer ci",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v7",
+              "number": 10,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 11,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-learning/actions/runs/38141429131/job/114475925521"
+        }
+      ],
+      "status": "completed"
+    },
+    "learning-fresh-verification": {
+      "source": "d1df4e9085527af63427b9861054c83427e09d28",
+      "result": "pass",
+      "cases": 2,
+      "commands": 12,
+      "expected_rejections": 2,
+      "trace": [
+        {
+          "argv": [
+            "/workspace/.cloud-setup/bin/php",
+            "/workspace/scratch/dotfiles-experiments/loop-current/bin/agent-loop",
+            "init",
+            "scaffold"
+          ],
+          "cwd": "/workspace/scratch/quality-cycle-17/fresh-pattern-b",
+          "exit": 0,
+          "elapsed_ns": 70558795,
+          "stdout": "[CREATE] .agent-loop/\n[CREATE] .agent-loop/init.json\n[CREATE] .agent-loop/.gitignore\n[CREATE] .agent-loop/tasks/\n[CREATE] .agent-loop/sessions/\n[CREATE] .agent-loop/learning/\n[CREATE] .agent-loop/learning/findings/\n\n[OK] init scaffold: minimal local workflow structure is ready.\n[WARN] Host assets were not projected because --agent was not provided.\nBefore workflow work:\n  vendor/bin/agent-loop init host-status --format=json\n  Follow its decision_required/next_action result to select and converge the detected coding host.\n  agent-loop init scaffold --prefix=<PROJECT>  # configure the real board identity before board commands\n  Build or refresh agent-map before workflow approve when governed Recall depends on repository discovery.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/.cloud-setup/bin/php",
+            "/workspace/scratch/quality-cycle-17/learning-fixed-consumer/bin/agent-learning",
+            "finding-capture",
+            "--root",
+            "/workspace/scratch/quality-cycle-17/fresh-pattern-b/.agent-loop/learning",
+            "--task",
+            "PHP17-B2",
+            "--session",
+            "fresh-pattern-session",
+            "--task-id-pattern",
+            "/^PHP17-[ABC][12]$/",
+            "--by",
+            "reviewer",
+            "--observation",
+            "Fresh custom task capture succeeds.",
+            "--hypothesis",
+            "Explicit pattern survives transition.",
+            "--evidence",
+            "Fresh bounded owner verification."
+          ],
+          "cwd": "/workspace/scratch/quality-cycle-17/fresh-pattern-b",
+          "exit": 0,
+          "elapsed_ns": 54158108,
+          "stdout": "{\"id\":\"finding.2026-10-11.32986d\",\"path\":\"/workspace/scratch/quality-cycle-17/fresh-pattern-b/.agent-loop/learning/findings/candidate/finding.2026-10-11.32986d.json\",\"status\":\"candidate\",\"validation_status\":\"unverified\",\"classification\":null,\"available_actions\":[{\"id\":\"review_validate\",\"requires\":[\"actor\",\"conclusion\"]},{\"id\":\"review_invalidate\",\"requires\":[\"actor\"]},{\"id\":\"review_reject\",\"requires\":[\"actor\"]}]}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/.cloud-setup/bin/php",
+            "/workspace/scratch/quality-cycle-17/learning-fixed-consumer/bin/agent-learning",
+            "finding-transition",
+            "finding.2026-10-11.32986d",
+            "validated",
+            "--root",
+            "/workspace/scratch/quality-cycle-17/fresh-pattern-b/.agent-loop/learning",
+            "--task-id-pattern",
+            "/^PHP17-[ABC][12]$/",
+            "--by",
+            "reviewer",
+            "--conclusion",
+            "Verified custom task transition and strict rollback."
+          ],
+          "cwd": "/workspace/scratch/quality-cycle-17/fresh-pattern-b",
+          "exit": 0,
+          "elapsed_ns": 57180712,
+          "stdout": "{\"id\":\"finding.2026-10-11.32986d\",\"status\":\"validated\",\"validation_status\":\"validated\",\"classification\":null,\"available_actions\":[{\"id\":\"classify\",\"requires\":[\"classification\"]}]}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/.cloud-setup/bin/php",
+            "/workspace/scratch/quality-cycle-17/learning-fixed-consumer/bin/agent-learning",
+            "finding-transition",
+            "finding.2026-10-11.32986d",
+            "validated",
+            "--root",
+            "/workspace/scratch/quality-cycle-17/fresh-pattern-b/.agent-loop/learning",
+            "--task-id-pattern",
+            "/^PHP17-[ABC][12]$/",
+            "--by",
+            "reviewer",
+            "--conclusion",
+            "Verified custom task transition and strict rollback."
+          ],
+          "cwd": "/workspace/scratch/quality-cycle-17/fresh-pattern-b",
+          "exit": 0,
+          "elapsed_ns": 42867730,
+          "stdout": "{\"id\":\"finding.2026-10-11.32986d\",\"status\":\"validated\",\"validation_status\":\"validated\",\"classification\":null,\"available_actions\":[{\"id\":\"classify\",\"requires\":[\"classification\"]}]}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/.cloud-setup/bin/php",
+            "/workspace/scratch/quality-cycle-17/learning-fixed-consumer/bin/agent-learning",
+            "finding-transition",
+            "finding.2026-10-11.32986d",
+            "archived",
+            "--root",
+            "/workspace/scratch/quality-cycle-17/fresh-pattern-b/.agent-loop/learning",
+            "--task-id-pattern",
+            "/^OTHER-\\d+$/",
+            "--by",
+            "reviewer",
+            "--reason",
+            "Intentional negative contract probe."
+          ],
+          "cwd": "/workspace/scratch/quality-cycle-17/fresh-pattern-b",
+          "exit": 1,
+          "elapsed_ns": 59121418,
+          "stdout": "",
+          "stderr": "/workspace/scratch/quality-cycle-17/fresh-pattern-b/.agent-loop/learning/findings/validated/finding.2026-10-11.32986d.json: record finding.2026-10-11.32986d: finding transition failed and was rolled back: /workspace/scratch/quality-cycle-17/fresh-pattern-b/.agent-loop/learning/findings/archived/finding.2026-10-11.32986d.json: record finding.2026-10-11.32986d: missing task references\n"
+        },
+        {
+          "argv": [
+            "/workspace/.cloud-setup/bin/php",
+            "/workspace/scratch/quality-cycle-17/learning-fixed-consumer/bin/agent-learning",
+            "validate",
+            "--root",
+            "/workspace/scratch/quality-cycle-17/fresh-pattern-b/.agent-loop/learning",
+            "--task-id-pattern",
+            "/^PHP17-[ABC][12]$/"
+          ],
+          "cwd": "/workspace/scratch/quality-cycle-17/fresh-pattern-b",
+          "exit": 0,
+          "elapsed_ns": 48317514,
+          "stdout": "Validated agent learning root: /workspace/scratch/quality-cycle-17/fresh-pattern-b/.agent-loop/learning\nFindings: 1\nProposals: 0\nRecall selections: 0\nGuidance outcomes: 0\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/.cloud-setup/bin/php",
+            "/workspace/scratch/dotfiles-experiments/loop-current/bin/agent-loop",
+            "init",
+            "scaffold"
+          ],
+          "cwd": "/workspace/scratch/quality-cycle-17/fresh pattern \u0394",
+          "exit": 0,
+          "elapsed_ns": 55231507,
+          "stdout": "[CREATE] .agent-loop/\n[CREATE] .agent-loop/init.json\n[CREATE] .agent-loop/.gitignore\n[CREATE] .agent-loop/tasks/\n[CREATE] .agent-loop/sessions/\n[CREATE] .agent-loop/learning/\n[CREATE] .agent-loop/learning/findings/\n\n[OK] init scaffold: minimal local workflow structure is ready.\n[WARN] Host assets were not projected because --agent was not provided.\nBefore workflow work:\n  vendor/bin/agent-loop init host-status --format=json\n  Follow its decision_required/next_action result to select and converge the detected coding host.\n  agent-loop init scaffold --prefix=<PROJECT>  # configure the real board identity before board commands\n  Build or refresh agent-map before workflow approve when governed Recall depends on repository discovery.\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/.cloud-setup/bin/php",
+            "/workspace/scratch/quality-cycle-17/learning-fixed-consumer/bin/agent-learning",
+            "finding-capture",
+            "--root",
+            "/workspace/scratch/quality-cycle-17/fresh pattern \u0394/.agent-loop/learning",
+            "--task",
+            "custom:73",
+            "--session",
+            "fresh-pattern-session",
+            "--task-id-pattern",
+            "/^custom:\\d+$/",
+            "--by",
+            "reviewer",
+            "--observation",
+            "Fresh custom task capture succeeds.",
+            "--hypothesis",
+            "Explicit pattern survives transition.",
+            "--evidence",
+            "Fresh bounded owner verification."
+          ],
+          "cwd": "/workspace/scratch/quality-cycle-17/fresh pattern \u0394",
+          "exit": 0,
+          "elapsed_ns": 54612038,
+          "stdout": "{\"id\":\"finding.2026-10-11.762356\",\"path\":\"/workspace/scratch/quality-cycle-17/fresh pattern \u0394/.agent-loop/learning/findings/candidate/finding.2026-10-11.762356.json\",\"status\":\"candidate\",\"validation_status\":\"unverified\",\"classification\":null,\"available_actions\":[{\"id\":\"review_validate\",\"requires\":[\"actor\",\"conclusion\"]},{\"id\":\"review_invalidate\",\"requires\":[\"actor\"]},{\"id\":\"review_reject\",\"requires\":[\"actor\"]}]}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/.cloud-setup/bin/php",
+            "/workspace/scratch/quality-cycle-17/learning-fixed-consumer/bin/agent-learning",
+            "finding-transition",
+            "finding.2026-10-11.762356",
+            "validated",
+            "--root",
+            "/workspace/scratch/quality-cycle-17/fresh pattern \u0394/.agent-loop/learning",
+            "--task-id-pattern",
+            "/^custom:\\d+$/",
+            "--by",
+            "reviewer",
+            "--conclusion",
+            "Verified custom task transition and strict rollback."
+          ],
+          "cwd": "/workspace/scratch/quality-cycle-17/fresh pattern \u0394",
+          "exit": 0,
+          "elapsed_ns": 51427607,
+          "stdout": "{\"id\":\"finding.2026-10-11.762356\",\"status\":\"validated\",\"validation_status\":\"validated\",\"classification\":null,\"available_actions\":[{\"id\":\"classify\",\"requires\":[\"classification\"]}]}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/.cloud-setup/bin/php",
+            "/workspace/scratch/quality-cycle-17/learning-fixed-consumer/bin/agent-learning",
+            "finding-transition",
+            "finding.2026-10-11.762356",
+            "validated",
+            "--root",
+            "/workspace/scratch/quality-cycle-17/fresh pattern \u0394/.agent-loop/learning",
+            "--task-id-pattern",
+            "/^custom:\\d+$/",
+            "--by",
+            "reviewer",
+            "--conclusion",
+            "Verified custom task transition and strict rollback."
+          ],
+          "cwd": "/workspace/scratch/quality-cycle-17/fresh pattern \u0394",
+          "exit": 0,
+          "elapsed_ns": 47093788,
+          "stdout": "{\"id\":\"finding.2026-10-11.762356\",\"status\":\"validated\",\"validation_status\":\"validated\",\"classification\":null,\"available_actions\":[{\"id\":\"classify\",\"requires\":[\"classification\"]}]}\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/.cloud-setup/bin/php",
+            "/workspace/scratch/quality-cycle-17/learning-fixed-consumer/bin/agent-learning",
+            "finding-transition",
+            "finding.2026-10-11.762356",
+            "archived",
+            "--root",
+            "/workspace/scratch/quality-cycle-17/fresh pattern \u0394/.agent-loop/learning",
+            "--task-id-pattern",
+            "/^OTHER-\\d+$/",
+            "--by",
+            "reviewer",
+            "--reason",
+            "Intentional negative contract probe."
+          ],
+          "cwd": "/workspace/scratch/quality-cycle-17/fresh pattern \u0394",
+          "exit": 1,
+          "elapsed_ns": 45205661,
+          "stdout": "",
+          "stderr": "/workspace/scratch/quality-cycle-17/fresh pattern \u0394/.agent-loop/learning/findings/validated/finding.2026-10-11.762356.json: record finding.2026-10-11.762356: finding transition failed and was rolled back: /workspace/scratch/quality-cycle-17/fresh pattern \u0394/.agent-loop/learning/findings/archived/finding.2026-10-11.762356.json: record finding.2026-10-11.762356: missing task references\n"
+        },
+        {
+          "argv": [
+            "/workspace/.cloud-setup/bin/php",
+            "/workspace/scratch/quality-cycle-17/learning-fixed-consumer/bin/agent-learning",
+            "validate",
+            "--root",
+            "/workspace/scratch/quality-cycle-17/fresh pattern \u0394/.agent-loop/learning",
+            "--task-id-pattern",
+            "/^custom:\\d+$/"
+          ],
+          "cwd": "/workspace/scratch/quality-cycle-17/fresh pattern \u0394",
+          "exit": 0,
+          "elapsed_ns": 41378823,
+          "stdout": "Validated agent learning root: /workspace/scratch/quality-cycle-17/fresh pattern \u0394/.agent-loop/learning\nFindings: 1\nProposals: 0\nRecall selections: 0\nGuidance outcomes: 0\n",
+          "stderr": ""
+        }
+      ],
+      "limits": "Fresh direct owner CLI with declaredvendorcopy; no publishedrelease, no runningLoopreplacement, no promotion."
+    },
+    "report-pr-merged": {
+      "mergeCommit": {
+        "oid": "5e509c40cb4234f8abbe8cb5da43b056e8d7729a"
+      },
+      "mergedAt": "2026-10-11T13:10:41Z",
+      "state": "MERGED"
+    },
+    "report-merged-ci": {
+      "conclusion": "success",
+      "headSha": "5e509c40cb4234f8abbe8cb5da43b056e8d7729a",
+      "jobs": [
+        {
+          "completedAt": "2026-10-11T13:11:01Z",
+          "conclusion": "success",
+          "databaseId": 114478003455,
+          "name": "python-contracts (3.13)",
+          "startedAt": "2026-10-11T13:10:47Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Compile",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Contract tests",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Capability diagnostics",
+              "number": 6,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@v4",
+              "number": 7,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 13,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 14,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 15,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38142142168/job/114478003455"
+        },
+        {
+          "completedAt": "2026-10-11T13:10:53Z",
+          "conclusion": "success",
+          "databaseId": 114478003510,
+          "name": "bashunit-integration",
+          "startedAt": "2026-10-11T13:10:47Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run TypedDevs/bashunit@860c797a48e34be20b019a70f58c0e06d15c8d33",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Bashunit real-CLI integration tests",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 8,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 9,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38142142168/job/114478003510"
+        },
+        {
+          "completedAt": "2026-10-11T13:11:10Z",
+          "conclusion": "success",
+          "databaseId": 114478003530,
+          "name": "candidate-cold-install",
+          "startedAt": "2026-10-11T13:10:47Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Install Zsh for a fresh consumer",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Verify candidate source, install, activate, verify and uninstall",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 9,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 10,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 11,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38142142168/job/114478003530"
+        },
+        {
+          "completedAt": "2026-10-11T13:11:02Z",
+          "conclusion": "success",
+          "databaseId": 114478003576,
+          "name": "python-contracts (3.12)",
+          "startedAt": "2026-10-11T13:10:48Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Compile",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Contract tests",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Capability diagnostics",
+              "number": 6,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@v4",
+              "number": 7,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 13,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 14,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 15,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38142142168/job/114478003576"
+        },
+        {
+          "completedAt": "2026-10-11T13:11:15Z",
+          "conclusion": "success",
+          "databaseId": 114478003586,
+          "name": "shell-contracts",
+          "startedAt": "2026-10-11T13:10:47Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Install independent shell validators",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "ShellCheck and Bash/Zsh syntax",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Actual Bash and Zsh activation contracts",
+              "number": 6,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 11,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 12,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 13,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38142142168/job/114478003586"
+        },
+        {
+          "completedAt": "2026-10-11T13:12:06Z",
+          "conclusion": "success",
+          "databaseId": 114478003595,
+          "name": "macos-installation",
+          "startedAt": "2026-10-11T13:10:55Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Installation, Bash and Zsh source contracts on macOS",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 7,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 8,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 9,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38142142168/job/114478003595"
+        },
+        {
+          "completedAt": "2026-10-11T13:11:02Z",
+          "conclusion": "success",
+          "databaseId": 114478003616,
+          "name": "python-contracts (3.10)",
+          "startedAt": "2026-10-11T13:10:48Z",
+          "status": "completed",
+          "steps": [
+            {
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/setup-python@v5",
+              "number": 3,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Compile",
+              "number": 4,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Contract tests",
+              "number": 5,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Capability diagnostics",
+              "number": 6,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@v4",
+              "number": 7,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/setup-python@v5",
+              "number": 13,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 14,
+              "status": "completed"
+            },
+            {
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 15,
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/voku/agent-dotfiles/actions/runs/38142142168/job/114478003616"
+        }
+      ],
+      "status": "completed"
+    },
+    "closeout": {
+      "schema_version": "1.0",
+      "command": "finish",
+      "task_id": "DOTFILES-17",
+      "complete": true,
+      "next_action": "none",
+      "next_action_kind": "none",
+      "next_action_invocation": null,
+      "manifest": {
+        "schema_version": "1.0",
+        "task_id": "DOTFILES-17",
+        "run_id": "run:DOTFILES-17:3ed1d1be3d2f0c07",
+        "mode": "governed",
+        "state": "complete",
+        "references": {
+          "board": {
+            "owner": "agent-kanban",
+            "state": "not_configured",
+            "observation_mode": "checked"
+          },
+          "session": {
+            "owner": "agent-session",
+            "state": "done",
+            "observation_mode": "checked",
+            "session_id": "2026-10-11-dotfiles-17-r2-8e4a7651",
+            "task_id": "DOTFILES-17",
+            "ephemeral": false,
+            "base_commit": "4c6fdd2c61d31789451f6675e7f2cdf0f209124b",
+            "source": {
+              "path": ".agent-loop/sessions/2026-10-11-dotfiles-17-r2-8e4a7651/session.json",
+              "sha256": "sha256:604a17f2be1e36209b0739d00c8d29fd53d38d47153f259f7cbddde15fc9b931"
+            }
+          },
+          "contract": {
+            "owner": "agent-loop",
+            "state": "approved",
+            "observation_mode": "checked",
+            "revision": 2,
+            "run_revision": 2,
+            "goal": "Finish PR17: correct independently demonstrated identity, workflow trigger and cleanup gaps, reviewed integration and fresh CI.",
+            "acceptance_criteria": [
+              "Reject wrong path/root/requested coordinates with valid bytes; installer changes rerun preflight; attempt safe uninstall independently of verification; reviewed CI and Dream include prior dogfood."
+            ],
+            "source": {
+              "path": ".agent-loop/contracts/DOTFILES-17/contract.json",
+              "sha256": "sha256:6201c0328305c950efba9fb5b4a7efc8d16367c5496a2428ef227272a297c895"
+            }
+          },
+          "approval": {
+            "owner": "agent-loop",
+            "state": "current",
+            "observation_mode": "checked",
+            "contract_revision": 2,
+            "approved_by": "user",
+            "approved_at": "2026-10-11T12:43:01+00:00",
+            "source": {
+              "path": ".agent-loop/contracts/DOTFILES-17/contract.json",
+              "sha256": "sha256:6201c0328305c950efba9fb5b4a7efc8d16367c5496a2428ef227272a297c895"
+            }
+          },
+          "map": {
+            "owner": "agent-map",
+            "state": "missing",
+            "observation_mode": "checked",
+            "path": ".agent-loop/map/php-symbols.json"
+          },
+          "search_index": {
+            "owner": "agent-map",
+            "state": "unavailable",
+            "observation_mode": "checked",
+            "path": ".agent-loop/map/search.sqlite"
+          },
+          "recall": {
+            "owner": "agent-recall-compiler",
+            "state": "compiled",
+            "observation_mode": "checked",
+            "compilation_id": "compilation.DOTFILES-17.2026-10-11-124301.d69d2354",
+            "bundle_sha256": "fb1b785ab2168f3ee16f0a630a106692fc9a9b90be197b68cd02a2ce5228c087",
+            "snapshot_sha256": "26b7dff51aae4c059bc70e920b3e7c0dccb398f74bf1167c32cd640b66cf989c",
+            "source": {
+              "path": ".agent-loop/recall/DOTFILES-17/meta.json",
+              "sha256": "sha256:91f08e1da12887ebf285265d7820855b64b25d96351e0cca5ddc03ae109f0999"
+            }
+          },
+          "execution_contract": {
+            "owner": "agent-loop",
+            "state": "not_required",
+            "required": false,
+            "observation_mode": "checked",
+            "contract_revision": 2,
+            "contract_source": {
+              "path": ".agent-loop/contracts/DOTFILES-17/contract.json",
+              "sha256": "sha256:6201c0328305c950efba9fb5b4a7efc8d16367c5496a2428ef227272a297c895"
+            }
+          },
+          "edit": {
+            "owner": "agent-loop",
+            "state": "none",
+            "observation_mode": "checked"
+          },
+          "verification": {
+            "owner": "agent-loop",
+            "state": "passed",
+            "observation_mode": "checked",
+            "run_id": "run:DOTFILES-17:3ed1d1be3d2f0c07",
+            "contract_revision": 2,
+            "implementation_snapshot": "sha256:1091af15e7f91384e723ccb7afb5d9dc6c79e25940172862e44d457f4e6eb0ff",
+            "source_session_id": "2026-10-11-dotfiles-17-r2-8e4a7651",
+            "source": {
+              "path": ".agent-loop/runs/DOTFILES-17/verification.json",
+              "sha256": "sha256:9c73ea0db80ab1c243130dddf49f60139146735acb08bbecfcdfa9c6a466cc61"
+            }
+          },
+          "review": {
+            "owner": "agent-recall-compiler",
+            "state": "warn",
+            "observation_mode": "checked",
+            "source": {
+              "path": ".agent-loop/recall/DOTFILES-17/reviews/DOTFILES-17.blindspots.json",
+              "sha256": "sha256:07cc430a595075dd1e5b434ece440dc4ab6cd7af7cc5b768d4baf7c2d42494e9"
+            }
+          },
+          "learning": {
+            "owner": "agent-learning",
+            "state": "decided",
+            "decision": "findings_recorded",
+            "observation_mode": "checked",
+            "run_id": "run:DOTFILES-17:3ed1d1be3d2f0c07",
+            "decided_by": "codex",
+            "decided_at": "2026-10-11T12:47:53+00:00",
+            "source": {
+              "path": ".agent-loop/learning/history/run-learning/b400be1f61ef0c4b79248a70c58064bd5c5250c2b7d112e85912590fb61d026c.json",
+              "sha256": "sha256:f73868f2a41a79664c3bcecaa9b2840dee5b4a27d3205ed200a0bf9a9a124ab1"
+            }
+          },
+          "outcome_lineage": {
+            "owner": "agent-learning",
+            "state": "run_bound",
+            "observation_mode": "checked",
+            "run_id": "run:DOTFILES-17:3ed1d1be3d2f0c07"
+          }
+        },
+        "disagreements": [],
+        "next_action": "none",
+        "next_action_kind": "none",
+        "next_action_invocation": null
+      },
+      "mutation_status": "accepted",
+      "optional_follow_ups": []
+    },
+    "learning-closeout": {
+      "schema_version": "1.0",
+      "command": "finish",
+      "task_id": "LEARNING-164",
+      "complete": true,
+      "next_action": "none",
+      "next_action_kind": "none",
+      "next_action_invocation": null,
+      "manifest": {
+        "schema_version": "1.0",
+        "task_id": "LEARNING-164",
+        "run_id": "run:LEARNING-164:96df23034ae53707",
+        "mode": "governed",
+        "state": "complete",
+        "references": {
+          "board": {
+            "owner": "agent-kanban",
+            "state": "not_configured",
+            "observation_mode": "checked"
+          },
+          "session": {
+            "owner": "agent-session",
+            "state": "done",
+            "observation_mode": "checked",
+            "session_id": "2026-10-11-learning-164-r1-b8c568ff",
+            "task_id": "LEARNING-164",
+            "ephemeral": false,
+            "base_commit": "0995ce4fb26329088883c8b52259f5ed48875e05",
+            "source": {
+              "path": ".agent-loop/sessions/2026-10-11-learning-164-r1-b8c568ff/session.json",
+              "sha256": "sha256:e1ed52533057d18500d5a1127c4b12eec2383dc0042c4b595d99bd8778ab362a"
+            }
+          },
+          "contract": {
+            "owner": "agent-loop",
+            "state": "approved",
+            "observation_mode": "checked",
+            "revision": 1,
+            "run_revision": 1,
+            "goal": "Honor explicitly configured task pattern consistently during Finding state transition, preserving default strict validation and rollback.",
+            "acceptance_criteria": [
+              "Customcapturethen transition passes; incompatiblepattern rollback unchanged; same-status response consistent; default tests and strictCI pass, independentreview and Dream include dogfood."
+            ],
+            "source": {
+              "path": ".agent-loop/contracts/LEARNING-164/contract.json",
+              "sha256": "sha256:8592d3e899a3b6c22948979d1178c59d79cdc4d8aa3262ff4629ef67e81d7d70"
+            }
+          },
+          "approval": {
+            "owner": "agent-loop",
+            "state": "current",
+            "observation_mode": "checked",
+            "contract_revision": 1,
+            "approved_by": "user",
+            "approved_at": "2026-10-11T12:56:16+00:00",
+            "source": {
+              "path": ".agent-loop/contracts/LEARNING-164/contract.json",
+              "sha256": "sha256:8592d3e899a3b6c22948979d1178c59d79cdc4d8aa3262ff4629ef67e81d7d70"
+            }
+          },
+          "map": {
+            "owner": "agent-map",
+            "state": "stale",
+            "observation_mode": "checked",
+            "path": ".agent-loop/map/php-symbols.json",
+            "snapshot": "sha256:086b77edad189dbf7dd725a22d682b20aa6905d9f3567f91a2543dba2a0e76e6",
+            "source": {
+              "path": ".agent-loop/map/php-symbols.json",
+              "sha256": "sha256:459c891a0f4e123fa19551215834a32780986befdc859846c90d45b412ae9edf"
+            },
+            "stale_entries_count": 3,
+            "stale_entries": [
+              {
+                "path": "src/Cli.php",
+                "reason": "hash"
+              },
+              {
+                "path": "src/FindingTransitionManager.php",
+                "reason": "hash"
+              },
+              {
+                "path": "tests/FindingCreateCliTest.php",
+                "reason": "hash"
+              }
+            ]
+          },
+          "search_index": {
+            "owner": "agent-map",
+            "state": "unavailable",
+            "observation_mode": "checked",
+            "path": ".agent-loop/map/search.sqlite"
+          },
+          "recall": {
+            "owner": "agent-recall-compiler",
+            "state": "compiled",
+            "observation_mode": "checked",
+            "compilation_id": "compilation.LEARNING-164.2026-10-11-125616.8229aa42",
+            "bundle_sha256": "4b43926251ef0ab0660386e9d1c65094365f62a9209f8242569446e6ea9ba943",
+            "snapshot_sha256": "75254ec09ea18a0f703fa9eee4dba0e4675dfb636d913db6bd5e7e403f3c2039",
+            "source": {
+              "path": ".agent-loop/recall/LEARNING-164/meta.json",
+              "sha256": "sha256:1b7089d2efa2c417b30c49ef91eac7471f11fb0bbdf1ad1875fc33b531a5f943"
+            }
+          },
+          "execution_contract": {
+            "owner": "agent-loop",
+            "state": "not_required",
+            "required": false,
+            "observation_mode": "checked",
+            "contract_revision": 1,
+            "contract_source": {
+              "path": ".agent-loop/contracts/LEARNING-164/contract.json",
+              "sha256": "sha256:8592d3e899a3b6c22948979d1178c59d79cdc4d8aa3262ff4629ef67e81d7d70"
+            }
+          },
+          "edit": {
+            "owner": "agent-loop",
+            "state": "none",
+            "observation_mode": "checked"
+          },
+          "verification": {
+            "owner": "agent-loop",
+            "state": "passed",
+            "observation_mode": "checked",
+            "run_id": "run:LEARNING-164:96df23034ae53707",
+            "contract_revision": 1,
+            "implementation_snapshot": "sha256:f3d11652ee5491e27dc00fcc16097259f59cb4b145e919a3569fe04e8672ec84",
+            "source_session_id": "2026-10-11-learning-164-r1-b8c568ff",
+            "source": {
+              "path": ".agent-loop/runs/LEARNING-164/verification.json",
+              "sha256": "sha256:6a1d77abf5bdc8fe0a25bf325f0f8eb1442060e8e8053481837c266af90de493"
+            }
+          },
+          "review": {
+            "owner": "agent-recall-compiler",
+            "state": "warn",
+            "observation_mode": "checked",
+            "source": {
+              "path": ".agent-loop/recall/LEARNING-164/reviews/LEARNING-164.blindspots.json",
+              "sha256": "sha256:184af17c90a1477cd204a12ebb7c79fc286bcc22673c3314fa5489e5ab4c338b"
+            }
+          },
+          "learning": {
+            "owner": "agent-learning",
+            "state": "decided",
+            "decision": "findings_recorded",
+            "observation_mode": "checked",
+            "run_id": "run:LEARNING-164:96df23034ae53707",
+            "decided_by": "codex",
+            "decided_at": "2026-10-11T12:59:19+00:00",
+            "source": {
+              "path": ".agent-loop/learning/history/run-learning/e436bdb29768430a4a6151112bddb98d04927f47ef6a777228e2f8901c0fa614.json",
+              "sha256": "sha256:261cb311c6a07cb08d814915ea9c4ca1d8402e9ece3800cae96948b7bdc52082"
+            }
+          },
+          "outcome_lineage": {
+            "owner": "agent-learning",
+            "state": "run_bound",
+            "observation_mode": "checked",
+            "run_id": "run:LEARNING-164:96df23034ae53707"
+          }
+        },
+        "disagreements": [],
+        "next_action": "none",
+        "next_action_kind": "none",
+        "next_action_invocation": null
+      },
+      "mutation_status": "accepted",
+      "optional_follow_ups": []
+    },
+    "report-closeout": {
+      "schema_version": "1.0",
+      "command": "finish",
+      "task_id": "DOTFILES-18",
+      "complete": true,
+      "next_action": "none",
+      "next_action_kind": "none",
+      "next_action_invocation": null,
+      "manifest": {
+        "schema_version": "1.0",
+        "task_id": "DOTFILES-18",
+        "run_id": "run:DOTFILES-18:4f4d246882672abb",
+        "mode": "governed",
+        "state": "complete",
+        "references": {
+          "board": {
+            "owner": "agent-kanban",
+            "state": "not_configured",
+            "observation_mode": "checked"
+          },
+          "session": {
+            "owner": "agent-session",
+            "state": "done",
+            "observation_mode": "checked",
+            "session_id": "2026-10-11-dotfiles-18-r1-16c33431",
+            "task_id": "DOTFILES-18",
+            "ephemeral": false,
+            "base_commit": "488dd128497be551acd37624cab10b89eac14263",
+            "source": {
+              "path": ".agent-loop/sessions/2026-10-11-dotfiles-18-r1-16c33431/session.json",
+              "sha256": "sha256:ad8c9de666cd84ca0cd26516d0e4f7c6e31a796988442dc27348012cceb79cab"
+            }
+          },
+          "contract": {
+            "owner": "agent-loop",
+            "state": "approved",
+            "observation_mode": "checked",
+            "revision": 1,
+            "run_revision": 1,
+            "goal": "Run and independently grade fresh guided native/CLI/BashZsh real-PHP maintenance trials, learn from quality and operational defects, repeatheldout, publish exact evidence and honest limits.",
+            "acceptance_criteria": [
+              "Independentblackboxcorrectness, meaningful regressions, source/Contract scopes, actual gates, timing/retrieval/token availability, Dream with prior evidence and no false success; reviewed report and exact-headCI."
+            ],
+            "source": {
+              "path": ".agent-loop/contracts/DOTFILES-18/contract.json",
+              "sha256": "sha256:340b47727060014b922eed5d2d96605959785a34616186e0bdbecd8ade8ea82b"
+            }
+          },
+          "approval": {
+            "owner": "agent-loop",
+            "state": "current",
+            "observation_mode": "checked",
+            "contract_revision": 1,
+            "approved_by": "user",
+            "approved_at": "2026-10-11T12:52:59+00:00",
+            "source": {
+              "path": ".agent-loop/contracts/DOTFILES-18/contract.json",
+              "sha256": "sha256:340b47727060014b922eed5d2d96605959785a34616186e0bdbecd8ade8ea82b"
+            }
+          },
+          "map": {
+            "owner": "agent-map",
+            "state": "missing",
+            "observation_mode": "checked",
+            "path": ".agent-loop/map/php-symbols.json"
+          },
+          "search_index": {
+            "owner": "agent-map",
+            "state": "unavailable",
+            "observation_mode": "checked",
+            "path": ".agent-loop/map/search.sqlite"
+          },
+          "recall": {
+            "owner": "agent-recall-compiler",
+            "state": "compiled",
+            "observation_mode": "checked",
+            "compilation_id": "compilation.DOTFILES-18.2026-10-11-125300.b273fe72",
+            "bundle_sha256": "2fafe7082024008b19d3bda9f95fad063628640b73d2bc15b6a34aba704d00bf",
+            "snapshot_sha256": "c55b1d77415063ea65e32ac111f0abeb04b1ba5de65b0e71867e9f2529c5ff65",
+            "source": {
+              "path": ".agent-loop/recall/DOTFILES-18/meta.json",
+              "sha256": "sha256:9333d2eb3c5f14ff047ad1d4630341f92a4b9f5a253be5d36e5db3edb9fb12de"
+            }
+          },
+          "execution_contract": {
+            "owner": "agent-loop",
+            "state": "not_required",
+            "required": false,
+            "observation_mode": "checked",
+            "contract_revision": 1,
+            "contract_source": {
+              "path": ".agent-loop/contracts/DOTFILES-18/contract.json",
+              "sha256": "sha256:340b47727060014b922eed5d2d96605959785a34616186e0bdbecd8ade8ea82b"
+            }
+          },
+          "edit": {
+            "owner": "agent-loop",
+            "state": "none",
+            "observation_mode": "checked"
+          },
+          "verification": {
+            "owner": "agent-loop",
+            "state": "passed",
+            "observation_mode": "checked",
+            "run_id": "run:DOTFILES-18:4f4d246882672abb",
+            "contract_revision": 1,
+            "implementation_snapshot": "sha256:fdad1b1dca41cf8a2e1d39a909fe779ea83abe5fdd9cbd3ff778dea962184f78",
+            "source_session_id": "2026-10-11-dotfiles-18-r1-16c33431",
+            "source": {
+              "path": ".agent-loop/runs/DOTFILES-18/verification.json",
+              "sha256": "sha256:3355ae20aa346b64a81449186d4774f83edf39fcb1b7646c44ef68a8a38ede98"
+            }
+          },
+          "review": {
+            "owner": "agent-recall-compiler",
+            "state": "warn",
+            "observation_mode": "checked",
+            "source": {
+              "path": ".agent-loop/recall/DOTFILES-18/reviews/DOTFILES-18.blindspots.json",
+              "sha256": "sha256:21a53163ba43dfe7585540d309b851f31baef94909cdb2a67b4164499ba2075a"
+            }
+          },
+          "learning": {
+            "owner": "agent-learning",
+            "state": "decided",
+            "decision": "findings_recorded",
+            "observation_mode": "checked",
+            "run_id": "run:DOTFILES-18:4f4d246882672abb",
+            "decided_by": "codex",
+            "decided_at": "2026-10-11T13:10:27+00:00",
+            "source": {
+              "path": ".agent-loop/learning/history/run-learning/35e98a24290b576396fc1c875026287c4e9212981f795f7e4c923e3b372ae515.json",
+              "sha256": "sha256:34a79c5f936fff6199c19e69449c892182c2701a18f23a280bae54b979d5d54e"
+            }
+          },
+          "outcome_lineage": {
+            "owner": "agent-learning",
+            "state": "run_bound",
+            "observation_mode": "checked",
+            "run_id": "run:DOTFILES-18:4f4d246882672abb"
+          }
+        },
+        "disagreements": [],
+        "next_action": "none",
+        "next_action_kind": "none",
+        "next_action_invocation": null
+      },
+      "mutation_status": "accepted",
+      "optional_follow_ups": []
+    },
+    "cross-round-independent-summary": {
+      "round1": [
+        {
+          "consumer": "A1",
+          "correctness": "4/4",
+          "scope": "pass",
+          "governed_closeout": "excluded incomplete",
+          "wall_seconds": 452.882897625,
+          "model_tokens": null
+        },
+        {
+          "consumer": "B1",
+          "correctness": "4/4",
+          "scope": "pass",
+          "governed_closeout": "excluded incomplete",
+          "wall_seconds": 427.704875282,
+          "model_tokens": null
+        },
+        {
+          "consumer": "C1",
+          "correctness": "4/4",
+          "scope": "pass",
+          "governed_closeout": "excluded incomplete",
+          "wall_seconds": 590.937483012,
+          "model_tokens": null
+        }
+      ],
+      "heldout_round2": [
+        {
+          "consumer": "A2",
+          "commit": "3a4754fc06e359d334b4db349ab8a15b13669ccd",
+          "wall_seconds": 262.965425873,
+          "correctness": "4/4",
+          "scope": "pass",
+          "governed_closeout": "complete",
+          "source_sha256_unchanged": true,
+          "model_tokens": null,
+          "final_identical_query_repeats": 0,
+          "learning_finding": "finding.2026-10-11.214129"
+        },
+        {
+          "consumer": "B2",
+          "commit": "757017e89ebda4a25ae84fe82a2ca78ca99346a6",
+          "wall_seconds": 313.867491297,
+          "correctness": "4/4",
+          "scope": "pass",
+          "governed_closeout": "complete",
+          "source_sha256_unchanged": true,
+          "model_tokens": null,
+          "final_identical_query_repeats": 0,
+          "learning_finding": "finding.2026-10-11.a01821"
+        },
+        {
+          "consumer": "C2",
+          "commit": "a2e89b2dd5f173a45309a9465de898d350033783",
+          "wall_seconds": 320.706121376,
+          "correctness": "4/4",
+          "scope": "pass",
+          "governed_closeout": "complete",
+          "source_sha256_unchanged": true,
+          "model_tokens": null,
+          "final_identical_query_repeats": 0,
+          "learning_finding": "finding.2026-10-11.2c6765"
+        }
+      ],
+      "judgment": {
+        "task_correctness": "All six repairs pass independent four-case executable oracle, scoped source review, and strengthened regression detects exact original seed. This is persistent correctness on two distinct real PHP maintenance defects.",
+        "tool_benefit": "INCONCLUSIVE: no correctness separation. Native and tool consumers all correct; optional tool usage real in both rounds, but interface mistakes and bounded-read followups persist.",
+        "runtime_improvement": "No claim: newer pinned candidate changes preflight only, runtime interface unchanged.",
+        "time_comparison": "Distinct seeded tasks, sharedCPU, harness timeout increased and taskID fixture corrected. Cannot attribute cross-round wall difference to dotfiles.",
+        "tokens": "Unavailable; no byte estimates.",
+        "governance": "Round1 scope and code correct but custom taskID pattern blocked Learning closure. Round2 supported PHP-170x IDs and600s timeout fix harness; never retrospectively counts old failed/timeouts as complete."
+      },
+      "governance_boundary": "First round correct PHP repairs excluded from governed fullcycle demonstration. Heldout tasks completed on unchanged frozen Loop using existing owner APIs; separate Learning PR165 targets documented custompattern defect after trial. C2 needed public typed FindingCreator to bind Session lineage; alias-generated manual candidate retained and rejected, not rewritten. Success with disclosed ownerAPI fallback does not prove CLI alias fixed.",
+      "runtime_pin_boundary": "Builder runtime unchanged; dotfiles runtime unchanged between pinned1e6 and793 preflightcandidate. No causal speed/toolquality improvement inferred from harnessfix/taskdifference."
+    },
+    "publication-review": {
+      "verdict": "PASS",
+      "immutable_evidence_commit": "67c55b0940ba3e136032560d669870a16c3442b3",
+      "download_url": "https://raw.githubusercontent.com/voku/agent-dotfiles/67c55b0940ba3e136032560d669870a16c3442b3/quality-cycle-17.tar.gz",
+      "archive_bytes": 4448914,
+      "archive_sha256": "ba65b00703026679099f801b660f9266c3a04c24d0a747cfd899485bd59717fb",
+      "manifest_verified_files": 1199,
+      "manifest_plus_payload_files": 1200,
+      "all_payload_bytes_hashes_verified": true,
+      "all_regular_safe_unique_archive_names": true,
+      "checks": [
+        {
+          "path": "source-snapshots/docs/QUALITY_CYCLE_17.md",
+          "sha256": "36db0d630ae4390f0905892e6770c3618e6f1c9a8dc4f1ed15c43c3678aa14bc",
+          "matches_independent_report_review": true
+        },
+        {
+          "path": "oracle/round1-seed.bundle",
+          "verify_exit": 0,
+          "verify_stdout": "The bundle contains this ref:\n33b46b83526f1fe5301cd36b97a212cb19d20b9a refs/evaluation/round1\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha1\n",
+          "verify_stderr": "/workspace/scratch/quality-cycle-17/publication-independent/verified-bundle0.bundle is okay\n",
+          "heads": "33b46b83526f1fe5301cd36b97a212cb19d20b9a refs/evaluation/round1\n"
+        },
+        {
+          "path": "oracle/round2-seed.bundle",
+          "verify_exit": 0,
+          "verify_stdout": "The bundle contains this ref:\n86702524f6e48d30fdd8b5fd5aa884d261c8a1ba refs/evaluation/round2\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha1\n",
+          "verify_stderr": "/workspace/scratch/quality-cycle-17/publication-independent/verified-bundle1.bundle is okay\n",
+          "heads": "86702524f6e48d30fdd8b5fd5aa884d261c8a1ba refs/evaluation/round2\n"
+        },
+        {
+          "path": "consumers/A1/repair.bundle",
+          "verify_exit": 0,
+          "verify_stdout": "The bundle contains this ref:\nf9b3dafb5acb16fe256983b1a28539ade372b893 HEAD\nThe bundle requires this ref:\n33b46b83526f1fe5301cd36b97a212cb19d20b9a \nThe bundle uses this hash algorithm: sha1\n",
+          "verify_stderr": "/workspace/scratch/quality-cycle-17/publication-independent/verified-bundle2.bundle is okay\n",
+          "heads": "f9b3dafb5acb16fe256983b1a28539ade372b893 HEAD\n"
+        },
+        {
+          "path": "consumers/A2/repair.bundle",
+          "verify_exit": 0,
+          "verify_stdout": "The bundle contains this ref:\n3a4754fc06e359d334b4db349ab8a15b13669ccd HEAD\nThe bundle requires this ref:\n86702524f6e48d30fdd8b5fd5aa884d261c8a1ba \nThe bundle uses this hash algorithm: sha1\n",
+          "verify_stderr": "/workspace/scratch/quality-cycle-17/publication-independent/verified-bundle3.bundle is okay\n",
+          "heads": "3a4754fc06e359d334b4db349ab8a15b13669ccd HEAD\n"
+        },
+        {
+          "path": "consumers/B1/repair.bundle",
+          "verify_exit": 0,
+          "verify_stdout": "The bundle contains this ref:\nf92a572e84e209d7f004011dc35a52ccfd0fb25a HEAD\nThe bundle requires this ref:\n33b46b83526f1fe5301cd36b97a212cb19d20b9a \nThe bundle uses this hash algorithm: sha1\n",
+          "verify_stderr": "/workspace/scratch/quality-cycle-17/publication-independent/verified-bundle4.bundle is okay\n",
+          "heads": "f92a572e84e209d7f004011dc35a52ccfd0fb25a HEAD\n"
+        },
+        {
+          "path": "consumers/B2/repair.bundle",
+          "verify_exit": 0,
+          "verify_stdout": "The bundle contains this ref:\n757017e89ebda4a25ae84fe82a2ca78ca99346a6 HEAD\nThe bundle requires this ref:\n86702524f6e48d30fdd8b5fd5aa884d261c8a1ba \nThe bundle uses this hash algorithm: sha1\n",
+          "verify_stderr": "/workspace/scratch/quality-cycle-17/publication-independent/verified-bundle5.bundle is okay\n",
+          "heads": "757017e89ebda4a25ae84fe82a2ca78ca99346a6 HEAD\n"
+        },
+        {
+          "path": "consumers/C1/repair.bundle",
+          "verify_exit": 0,
+          "verify_stdout": "The bundle contains this ref:\n695c8b496faecae09cfa419f0128c1b4d6560252 HEAD\nThe bundle requires this ref:\n33b46b83526f1fe5301cd36b97a212cb19d20b9a \nThe bundle uses this hash algorithm: sha1\n",
+          "verify_stderr": "/workspace/scratch/quality-cycle-17/publication-independent/verified-bundle6.bundle is okay\n",
+          "heads": "695c8b496faecae09cfa419f0128c1b4d6560252 HEAD\n"
+        },
+        {
+          "path": "consumers/C2/repair.bundle",
+          "verify_exit": 0,
+          "verify_stdout": "The bundle contains this ref:\na2e89b2dd5f173a45309a9465de898d350033783 HEAD\nThe bundle requires this ref:\n86702524f6e48d30fdd8b5fd5aa884d261c8a1ba \nThe bundle uses this hash algorithm: sha1\n",
+          "verify_stderr": "/workspace/scratch/quality-cycle-17/publication-independent/verified-bundle7.bundle is okay\n",
+          "heads": "a2e89b2dd5f173a45309a9465de898d350033783 HEAD\n"
+        }
+      ],
+      "bundle_prerequisites": "Two complete seed bundles verified/imported in private frozen-source ordinary clone first; six incremental repair bundles then verified with correct seed prerequisite commits.",
+      "scope": "Publication integrity only; no fulltests rerun. Snapshot intentionally precedes final report link/closeout; pending/failed historical artifacts are evidence, not success claims.",
+      "download_retry": "gh api binary Accept refused short source buffer; direct exact-ref raw download succeeded.",
+      "verification_retry": "First repair verify against originalsource correctly refused missingseed33b46b...; importing publishedseed bundles supplied declared prerequisites."
+    },
+    "dream-reviewed-lessons": {
+      "kind": "host review of actual Dream results plus owner consolidation inputs; not Dream-generated semantic approval",
+      "inputs": [
+        "dream-evidence-context.md",
+        "dream-round1-context.md",
+        "learning-dream-context.md",
+        "dream-heldout-context.md",
+        "docs/EVALUATION_2026-10-11.md",
+        "docs/MOMENTUM_EXPERIMENTS.md",
+        "cross-round-independent-summary.json",
+        "learning-fresh-verification.json"
+      ],
+      "reports": [
+        {
+          "report": "dream-after-pr17.json",
+          "evaluated_guidance": 0,
+          "warnings": [],
+          "decisions": [],
+          "suppressed": [],
+          "explicit_outcomes": 0,
+          "outcome_coverage": null
+        },
+        {
+          "report": "dream-postmerge.json",
+          "evaluated_guidance": 0,
+          "warnings": [],
+          "decisions": [],
+          "suppressed": [],
+          "explicit_outcomes": 0,
+          "outcome_coverage": null
+        },
+        {
+          "report": "dream-round1.json",
+          "evaluated_guidance": 0,
+          "warnings": [],
+          "decisions": [],
+          "suppressed": [],
+          "explicit_outcomes": 0,
+          "outcome_coverage": null
+        },
+        {
+          "report": "learning-dream.json",
+          "evaluated_guidance": 0,
+          "warnings": [],
+          "decisions": [],
+          "suppressed": [],
+          "explicit_outcomes": 0,
+          "outcome_coverage": null
+        },
+        {
+          "report": "dream-heldout.json",
+          "evaluated_guidance": 0,
+          "warnings": [],
+          "decisions": [],
+          "suppressed": [],
+          "explicit_outcomes": 0,
+          "outcome_coverage": null
+        }
+      ],
+      "reviewed_lessons": [
+        {
+          "lesson": "Full source identity belongs in an evidence oracle",
+          "disposition": "validated and structurally enforced via PR17 negative metadata regressions; no new prose guidance promotion"
+        },
+        {
+          "lesson": "Explicit owner task validation configuration must survive transition",
+          "disposition": "validated and structurally enforced via LearningPR165 optionalpattern + blackbox regressions; freshconsumer2cases pass; frozenRuntimeunchanged"
+        },
+        {
+          "lesson": "Correct repair and optionaltooluse do not imply comparativebenefit",
+          "disposition": "validated findings and report limits; no token/productivity claim, no generatedcandidatepromotion"
+        },
+        {
+          "lesson": "Governed consumer Finding must retain current Session lineage",
+          "disposition": "heldout public ownercapture/typedAPI verified; aliasnotfixed, first failures preserved"
+        }
+      ],
+      "pending_proposals": [],
+      "decisions_executed": "None; no activeguidance promotion, retirement, projection rebuild or releaserequest. Findings validated against independent evidence; governed RunLearning separatelyrecords lineage."
+    },
+    "dream-final": {
+      "schema_version": "1.0",
+      "report_type": "agent-learning-dream",
+      "evaluated_guidance_count": 0,
+      "warnings": [],
+      "decisions": [],
+      "suppressed_decisions": [],
+      "metrics": {
+        "selected_guidance_count": 0,
+        "explicit_outcome_count": 0,
+        "outcome_completeness_rate": null,
+        "candidate_queue_count": 0,
+        "oldest_candidate_age_days": null,
+        "stale_candidate_count": 0,
+        "stale_candidate_rate": 0,
+        "suppressed_decision_count": 0,
+        "duplicate_decision_count": 0,
+        "reviewable_decision_count": 0,
+        "median_finding_to_decision_hours": null,
+        "active_guidance_by_tier": [],
+        "outcome_signals": {
+          "helpful": 0,
+          "harmful": 0,
+          "irrelevant": 0,
+          "not_used": 0,
+          "unknown": 0
+        }
+      },
+      "history_projection": {
+        "schema_version": "1.0",
+        "source_digest": "11256ae43598bd56f83a59f65d71adac886bc8ee1315e1ae3e9212cee3b97619",
+        "active_guidance_record_count": 0,
+        "archived_record_count": 0,
+        "files_read": 9,
+        "bytes_read": 14545,
+        "projection_bytes": 2633,
+        "compression_ratio": 5.52411697683251,
+        "rebuild_runtime_milliseconds": null
+      },
+      "remaining_uncertainty": "The run observes immutable histories and structurally valid repository state. It cannot prove that a human-reviewed candidate should be accepted."
+    }
+  },
+  "limits": [
+    "First-round repair quality passes but governance incomplete; not counted as completed cycles.",
+    "General comparative tool benefit INCONCLUSIVE; actual model IDs/tokens unavailable.",
+    "Ownerfix merged/unreleased and not installed into running Loop.",
+    "Shortcapturealias Sessionlineage remains unfixed in tested frozenpin; ownerentrypoint/typedAPI verified.",
+    "Shared host instruction isolation and seeded tasks do not constitute a causal larger productionstudy."
+  ]
+}
