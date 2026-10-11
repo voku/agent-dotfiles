@@ -190,6 +190,49 @@ jobs:
             echo 'Historical Dream: NOT EXECUTED; owner preconditions correctly refused it.'
             echo 'No Learning bytes were changed. This is not a green historic Dream claim.'
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify historical custom task-id override without changing archived records
+        run: |
+          set -euo pipefail
+          owner="$GITHUB_WORKSPACE/owner/bin/agent-loop"
+          corpus="$RUNNER_TEMP/learning-corpus/consumers"
+          mkdir -p reports/custom-task-proof
+          : > reports/custom-task-proof/outcomes.tsv
+          for arm in A1 B1 C1; do
+            project="$corpus/$arm"
+            learning="$project/.agent-loop/learning"
+            find "$learning" -type f -print0 | sort -z | xargs -0r sha256sum > "reports/custom-task-proof/$arm.before"
+            # Exact approved source fixture identity from agent-learning#164,
+            # not a fabricated replacement task id or altered original file.
+            set +e
+            (cd "$project" && php "$owner" learn validate \
+              --task-id-pattern '/^PHP17-[ABC][12]$/') \
+              > "reports/custom-task-proof/$arm.validate.log" 2>&1
+            status=$?
+            dream=125
+            if test "$status" -eq 0; then
+              (cd "$project" && php "$owner" learn dream \
+                --task-id-pattern '/^PHP17-[ABC][12]$/' --dry-run --format=json \
+                --report "$GITHUB_WORKSPACE/reports/custom-task-proof/$arm.dream.json") \
+                > "reports/custom-task-proof/$arm.stdout.json" \
+                2> "reports/custom-task-proof/$arm.stderr.txt"
+              dream=$?
+            fi
+            set -e
+            find "$learning" -type f -print0 | sort -z | xargs -0r sha256sum > "reports/custom-task-proof/$arm.after"
+            cmp "reports/custom-task-proof/$arm.before" "reports/custom-task-proof/$arm.after" || {
+              echo "Historical Learning bytes changed for $arm" >&2
+              exit 1
+            }
+            printf '%s\t%s\t%s\n' "$arm" "$status" "$dream" >> reports/custom-task-proof/outcomes.tsv
+          done
+          cat reports/custom-task-proof/outcomes.tsv
+          {
+            echo '### Historical custom task-ID format investigation (read-only)'
+            echo 'A1/B1/C1 use actual PHP17-A1/PHP17-B1/PHP17-C1 task IDs.'
+            echo 'Default validator expects digits at the end of ticket IDs; the owner'
+            echo 'can accept the source workflow pattern with explicit --task-id-pattern.'
+            echo 'No original record is changed. Results are diagnostic, not owner approval.'
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Retain inventory for independent selection of validated roots
         if: always()
         uses: actions/upload-artifact@v7
