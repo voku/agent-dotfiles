@@ -1,2 +1,4 @@
 # Only the explicitly selected agent-owned root is exported.
+# Export through the builtin; the value is consumed by .functions.
+# shellcheck disable=SC2034
 builtin export AGENT_DOTFILES_HOME="$1"

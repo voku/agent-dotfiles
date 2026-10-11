@@ -21,7 +21,7 @@ for argument do
     esac
 done
 case "$0" in */*) script_parent=${0%/*}; [ -n "$script_parent" ] || script_parent=/ ;; *) script_parent=. ;; esac
-script_root=$(CDPATH= cd -P -- "$script_parent" && printf '%s/' "$PWD") || exit 2
+script_root=$(CDPATH='' cd -P -- "$script_parent" && printf '%s/' "$PWD") || exit 2
 script_root=${script_root%/}
 if ! command -v python3 >/dev/null 2>&1; then
     printf '%s\n' 'agent-dotfiles: python3 is required (Python 3.10+)' >&2

@@ -172,10 +172,10 @@ def verify(prefix: Path) -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     commands = parser.add_subparsers(dest="command", required=True)
     for name in ("install", "verify", "uninstall"):
-        command = commands.add_parser(name)
+        command = commands.add_parser(name, allow_abbrev=False)
         command.add_argument("--prefix", required=True)
         command.add_argument("--revision", required=name == "install",
                              help="full source commit; optionally assert the installed pin")
