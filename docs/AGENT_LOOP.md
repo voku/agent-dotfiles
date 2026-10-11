@@ -45,8 +45,9 @@ extra allowed implementation path. Stop source mutation if the required file
 is excluded, and resolve authority through the owner workflow. Passing tests or
 `complete/none` do not retrospectively establish scope compliance.
 
-The historical comparison and its limitations are recorded in
-[the full-cycle report](FULL_CYCLE.md). The planned three-way maintenance
-comparison, independent held-out evaluation and release gates are tracked in
-[issue #12](https://github.com/voku/agent-dotfiles/issues/12); those results
-are not established by this document.
+The historical comparison is in [the full-cycle report](FULL_CYCLE.md).
+Completed three-way maintenance, independent held-out grades, scope failures and
+remaining publication gates are recorded in
+[the shell evaluation](EVALUATION_2026-10-11.md) and
+[issue #12](https://github.com/voku/agent-dotfiles/issues/12).
+General productivity improvement remains inconclusive; no default routing follows.

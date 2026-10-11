@@ -303,3 +303,20 @@ Final reviewed core pin `e41260137b0e2677307bbcb5b607a28718459080`
 passed cold installation, manifest verification, strict doctor, fresh Bash/Zsh
 exact-byte/hash reads, deactivation, uninstall and previous b9 prefix rollback.
 The earlier running benchmark prefixes remain unchanged.
+
+## Concurrent installer and CI work preserved
+
+While this session was paused, PR #16 advanced to
+`d335ad0f17ccc58ff3741e1b891ceeb041d36da3`. Its regression demonstrates that
+abbreviated `--sour` could override the root installer's source with another valid
+clean checkout. Both argparse levels now disable abbreviation; full flags and
+manifest contracts are preserved. The red commit `304f0ac4554ffd3312f0d7d537b3af6027345ee2`
+failed the actual macOS regression as expected; the fixed head passed
+[run 38136379717](https://github.com/voku/agent-dotfiles/actions/runs/38136379717).
+
+Those remote commits also add exact-head cold-install Bash/Zsh CI, preserve doctor
+failures through deactivation, ignore generated artifact directories and keep
+0.4.0 marked unreleased. Root merges them without force push under the separate
+correctly scoped DOTFILES-14 Contract. Earlier e412 cold evidence does not validate
+the newer installer; the combined head requires fresh checks. PR #14 was already
+closed as superseded during that pause, so no duplicate cleanup is needed.
