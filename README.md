@@ -84,6 +84,15 @@ docs/                concise contracts, examples and historical evidence links
 
 See [shell helpers](docs/SHELL.md), [pinned installation and rollback](docs/INSTALLATION.md) and the [optional agent-loop consumer contract](docs/AGENT_LOOP.md). Automatic installation and host-policy changes remain outside the CLI contract.
 
+## Project onboarding for Codex and Claude Code
+
+The optional [`project-onboarding`](docs/PROJECT_ONBOARDING.md) skill gives a
+fresh coding agent a practical first pass for a PHP failure or unfamiliar
+repository: verified Git state, Composer scripts and configuration, supplied
+failure evidence, and the smallest relevant source location. It is one shared
+source projected explicitly into a project-local Codex or Claude Code skill
+directory; it does not install dependencies or run project checks on its own.
+
 ## Requirements
 
 Python 3.10+ on Linux, macOS or WSL, and `rg` for the search commands. `git` is recommended for coding workflows. Everything else is optional. The name `sg` is deliberately not recognized as `ast-grep`, because on Linux it can refer to the unrelated `newgrp` utility. The Python standard library is sufficient; no pip/Composer install is required.

@@ -19,6 +19,7 @@ MANIFEST = "installation.json"
 SHELL_FILES = {".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"}
 SHELL_MODULES = {"shell/modules/context.sh", "shell/modules/git.sh"}
 SHELL_CORE = {"shell/core/activation.sh", "shell/core/deactivation.sh"}
+SKILL_FILES = {"skills/project-onboarding/SKILL.md"}
 LAUNCHER = b'''#!/usr/bin/env python3
 """Explicitly activated isolated agent-dotfiles; do not create bytecode."""
 import sys
@@ -87,8 +88,8 @@ def install(source: Path, revision: str, prefix: Path, *, preview: bool = False)
         raise SetupError("existing prefix must be an empty directory")
     tracked = git(source, "ls-files", "-z").split(b"\0")
     paths = [os.fsdecode(name) for name in tracked if name]
-    paths = [name for name in paths if name in {"LICENSE", "bin/agent-dotfiles"} | SHELL_FILES | SHELL_MODULES | SHELL_CORE or runtime_path(name)]
-    required = {"LICENSE", "bin/agent-dotfiles", "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"} | SHELL_FILES | SHELL_MODULES | SHELL_CORE
+    paths = [name for name in paths if name in {"LICENSE", "bin/agent-dotfiles"} | SHELL_FILES | SHELL_MODULES | SHELL_CORE | SKILL_FILES or runtime_path(name)]
+    required = {"LICENSE", "bin/agent-dotfiles", "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"} | SHELL_FILES | SHELL_MODULES | SHELL_CORE | SKILL_FILES
     if not required.issubset(paths):
         raise SetupError("tracked runtime files are missing")
     contents = {}
@@ -161,7 +162,7 @@ def verify(prefix: Path) -> dict:
         raise SetupError("incomplete shell lifecycle manifest")
     directories = set()
     for name, entry in files.items():
-        if name not in required | SHELL_FILES | SHELL_MODULES | SHELL_CORE and not runtime_path(name):
+        if name not in required | SHELL_FILES | SHELL_MODULES | SHELL_CORE | SKILL_FILES and not runtime_path(name):
             raise SetupError("unsafe or unknown installation entry")
         if (not isinstance(entry, dict) or set(entry) != {"sha256", "mode"}
                 or not isinstance(entry["sha256"], str)

@@ -54,6 +54,27 @@ class RealPhpPreflightTest(unittest.TestCase):
             self.assertEqual((root / "calls").read_text().splitlines(),
                              ["verify", "uninstall"])
 
+    def test_project_onboarding_rejects_non_object_composer_scripts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "composer.json").write_text('{"name":"fixture","scripts":[]}')
+            with self.assertRaises(AssertionError):
+                preflight.project_onboarding(root, b"skill")
+
+    def test_project_onboarding_records_declared_checks_not_check_results(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "composer.json").write_text(
+                '{"name":"fixture/project","scripts":{"test":"phpunit","phpstan":"phpstan"}}'
+            )
+            (root / "phpunit.xml.dist").write_text("<phpunit/>")
+            skill = b"---\nname: project-onboarding\n---\n"
+            report = preflight.project_onboarding(root, skill)
+            self.assertEqual(report["composer"]["package"], "fixture/project")
+            self.assertEqual(report["composer"]["scripts"], ["phpstan", "test"])
+            self.assertEqual(report["verification_configurations"], ["phpunit.xml.dist"])
+            self.assertNotIn("result", report)
+
 
 if __name__ == "__main__":
     unittest.main()
