@@ -1,0 +1,11 @@
+{
+  "schema": "agent-dotfiles.v1.capability-profile",
+  "name": "php",
+  "extends": [
+    "minimal"
+  ],
+  "tools": [
+    "php",
+    "composer"
+  ]
+}

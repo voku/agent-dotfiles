@@ -1,0 +1,61 @@
+name: redpill-profile-contract
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  profile-plans:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Exact-head profile validation and real read-only plans
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          mkdir -p "$RUNNER_TEMP/redpill-plans"
+          python3 -m unittest discover -s tests -p 'test_profile_catalog.py' -v 2>&1 | tee "$RUNNER_TEMP/redpill-plans/contracts.log"
+          before="$(git status --porcelain=v1 --untracked-files=no)"
+          for profile in minimal php debug; do
+            ./firstInstall.sh plan --profile "$profile" > "$RUNNER_TEMP/redpill-plans/$profile.json"
+          done
+          after="$(git status --porcelain=v1 --untracked-files=no)"
+          test "$before" = "$after"
+          python3 - "$RUNNER_TEMP/redpill-plans" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          root = Path(sys.argv[1])
+          minimal = ["python3", "git", "rg", "jq", "curl"]
+          expected = {
+              "minimal": minimal,
+              "php": minimal + ["php", "composer"],
+              "debug": minimal + ["fd", "shellcheck", "hyperfine", "strace"],
+          }
+          for profile, tools in expected.items():
+              plan = json.loads((root / (profile + ".json")).read_text())
+              assert plan["schema"] == "agent-dotfiles.v1.bootstrap-plan", plan
+              assert plan["operation"] == "plan" and plan["profile"] == profile, plan
+              assert [tool["name"] for tool in plan["tools"]] == tools, plan
+              assert plan["package_command_requires_approval"] is (plan["package_command_argv"] is not None), plan
+          PY
+      - name: Retain raw immutable-HEAD plan evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: redpill-plans-${{ github.run_id }}
+          path: ${{ runner.temp }}/redpill-plans/
+          if-no-files-found: warn
+          retention-days: 7

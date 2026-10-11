@@ -1,0 +1,12 @@
+{
+  "schema": "agent-dotfiles.v1.capability-profile",
+  "name": "minimal",
+  "extends": [],
+  "tools": [
+    "python3",
+    "git",
+    "rg",
+    "jq",
+    "curl"
+  ]
+}

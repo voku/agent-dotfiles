@@ -10,6 +10,12 @@ import platform
 import shutil
 from typing import Literal
 
+# Bundled, reviewed profile data. Direct execution and package imports are both supported.
+if __package__:
+    from .profile_catalog import resolve_profile
+else:
+    from profile_catalog import resolve_profile
+
 
 Profile = Literal["minimal", "php", "debug"]
 
@@ -56,7 +62,11 @@ def package_manager(system: str, os_release: dict[str, str], has_brew: bool, has
 def plan(profile: Profile, *, system: str, os_release: dict[str, str], found: dict[str, str | None]) -> dict[str, object]:
     """Describe a fixed allowlist of capabilities without running any tool."""
     manager = package_manager(system, os_release, found.get("brew") is not None, found.get("apt-get") is not None)
-    selected = COMMON + (PHP if profile == "php" else ()) + (DEBUG if profile == "debug" else ())
+    registry = {tool.name: tool for tool in COMMON + PHP + DEBUG}
+    try:
+        selected = tuple(registry[name] for name in resolve_profile(profile))
+    except KeyError as exc:
+        raise ValueError(f"unapproved capability in bundled profile: {exc.args[0]}") from exc
     tools: list[dict[str, object]] = []
     packages: list[str] = []
     unmanaged: list[str] = []
@@ -120,7 +130,11 @@ def main(argv: list[str] | None = None) -> int:
             pass
     commands = {cmd for t in COMMON + PHP + DEBUG for cmd in t.commands} | {"brew", "apt-get"}
     found = {cmd: shutil.which(cmd) for cmd in sorted(commands)}
-    print(json.dumps(plan(args.profile, system=system, os_release=os_release, found=found), separators=(",", ":")))
+    try:
+        result = plan(args.profile, system=system, os_release=os_release, found=found)
+    except ValueError as exc:
+        parser.exit(2, f"agent-dotfiles: invalid bundled profile: {exc}\n")
+    print(json.dumps(result, separators=(",", ":")))
     return 0
 
 
