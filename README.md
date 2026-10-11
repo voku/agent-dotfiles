@@ -53,9 +53,10 @@ verification and safe removal. No package installation or network download occur
 ```text
 .bashrc              explicit Bash activation
 .zshrc               explicit Zsh activation
-.shellrc             shared activation and validation
+.shellrc             shared root resolution and reviewed lifecycle loader
 .exports             agent-owned installation location
 .functions           fixed-module loader and deactivation
+shell/core/          fixed activation and deactivation lifecycle
 shell/modules/       explicit context and Git helper definitions
 install.sh           pinned install / verify / uninstall entrypoint
 bin/agent-dotfiles   standalone machine-readable CLI

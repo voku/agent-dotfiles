@@ -1,6 +1,6 @@
-# Shared explicit Bash/Zsh activation. No interactive or user configuration.
-_agent_dotfiles_activate() {
-    local _agent_source="$1" _agent_parent _agent_home _agent_name
+# Shared Bash/Zsh entry: resolve the reviewed root, then delegate lifecycle.
+_agent_dotfiles_bootstrap() {
+    local _agent_source="$1" _agent_parent _agent_home _agent_status
     if [ -n "${ZSH_VERSION-}" ]; then
         # Zsh supplies funcsourcetrace; Bash never executes this branch.
         # shellcheck disable=SC2154
@@ -12,45 +12,32 @@ _agent_dotfiles_activate() {
     esac
     [ -n "$_agent_parent" ] || _agent_parent=/
     _agent_home=$(CDPATH='' builtin cd -- "$_agent_parent" && builtin pwd -P && printf '.') || {
-        unset -f _agent_dotfiles_activate
+        unset -f _agent_dotfiles_bootstrap
         return 2
     }
     _agent_home=${_agent_home%.}
     _agent_home=${_agent_home%$'\n'}
-    for _agent_name in .exports .functions shell/modules/context.sh shell/modules/git.sh; do
-        if [ ! -r "$_agent_home/$_agent_name" ]; then
-            printf 'agent-dotfiles: required %s is missing or unreadable\n' "$_agent_name" >&2
-            unset -f _agent_dotfiles_activate
-            return 2
-        fi
-    done
-    if [ ! -x "$_agent_home/bin/agent-dotfiles" ]; then
-        printf 'agent-dotfiles: required bin/agent-dotfiles is missing or not executable\n' >&2
-        unset -f _agent_dotfiles_activate
+    if [ ! -r "$_agent_home/shell/core/activation.sh" ]; then
+        printf 'agent-dotfiles: required shell/core/activation.sh is missing or unreadable\n' >&2
+        unset -f _agent_dotfiles_bootstrap
         return 2
     fi
-    if [ "${AGENT_DOTFILES_HOME+x}" = x ]; then
-        printf 'agent-dotfiles: AGENT_DOTFILES_HOME already exists; deactivate first\n' >&2
-        unset -f _agent_dotfiles_activate
-        return 2
+    # shellcheck source=shell/core/activation.sh
+    . "$_agent_home/shell/core/activation.sh"
+    _agent_status=$?
+    if [ "$_agent_status" -eq 0 ]; then
+        _agent_dotfiles_activate "$_agent_home"
+        _agent_status=$?
     fi
-    for _agent_name in agent_dotfiles agent_doctor agent_files agent_search agent_read agent_tracked agent_status agent_patch agent_history agent_blame agent_deactivate; do
-        if typeset -f "$_agent_name" >/dev/null 2>&1 || alias "$_agent_name" >/dev/null 2>&1; then
-            printf 'agent-dotfiles: owned namespace collision: %s\n' "$_agent_name" >&2
-            unset -f _agent_dotfiles_activate
-            return 2
-        fi
-    done
-    . "$_agent_home/.exports" "$_agent_home"
-    . "$_agent_home/.functions"
-    unset -f _agent_dotfiles_activate
+    unset -f _agent_dotfiles_activate _agent_dotfiles_bootstrap
+    return "$_agent_status"
 }
 if [ -n "${BASH_VERSION-}" ]; then
-    _agent_dotfiles_activate "${BASH_SOURCE[0]}"
+    _agent_dotfiles_bootstrap "${BASH_SOURCE[0]}"
 elif [ -n "${ZSH_VERSION-}" ]; then
-    _agent_dotfiles_activate ''
+    _agent_dotfiles_bootstrap ''
 else
     printf 'agent-dotfiles: explicit activation requires Bash or Zsh\n' >&2
-    unset -f _agent_dotfiles_activate
+    unset -f _agent_dotfiles_bootstrap
     return 2
 fi

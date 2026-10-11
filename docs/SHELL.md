@@ -36,14 +36,19 @@ Activation refuses existing owned names or `AGENT_DOTFILES_HOME` rather than
 replacing custom definitions. Run `agent_deactivate` before activating another
 version. No eval-based restoration or command interception is involved.
 
-## Explicit shell modules
+## Explicit shell lifecycle and modules
 
-`.bashrc` and `.zshrc` delegate to `.shellrc`, which checks that the fixed
-`shell/modules/context.sh` and `shell/modules/git.sh` assets are present before
-activation. `.functions` loads these two reviewed modules in a fixed order and
-defines deactivation. No dynamically discovered plugins, host startup files or
-module-specific settings are loaded. The installation manifest pins and checks
-both modules, and old pre-modular manifests remain verifiable for rollback.
+`.bashrc` and `.zshrc` delegate to `.shellrc`, which resolves the reviewed
+installation root and loads exactly `shell/core/activation.sh`. Core activation
+checks the required assets, executable, exported namespace and owned function
+names **before** exporting anything. `.functions` then loads the reviewed
+`shell/modules/context.sh`, `shell/modules/git.sh` and
+`shell/core/deactivation.sh` in fixed order. There is no plugin discovery,
+host startup sourcing, dynamic evaluation or per-host runtime configuration.
+
+The pinned installation manifest includes and hashes both lifecycle files,
+all modules and each entry point. Earlier pre-core and pre-modular manifests
+remain verifiable for rollback; new installs require the complete tree.
 
 ## Choose tools by the evidence needed
 
