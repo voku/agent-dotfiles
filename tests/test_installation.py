@@ -22,7 +22,7 @@ class InstallationTest(unittest.TestCase):
         self.root = Path(temporary.name).resolve()
         self.source = self.root / "source"
         self.source.mkdir()
-        for name in ("agent_dotfiles", "bin"):
+        for name in ("agent_dotfiles", "bin", "shell"):
             shutil.copytree(PROJECT / name, self.source / name,
                             ignore=shutil.ignore_patterns("__pycache__"))
         shutil.copyfile(PROJECT / "LICENSE", self.source / "LICENSE")
@@ -182,7 +182,8 @@ class InstallationTest(unittest.TestCase):
                  "commit", "-qm", "profile fixture")
         self.revision = self.git("rev-parse", "HEAD").strip()
         self.assertEqual(self.install()[0], 0)
-        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"):
+        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports",
+                     "shell/modules/context.sh", "shell/modules/git.sh"):
             self.assertEqual((self.prefix / name).read_bytes(), (self.source / name).read_bytes())
         self.assertFalse(marker.exists())
         self.assertEqual(self.command("verify")[0], 0)
@@ -199,13 +200,57 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.install()[0], 2)
         self.assertFalse(self.prefix.exists())
 
+    def test_all_modules_required_for_new_installations(self):
+        self.git("rm", "shell/modules/git.sh")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", "missing shell module")
+        self.revision = self.git("rev-parse", "HEAD").strip()
+        self.assertEqual(self.install()[0], 2)
+        self.assertFalse(self.prefix.exists())
+
+    def test_modified_module_refuses_verify_and_uninstall(self):
+        self.assertEqual(self.install()[0], 0)
+        target = self.prefix / "shell/modules/git.sh"
+        target.write_text("# modified\n")
+        self.assertEqual(self.command("verify")[0], 2)
+        self.assertEqual(self.command("uninstall")[0], 2)
+        self.assertEqual(target.read_text(), "# modified\n")
+
+    def test_partial_module_manifest_refused(self):
+        self.assertEqual(self.install()[0], 0)
+        manifest = self.prefix / "installation.json"
+        data = json.loads(manifest.read_text())
+        (self.prefix / "shell/modules/context.sh").unlink()
+        del data["files"]["shell/modules/context.sh"]
+        manifest.write_text(json.dumps(data))
+        self.assertEqual(self.command("verify")[0], 2)
+        self.assertEqual(self.command("uninstall")[0], 2)
+
+    def test_pre_modular_shell_manifest_still_verifies_and_uninstalls(self):
+        # Model v0.4.0: all five profiles exist, but no shell/modules/ tree.
+        self.assertEqual(self.install()[0], 0)
+        manifest = self.prefix / "installation.json"
+        data = json.loads(manifest.read_text())
+        for name in ("shell/modules/context.sh", "shell/modules/git.sh"):
+            (self.prefix / name).unlink()
+            del data["files"][name]
+        (self.prefix / "shell/modules").rmdir()
+        (self.prefix / "shell").rmdir()
+        manifest.write_text(json.dumps(data))
+        self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
+        self.assertEqual(self.command("uninstall", "--revision", self.revision)[0], 0)
+        self.assertFalse(self.prefix.exists())
+
     def test_cli_only_legacy_manifest_still_verifies_and_uninstalls(self):
         self.assertEqual(self.install()[0], 0)
         manifest = self.prefix / "installation.json"
         data = json.loads(manifest.read_text())
-        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"):
+        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports",
+                     "shell/modules/context.sh", "shell/modules/git.sh"):
             (self.prefix / name).unlink()
             del data["files"][name]
+        (self.prefix / "shell/modules").rmdir()
+        (self.prefix / "shell").rmdir()
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
         self.assertEqual(self.command("uninstall", "--revision", self.revision)[0], 0)
