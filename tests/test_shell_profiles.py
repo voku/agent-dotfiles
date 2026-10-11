@@ -9,7 +9,8 @@ import tempfile
 import unittest
 
 PROJECT = Path(__file__).resolve().parent.parent
-ASSETS = ('.bashrc', '.zshrc', '.shellrc', '.exports', '.functions')
+ASSETS = ('.bashrc', '.zshrc', '.shellrc', '.exports', '.functions',
+          'shell/modules/context.sh', 'shell/modules/git.sh')
 
 
 class ShellProfilesTest(unittest.TestCase):
@@ -20,7 +21,9 @@ class ShellProfilesTest(unittest.TestCase):
         self.home = self.root / 'agent tools [雪]\\literal\n'
         self.home.mkdir()
         for name in ASSETS:
-            shutil.copyfile(PROJECT / name, self.home / name)
+            target = self.home / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(PROJECT / name, target)
         (self.home / 'bin').mkdir()
         self.binary = self.home / 'bin/agent-dotfiles'
         self.binary.write_text(f'#!{sys.executable}\nimport json,os,sys\nprint(json.dumps(sys.argv[1:]))\nsys.exit(int(os.environ.get("FIXTURE_EXIT", "0")))\n')
@@ -109,6 +112,12 @@ agent_deactivate
             result = self.run_shell(shell, profile, '. "$1"')
             self.assertEqual(result.returncode, 2)
             self.assertIn('.functions', result.stderr)
+        shutil.copyfile(PROJECT / '.functions', self.home / '.functions')
+        (self.home / 'shell/modules/context.sh').unlink()
+        for shell, profile in self.shells():
+            result = self.run_shell(shell, profile, '. "$1"')
+            self.assertEqual(result.returncode, 2)
+            self.assertIn('shell/modules/context.sh', result.stderr)
 
     def test_removed_executable_is_visible_failure(self):
         for shell, profile in self.shells():

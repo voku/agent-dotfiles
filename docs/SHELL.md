@@ -36,6 +36,15 @@ Activation refuses existing owned names or `AGENT_DOTFILES_HOME` rather than
 replacing custom definitions. Run `agent_deactivate` before activating another
 version. No eval-based restoration or command interception is involved.
 
+## Explicit shell modules
+
+`.bashrc` and `.zshrc` delegate to `.shellrc`, which checks that the fixed
+`shell/modules/context.sh` and `shell/modules/git.sh` assets are present before
+activation. `.functions` loads these two reviewed modules in a fixed order and
+defines deactivation. No dynamically discovered plugins, host startup files or
+module-specific settings are loaded. The installation manifest pins and checks
+both modules, and old pre-modular manifests remain verifiable for rollback.
+
 ## Choose tools by the evidence needed
 
 Use native `rg -n` and a source read when the file or symbol location is already

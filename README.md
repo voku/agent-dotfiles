@@ -55,7 +55,8 @@ verification and safe removal. No package installation or network download occur
 .zshrc               explicit Zsh activation
 .shellrc             shared activation and validation
 .exports             agent-owned installation location
-.functions           namespaced source/Git helpers
+.functions           fixed-module loader and deactivation
+shell/modules/       explicit context and Git helper definitions
 install.sh           pinned install / verify / uninstall entrypoint
 bin/agent-dotfiles   standalone machine-readable CLI
 agent_dotfiles/      Python standard-library implementation
