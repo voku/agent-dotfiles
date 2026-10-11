@@ -42,6 +42,7 @@ class ProjectOnboardingSkillTest(unittest.TestCase):
 
     def test_documentation_forces_project_local_host_targets(self):
         documentation = (PROJECT / "docs/PROJECT_ONBOARDING.md").read_text()
+        self.assertIn('CODEX_HOME="$PWD/.codex"', documentation)
         self.assertIn('CODEX_SKILLS_DIR="$PWD/.codex/skills"', documentation)
         self.assertIn('CLAUDE_SKILLS_DIR="$PWD/.claude/skills"', documentation)
         self.assertIn("init install-assets --agent=codex", documentation)

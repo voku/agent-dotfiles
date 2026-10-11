@@ -25,9 +25,9 @@ the matching mutation; `--extra-skills-root` adds this source beside the
 project's existing desired skills instead of replacing that set:
 
 ```sh
-CODEX_SKILLS_DIR="$PWD/.codex/skills" vendor/bin/agent-loop init install-assets --agent=codex \
+CODEX_HOME="$PWD/.codex" CODEX_SKILLS_DIR="$PWD/.codex/skills" vendor/bin/agent-loop init install-assets --agent=codex \
   --extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills --skip-git-config --dry-run
-CODEX_SKILLS_DIR="$PWD/.codex/skills" vendor/bin/agent-loop init install-assets --agent=codex \
+CODEX_HOME="$PWD/.codex" CODEX_SKILLS_DIR="$PWD/.codex/skills" vendor/bin/agent-loop init install-assets --agent=codex \
   --extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills --skip-git-config
 CLAUDE_SKILLS_DIR="$PWD/.claude/skills" vendor/bin/agent-loop init install-assets --agent=claude \
   --extra-skills-root=/absolute/approved-agent-dotfiles-prefix/skills --skip-git-config --dry-run
@@ -37,8 +37,9 @@ CLAUDE_SKILLS_DIR="$PWD/.claude/skills" vendor/bin/agent-loop init install-asset
 
 The first command targets `.codex/skills/project-onboarding/SKILL.md`; the
 second targets `.claude/skills/project-onboarding/SKILL.md`. The command-scoped
-environment variables keep the projection project-local even when a host has a
-global skill directory configured. `agent-loop` owns that projection, including
+environment variables keep the complete projection, including Codex subagents,
+project-local even when a host has a global skill directory configured.
+`agent-loop` owns that projection, including
 its managed-asset manifest and conflict handling. `install-assets` may also
 converge the project's other configured agent-loop assets; do not use it merely
 to copy one file into a project that has not adopted agent-loop. Run the command
