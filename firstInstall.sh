@@ -10,4 +10,5 @@ if ! python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' 
   exit 2
 fi
 script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
-exec python3 "$script_dir/tools/bootstrap_plan.py" "$@"
+# -B keeps the read-only planner from writing import caches into the source tree.
+exec python3 -B "$script_dir/tools/bootstrap_plan.py" "$@"

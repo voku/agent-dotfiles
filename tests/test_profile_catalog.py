@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
+import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -26,6 +29,44 @@ class ProfileCatalogTests(unittest.TestCase):
             (fake / "minimal.json").write_text('{"tools":["evil"]}', encoding="utf-8")
             with patch("os.getcwd", return_value=tmp):
                 self.assertEqual(resolve_profile("minimal")[0], "python3")
+
+    def test_real_planner_does_not_write_bytecode_into_its_checkout(self) -> None:
+        """A source-side import cache violates the read-only first-install contract."""
+        original = Path(__file__).resolve().parents[1]
+        paths = (
+            "firstInstall.sh",
+            "tools/bootstrap_plan.py",
+            "tools/profile_catalog.py",
+            ".redpill/profiles/minimal.json",
+            ".redpill/profiles/php.json",
+            ".redpill/profiles/debug.json",
+        )
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "source"
+            for name in paths:
+                target = root / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(original / name, target)
+
+            def snapshot() -> list[str]:
+                return sorted(str(path.relative_to(root)) for path in root.rglob("*"))
+
+            before = snapshot()
+            environment = os.environ.copy()
+            environment.pop("PYTHONDONTWRITEBYTECODE", None)
+            environment.pop("PYTHONPYCACHEPREFIX", None)
+            result = subprocess.run(
+                [str(root / "firstInstall.sh"), "plan", "--profile", "php"],
+                cwd=temp,
+                env=environment,
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=15,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(result.stdout)["profile"], "php")
+            self.assertEqual(snapshot(), before, "read-only planning created source-side files")
 
     def test_invalid_profile_name_is_rejected(self) -> None:
         with self.assertRaisesRegex(ValueError, "unsupported profile"):
