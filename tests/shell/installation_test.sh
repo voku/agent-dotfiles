@@ -53,7 +53,7 @@ function test_installed_bash_helpers_preserve_source_and_safe_deactivation() {
   local output
   python3 "$INSTALL_PROJECT/tools/install.py" install --source "$INSTALL_TEST_ROOT/source" --revision "$INSTALL_TEST_PIN" --prefix "$INSTALL_TEST_ROOT/consumer" >/dev/null
   printf 'first\nsecond\n' > "$INSTALL_TEST_ROOT/literal [λ].txt"
-  output="$(bash --noprofile --norc -c '. "$1/.bashrc"; agent_read "$2" --root "$3" --start 2 --end 2; agent_deactivate' consumer "$INSTALL_TEST_ROOT/consumer" 'literal [λ].txt' "$INSTALL_TEST_ROOT")"
+  output="$(env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc"; agent_read "$2" --root "$3" --start 2 --end 2; agent_deactivate' consumer "$INSTALL_TEST_ROOT/consumer" 'literal [λ].txt' "$INSTALL_TEST_ROOT")"
   assert_same 'second' "$(printf '%s' "$output" | python3 -c 'import json,sys; print(json.load(sys.stdin)["content"], end="")')"
   python3 "$INSTALL_PROJECT/tools/install.py" verify --prefix "$INSTALL_TEST_ROOT/consumer" --revision "$INSTALL_TEST_PIN" >/dev/null
 }

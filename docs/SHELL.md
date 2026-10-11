@@ -20,15 +20,16 @@ source /absolute/agent-dotfiles/.zshrc
 For hosts that run each tool call in a new shell, activate in that call explicitly:
 
 ```sh
-bash --noprofile --norc -c '. "$1/.bashrc"; shift; agent_search "$@"' \
+env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc"; shift; agent_search "$@"' \
   consumer /absolute/agent-dotfiles 'function save(' --root /project --glob '*.php'
 ```
 
 Activation is silent on success. It exports `AGENT_DOTFILES_HOME` and defines only
 the functions below. PATH, working directory, positional arguments and shell options
 are preserved. Shared files are resolved beside the selected profile, never from
-HOME or the project being investigated. Use `bash --noprofile --norc` or `zsh -f`
-when creating a dedicated shell; activation itself cannot undo an already-loaded
+HOME or the project being investigated. Use `env -u BASH_ENV bash --noprofile --norc` or `zsh -f`
+when creating a dedicated shell. Clearing `BASH_ENV` is required: Bash reads
+that inherited startup file even with `--noprofile --norc`. Activation itself cannot undo an already-loaded
 user configuration. Source `.bashrc` in Bash and `.zshrc` in Zsh, not via `sh`.
 
 Activation refuses existing owned names or `AGENT_DOTFILES_HOME` rather than

@@ -51,10 +51,10 @@ interactive dotfiles or modify user startup files. See [shell setup](SHELL.md).
 First verify the approved version and inspect capabilities:
 
 ```sh
-/private/existing-parent/agent-dotfiles-APPROVED_FULL_COMMIT_SHA/bin/agent-dotfiles doctor
 /path/to/agent-dotfiles/install.sh verify \
   --prefix /private/existing-parent/agent-dotfiles-APPROVED_FULL_COMMIT_SHA \
   --revision APPROVED_FULL_COMMIT_SHA
+/private/existing-parent/agent-dotfiles-APPROVED_FULL_COMMIT_SHA/bin/agent-dotfiles doctor
 ```
 
 `doctor` reports the actual executable inventory; `doctor --strict` returns 2

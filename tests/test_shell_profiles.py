@@ -45,6 +45,7 @@ class ShellProfilesTest(unittest.TestCase):
         env = {**os.environ, 'HOME': str(self.user)}
         env.pop('AGENT_DOTFILES_HOME', None)
         env.update(environment or {})
+        env.pop("BASH_ENV", None)  # Bash startup occurs before our explicit profile.
         return subprocess.run([shell, *flags, '-c', script, 'consumer', str(self.home / profile), *args],
                               cwd=self.root, env=env, capture_output=True, text=True, timeout=15)
 
@@ -72,6 +73,15 @@ agent_deactivate
                 self.assertEqual(result.stdout, '')
                 self.assertEqual(result.stderr, '')
                 self.assertFalse((self.root / 'unsafe-startup').exists())
+
+    def test_fresh_consumer_blocks_inherited_bash_startup(self):
+        startup = self.root / 'inherited-startup.sh'
+        marker = self.root / 'unsafe-inherited-startup'
+        startup.write_text(f'touch "{marker}"\n')
+        for shell, profile in self.shells():
+            result = self.run_shell(shell, profile, '. "$1"; agent_doctor', environment={'BASH_ENV': str(startup)})
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertFalse(marker.exists(), 'Inherited BASH_ENV executed before explicit activation')
 
     def test_wrappers_preserve_argv_and_nonzero_exit(self):
         mapping = {'agent_search': 'search', 'agent_read': 'read', 'agent_patch': 'git-patch',

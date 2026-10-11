@@ -25,7 +25,7 @@ agent_deactivate
 
 Zsh users source `/path/to/agent-dotfiles/.zshrc` instead. Neither profile changes
 PATH, shell options, the current directory, prompts, user dotfiles or Git config.
-For a non-interactive agent session, use `bash --noprofile --norc` or `zsh -f`
+For a non-interactive agent session, use `env -u BASH_ENV bash --noprofile --norc` or `zsh -f`
 and explicitly source the reviewed profile. See [shell setup and helpers](docs/SHELL.md).
 
 For a reusable consumer, install a reviewed full commit into a private prefix:
