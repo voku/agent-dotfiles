@@ -255,6 +255,14 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.install()[0], 2)
         self.assertFalse(self.prefix.exists())
 
+    def test_project_onboarding_skill_required_for_new_installations(self):
+        self.git("rm", "skills/project-onboarding/SKILL.md")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", "missing project onboarding skill")
+        self.revision = self.git("rev-parse", "HEAD").strip()
+        self.assertEqual(self.install()[0], 2)
+        self.assertFalse(self.prefix.exists())
+
     def test_modified_core_refuses_verify_and_uninstall(self):
         self.assertEqual(self.install()[0], 0)
         target = self.prefix / "shell/core/activation.sh"
