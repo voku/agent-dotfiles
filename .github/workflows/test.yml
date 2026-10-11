@@ -115,8 +115,8 @@ jobs:
           ./install.sh verify --prefix "$prefix" --revision "$CANDIDATE_SHA" > "$root/verify-before.json"
           "$prefix/bin/agent-dotfiles" doctor > "$root/direct-doctor.json"
 
-          env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc" || exit $?; agent_doctor; agent_deactivate' fresh-bash "$prefix" > "$root/bash-doctor.json"
-          env -u ZDOTDIR zsh -f -c 'source "$1/.zshrc" || exit $?; agent_doctor; agent_deactivate' fresh-zsh "$prefix" > "$root/zsh-doctor.json"
+          env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc" || exit $?; agent_doctor || exit $?; agent_deactivate' fresh-bash "$prefix" > "$root/bash-doctor.json"
+          env -u ZDOTDIR zsh -f -c 'source "$1/.zshrc" || exit $?; agent_doctor || exit $?; agent_deactivate' fresh-zsh "$prefix" > "$root/zsh-doctor.json"
           for report in "$root/direct-doctor.json" "$root/bash-doctor.json" "$root/zsh-doctor.json"; do
             python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["schema"] == "agent-dotfiles.v1.doctor"' "$report"
           done
