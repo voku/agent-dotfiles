@@ -63,6 +63,17 @@ class BootstrapPlanTest(unittest.TestCase):
             self.assertEqual(json.loads(res.stdout)["operation"], "plan")
             self.assertEqual(tuple(Path(dirname).iterdir()), before)
 
+    def test_missing_python_has_actionable_error_without_mutation(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        script = root / "firstInstall.sh"
+        with tempfile.TemporaryDirectory() as dirname:
+            res = subprocess.run(["/bin/sh", str(script), "plan"], cwd=dirname,
+                                 env={"PATH": dirname}, capture_output=True,
+                                 text=True, check=False)
+            self.assertEqual(res.returncode, 2)
+            self.assertIn("Python 3.10+ is required", res.stderr)
+            self.assertFalse(tuple(Path(dirname).iterdir()))
+
     def test_main_does_not_invoke_subprocesses(self) -> None:
         with patch("tools.bootstrap_plan.platform.system", return_value="Linux"), \
              patch("tools.bootstrap_plan.platform.freedesktop_os_release", return_value={"ID": "debian"}), \
