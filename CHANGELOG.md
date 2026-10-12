@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.5.0
+
+- Establish one reviewed `.redpill/` Bash/Zsh runtime with explicit, reversible
+  activation and per-invocation `agent_git`/`agent_rg` defaults; retain verification
+  and removal of older pinned installation manifests.
+- Add read-only first-install capability plans, diagnostic tool profiles and
+  trustworthy Git workspace evidence without provisioning host packages.
+- Distribute the project-onboarding skill and a pinned selection of portable
+  agent-skills; keep workflow, Learning, Recall and memory with agent-loop.
+- Document the complete pinned install/verify/activate/deactivate/uninstall path
+  and prove byte-identical manifests and equivalent behavior across two consumers,
+  with unchanged HOME, project and source trees.
+- Make the workflow test fixture portable to Python3-only hosts and provision
+  real ripgrep in CI so search-reliability measurements execute rather than skip.
+- Measure exact-search correctness under four fixed host configurations: native
+  `rg` 1/4, `agent_rg` 4/4, explicit native `rg --no-config` 4/4. This is a narrow
+  configuration-isolation result; general productivity, speed and token benefits
+  remain inconclusive.
+
 ## 0.4.0
 
 - Require Linux Bash/Zsh activation tests and ShellCheck validation of the root
