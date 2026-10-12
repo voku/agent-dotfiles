@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           path: dotfiles
-          ref: \${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - name: Checkout immutable agent-loop owner
         uses: actions/checkout@v7
@@ -43,7 +43,7 @@ jobs:
       - name: Validate actual external Learning root and retrieve project documents
         shell: bash
         env:
-          EXPECTED_CANDIDATE: \${{ github.event.pull_request.head.sha || github.sha }}
+          EXPECTED_CANDIDATE: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
           project="$GITHUB_WORKSPACE/dotfiles"
@@ -92,6 +92,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: project-learning-consumer
-          path: \${{ runner.temp }}/agent-loop-consumer-proof/
+          path: ${{ runner.temp }}/agent-loop-consumer-proof/
           if-no-files-found: warn
           retention-days: 14
