@@ -7,6 +7,8 @@ A tool appearing in dotfiles does **not** prove it is agent-safe. Test actual ex
 | `rg` | Literal, file search | `rg --json -F -- PATTERN .`, `rg --files -0` | Required for search wrapper |
 | `git` | Version-control evidence | `git status --porcelain=v1 -z`, `git ls-files -z` | Required for normal coding workflow, detected only |
 | `jq` | JSON processing | `jq -c FILTER FILE`; validate with `jq empty FILE` | Optional, prefer no display decoration |
+| `php` | PHP project inspection and native checks | Discover interpreter before selecting project commands | Required only for `doctor --profile php` readiness |
+| `composer` | PHP dependency/project metadata | Use only after inspecting the project and its declared commands | Optional within PHP profile; executable presence is not compatibility |
 | `fd` or `fdfind` | Alternate file search | `fd --type f --print0` | Optional, **explicit selection**, no silent semantic fallback |
 | `shellcheck` | Shell diagnostics | File-scoped invocation | Optional, gate before CI use |
 | `strace` | Linux syscall evidence | Small, scoped target; sanitize sensitive traces | Optional, never always-on |
@@ -48,8 +50,12 @@ binaries; their mere presence does not change workflow routing or authorization.
 
 ## Explicit coding-agent profiles
 
-`profiles/*.json` defines the non-executable `minimal`, `git`, `php`, and
-`shell` profiles. Select one or more through `agent-dotfiles doctor --profile`.
+`agent-dotfiles doctor` without `--profile` is the universal foundation: it
+already checks Git and ripgrep and inventories optional tools. The existing
+`minimal`, `git`, and `shell` profile names remain backward-compatible
+diagnostic views, not separate environments users must opt into. The
+non-executable `php` profile adds PHP readiness and optional Composer detection.
+Select additional views through `agent-dotfiles doctor --profile`.
 The JSON report states each declared required/optional tool, observed executable,
 unavailable capability, and platform limit. It never installs a package, changes
 PATH, sources user/project files, adds an alias, or picks a command for the

@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.bootstrap_plan import main, package_manager, plan
+from tools.bootstrap_plan import PHP, main, package_manager, plan
 
 
 class BootstrapPlanTest(unittest.TestCase):
@@ -46,6 +46,16 @@ class BootstrapPlanTest(unittest.TestCase):
     def test_php_does_not_assume_system_package_is_suitable(self) -> None:
         result = plan("php", system="Linux", os_release={"ID": "ubuntu"}, found={"apt-get": "/usr/bin/apt-get"})
         self.assertEqual(set(result["unmanaged_missing"]), {"php", "composer"})
+
+    def test_php_planner_and_diagnostic_names_agree(self) -> None:
+        profile_path = Path(__file__).resolve().parents[1] / "profiles" / "php.json"
+        profile = json.loads(profile_path.read_text(encoding="utf-8"))
+        planner_names = {tool.name for tool in PHP}
+        diagnostic_names = set(profile["required_tools"]) | set(profile["optional_tools"])
+        self.assertEqual(planner_names, {"php", "composer"})
+        self.assertTrue(planner_names.issubset(diagnostic_names))
+        self.assertIn("php", profile["required_tools"])
+        self.assertIn("composer", profile["optional_tools"])
 
     def test_fdfind_is_recognized(self) -> None:
         result = plan("debug", system="Linux", os_release={"ID": "debian"}, found={"apt-get": "/usr/bin/apt-get", "fdfind": "/usr/bin/fdfind"})

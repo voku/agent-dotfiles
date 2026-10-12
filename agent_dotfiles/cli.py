@@ -32,6 +32,7 @@ MAX_CONTEXT_FILE_BYTES = 16 * 1024 * 1024
 
 REQUIRED_TOOLS = ("rg", "git")
 OPTIONAL_TOOLS = ("jq", "curl", "fd", "shellcheck", "strace", "hyperfine", "ast-grep", "ctags", "difft", "delta")
+PROFILE_ONLY_TOOLS = ("php", "composer")
 PROFILE_NAMES = ("minimal", "git", "php", "shell")
 PROFILE_SCHEMA = SCHEMA_VERSION + ".profile"
 
@@ -78,7 +79,7 @@ def _profile_definition(name: str) -> dict[str, Any]:
         data: Any = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise CommandFailure("invalid_profile", f"Unable to load packaged profile {name!r}") from exc
-    known_tools = set(REQUIRED_TOOLS) | set(OPTIONAL_TOOLS)
+    known_tools = set(REQUIRED_TOOLS) | set(OPTIONAL_TOOLS) | set(PROFILE_ONLY_TOOLS)
     if (not isinstance(data, dict) or set(data) != {"schema", "name", "description", "required_tools", "optional_tools", "platform_limits"}
             or data["schema"] != PROFILE_SCHEMA or data["name"] != name or not isinstance(data["description"], str)
             or not isinstance(data["required_tools"], list) or not isinstance(data["optional_tools"], list)
@@ -106,12 +107,18 @@ def _profile_report(name: str, inventory: dict[str, Any]) -> dict[str, Any]:
         for tool in definition[f"{role}_tools"]:
             limit = limits.get(tool)
             platform_supported = limit is None or sys.platform in limit["platforms"]
-            detail = {"name": tool, "role": role, "available": inventory[tool]["available"],
+            if tool in PROFILE_ONLY_TOOLS:
+                # Profile capabilities must not change the default doctor JSON.
+                executable = _resolve_executable(tool)
+                observed = {"available": executable is not None, "path": executable}
+            else:
+                observed = inventory[tool]
+            detail = {"name": tool, "role": role, "available": observed["available"],
                       "platform_supported": platform_supported}
-            if inventory[tool].get("path") is not None:
-                detail["path"] = inventory[tool]["path"]
-            if inventory[tool].get("executable") is not None:
-                detail["executable"] = inventory[tool]["executable"]
+            if observed.get("path") is not None:
+                detail["path"] = observed["path"]
+            if observed.get("executable") is not None:
+                detail["executable"] = observed["executable"]
             if limit is not None:
                 detail["platform_limit"] = {"platforms": limit["platforms"], "reason": limit["reason"]}
             tools.append(detail)
