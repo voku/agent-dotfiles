@@ -104,6 +104,28 @@ jobs:
           candidate_root="$RUNNER_TEMP/finding-capture-project"
           mkdir -p "$candidate_root/.agent-loop"
           cp -R "$project/.agent-loop/learning" "$candidate_root/.agent-loop/learning"
+          # Create a pre-existing owner-generated Finding in scratch so this
+          # regression tests coexistence with retained Learning state, rather
+          # than accidentally relying on an empty repository.
+          php "$owner/bin/agent-loop" learn capture \
+            --root "$candidate_root/.agent-loop/learning" \
+            --task DOTFILES-9998 \
+            --by ci-contract \
+            --scope shell/modules/git.sh \
+            --observation 'CI fixture only: earlier Finding in the same local root' \
+            --hypothesis 'Earlier owner records remain unchanged by later tasks' \
+            --evidence 'Synthetic pre-existing record, not an approved decision' \
+            > "$evidence/preexisting-capture.json"
+          python3 - "$candidate_root/.agent-loop/learning" "$evidence/before-findings.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          root = Path(sys.argv[1])
+          existing = sorted(p.relative_to(root).as_posix()
+                            for p in (root / "findings").rglob("*.json"))
+          assert existing, "the fixture must begin with existing Findings"
+          Path(sys.argv[2]).write_text(json.dumps(existing), encoding="utf-8")
+          PY
           php "$owner/bin/agent-loop" learn capture \
             --root "$candidate_root/.agent-loop/learning" \
             --task DOTFILES-9999 \
@@ -113,19 +135,25 @@ jobs:
             --hypothesis 'Learning writes unverified candidates under the supplied root' \
             --evidence 'Synthetic integration probe, not a real workflow outcome' \
             > "$evidence/candidate-capture.json"
-          python3 - "$evidence/candidate-capture.json" "$candidate_root/.agent-loop/learning" <<'PY'
+          python3 - "$evidence/candidate-capture.json" "$candidate_root/.agent-loop/learning" "$evidence/before-findings.json" <<'PY'
           import json
           import sys
           from pathlib import Path
           receipt = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
           root = Path(sys.argv[2]).resolve()
-          candidates = list((root / "findings").rglob("*.json"))
-          assert len(candidates) == 1, candidates
-          finding = json.loads(candidates[0].read_text(encoding="utf-8"))
+          before = set(json.loads(Path(sys.argv[3]).read_text(encoding="utf-8")))
+          current = {p.relative_to(root).as_posix()
+                     for p in (root / "findings").rglob("*.json")}
+          created = current - before
+          assert len(created) == 1, (before, created)
+          assert before <= current, "older records disappeared"
+          created_path = root / next(iter(created))
+          finding = json.loads(created_path.read_text(encoding="utf-8"))
+          assert finding["id"] == receipt["id"], receipt
+          assert Path(receipt["path"]).resolve() == created_path.resolve(), receipt
           assert finding["task_id"] == "DOTFILES-9999", finding
           assert finding["status"] == "candidate", finding
           assert finding["validation_status"] == "unverified", finding
-          assert receipt, receipt
           PY
           php "$owner/bin/agent-loop" learn validate --root "$candidate_root/.agent-loop/learning" \
             > "$evidence/candidate-validation.txt" 2>&1

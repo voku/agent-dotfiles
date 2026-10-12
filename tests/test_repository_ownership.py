@@ -31,6 +31,13 @@ class RepositoryOwnershipTest(unittest.TestCase):
                 self.assertTrue((ROOT / name).is_file(), name)
                 self.assertFalse(installation_path(name), name)
 
+    def test_git_example_references_installed_source_location(self) -> None:
+        example = (ROOT / "examples/gitconfig.agent.example").read_text(encoding="utf-8")
+        self.assertIn(
+            "include.path=/absolute/path/examples/gitconfig.agent.example", example
+        )
+        self.assertNotIn("/absolute/path/config/gitconfig.agent.example", example)
+
     def test_runtime_inputs_remain_explicit(self) -> None:
         for name in (
             ".bashrc",
