@@ -97,7 +97,7 @@ class InstallationTest(unittest.TestCase):
             ".agent-loop/learning/config.json": '{"schema_version": "1.0"}\n',
             ".agent-loop/learning/findings/validated/fixture.json": '{"id": "fixture"}\n',
             "MEMORY.md": "# Project-maintainer knowledge\n",
-            "docs/recall-documents.json": '{"schema_version": "1.0", "documents": []}\n",
+            "docs/recall-documents.json": '{"schema_version": "1.0", "documents": []}\\n',
         }
         for relative, content in project_only.items():
             file = self.source / relative
