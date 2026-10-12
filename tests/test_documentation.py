@@ -82,6 +82,31 @@ class PublicDocumentationTest(unittest.TestCase):
                 capture_output=True, text=True, timeout=20, env=env, check=False,
             )
             self.assertEqual(baseline.returncode, 0, baseline.stderr)
+            unborn = subprocess.run(
+                [sys.executable, str(PROJECT_ROOT / "bin" / "agent-dotfiles"),
+                 "workspace", "--root", str(root), "--limit", "50"],
+                capture_output=True, text=True, timeout=20, env=env, check=False,
+            )
+            self.assertEqual(unborn.returncode, 2, unborn.stdout + unborn.stderr)
+            self.assertEqual(json.loads(unborn.stdout)["error"], "missing_head")
+            (root / "tracked.txt").write_text("hello, real checkout\\n", encoding="utf-8")
+            added = subprocess.run(
+                ["git", "-C", str(root), "add", "--", "tracked.txt"],
+                capture_output=True, text=True, timeout=20, env=env, check=False,
+            )
+            self.assertEqual(added.returncode, 0, added.stderr)
+            committed = subprocess.run(
+                ["git", "-C", str(root), "-c", "user.name=Fixture",
+                 "-c", "user.email=fixture@example.invalid", "commit", "-qm", "initial"],
+                capture_output=True, text=True, timeout=20, env=env, check=False,
+            )
+            self.assertEqual(committed.returncode, 0, committed.stderr)
+            baseline = subprocess.run(
+                ["git", "-C", str(root), "status", "--porcelain=v1", "--untracked-files=all"],
+                capture_output=True, text=True, timeout=20, env=env, check=False,
+            )
+            self.assertEqual(baseline.returncode, 0, baseline.stderr)
+            self.assertEqual(baseline.stdout, "")
             doctor = subprocess.run(
                 [sys.executable, str(PROJECT_ROOT / "bin" / "agent-dotfiles"),
                  "doctor", "--profile", "minimal"],
@@ -112,7 +137,7 @@ class PublicDocumentationTest(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn("Do not install or configure `agent-loop`", prompt)
-        self.assertIn("Do not install or configure `agent-loop`", prompt)
+        self.assertIn("project memory", prompt)
         self.assertIn("unavailable", prompt.lower())
         self.assertIn("CODEX", prompt.upper())
         self.assertIn("CLAUDE", prompt.upper())
