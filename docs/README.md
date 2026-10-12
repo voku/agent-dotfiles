@@ -39,4 +39,5 @@ in the [repository README](../README.md).
 - [Runtime versus maintainer-owned paths](REPOSITORY_LAYOUT.md).
 - [Product boundaries (ADR 0001)](decisions/0001-product-boundaries.md).
 - [Project-local Learning and memory (ADR 0002)](decisions/0002-repository-learning.md).
+- [Registered project Recall documents](recall-documents.json) (read-only retrieval of reviewed memory/ADRs).
 - [Durable repository memory](../MEMORY.md).

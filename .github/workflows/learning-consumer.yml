@@ -1,0 +1,97 @@
+name: Project-local Learning and Recall consumer
+
+on:
+  pull_request:
+    paths:
+      - '.agent-loop/**'
+      - 'MEMORY.md'
+      - 'docs/decisions/**'
+      - 'docs/recall-documents.json'
+      - 'docs/REPOSITORY_LAYOUT.md'
+      - 'tests/test_repository_ownership.py'
+      - '.github/workflows/learning-consumer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-agent-loop-consumer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact candidate without persisted credentials
+        uses: actions/checkout@v7
+        with:
+          path: dotfiles
+          ref: \${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Checkout immutable agent-loop owner
+        uses: actions/checkout@v7
+        with:
+          repository: voku/agent-loop
+          ref: fad403a209d7d9f4438bf7036ce962780f44938c
+          path: agent-loop
+          persist-credentials: false
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+      - name: Install owner runtime away from candidate
+        run: composer install --working-dir=agent-loop --no-dev --no-interaction --prefer-dist --no-progress --no-scripts
+      - name: Validate actual external Learning root and retrieve project documents
+        shell: bash
+        env:
+          EXPECTED_CANDIDATE: \${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          project="$GITHUB_WORKSPACE/dotfiles"
+          owner="$GITHUB_WORKSPACE/agent-loop"
+          evidence="$RUNNER_TEMP/agent-loop-consumer-proof"
+          mkdir -p "$evidence"
+          test "$(git -C "$project" rev-parse HEAD)" = "$EXPECTED_CANDIDATE"
+          test "$(git -C "$owner" rev-parse HEAD)" = fad403a209d7d9f4438bf7036ce962780f44938c
+          php --version > "$evidence/php-version.txt"
+          composer --version > "$evidence/composer-version.txt"
+          cp "$owner/composer.lock" "$evidence/owner-dependencies.lock"
+          printf '%s\n' "$EXPECTED_CANDIDATE" > "$evidence/candidate-sha.txt"
+          printf '%s\n' fad403a209d7d9f4438bf7036ce962780f44938c > "$evidence/owner-sha.txt"
+          test -z "$(git -C "$project" status --porcelain=v1 --untracked-files=all)"
+          (
+            cd "$project"
+            php "$owner/bin/agent-loop" learn validate --root "$project/.agent-loop/learning" \
+              > "$evidence/learning-validation.txt" 2>&1
+            php "$owner/bin/agent-loop" recall compile \
+              --root "$project/.agent-loop/learning" \
+              --task DOTFILES-CONSUMER-PROOF \
+              --description 'Inspect safe agent-owned runtime and reviewed project decisions' \
+              --file shell/core/activation.sh \
+              --document-manifest "$project/docs/recall-documents.json" \
+              --output-dir "$evidence/recall" \
+              > "$evidence/recall-compile.txt" 2>&1
+          )
+          grep -F 'Validated agent learning root:' "$evidence/learning-validation.txt"
+          grep -R -F -q 'One owner per file' "$evidence/recall"
+          grep -R -F -q 'No implicit' "$evidence/recall" || grep -R -F -q 'private-prefix' "$evidence/recall"
+          test -z "$(git -C "$project" status --porcelain=v1 --untracked-files=all)"
+          # Negative control in an isolated scratch copy: fail closed on malformed config.
+          scratch="$RUNNER_TEMP/invalid-learning-project"
+          mkdir -p "$scratch/.agent-loop"
+          cp -R "$project/.agent-loop/learning" "$scratch/.agent-loop/learning"
+          printf '{' > "$scratch/.agent-loop/learning/config.json"
+          if php "$owner/bin/agent-loop" learn validate --root "$scratch/.agent-loop/learning" \
+              > "$evidence/invalid-learning.txt" 2>&1; then
+            echo 'Invalid Learning config unexpectedly accepted' >&2
+            exit 1
+          fi
+          test -s "$evidence/invalid-learning.txt"
+          echo 'Real agent-loop Learning validates and registered Recall documents appear in its artifacts.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload independently inspectable owner receipts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: project-learning-consumer
+          path: \${{ runner.temp }}/agent-loop-consumer-proof/
+          if-no-files-found: warn
+          retention-days: 14

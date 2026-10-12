@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "documents": [
+    {
+      "id": "adr.agent-dotfiles-reviewed-rules",
+      "type": "adr",
+      "source": "../MEMORY.md",
+      "scope": [],
+      "tags": [
+        "architecture",
+        "learning",
+        "project"
+      ],
+      "max_chars": 4400
+    },
+    {
+      "id": "adr.agent-dotfiles-runtime-boundaries",
+      "type": "adr",
+      "source": "decisions/0001-product-boundaries.md",
+      "scope": [
+        ".bashrc",
+        ".zshrc",
+        ".shellrc",
+        "shell/",
+        "agent_dotfiles/",
+        "tools/install.py",
+        "profiles/"
+      ],
+      "tags": [
+        "shell",
+        "installation",
+        "architecture"
+      ],
+      "max_chars": 4400
+    },
+    {
+      "id": "adr.agent-dotfiles-learning-boundary",
+      "type": "adr",
+      "source": "decisions/0002-repository-learning.md",
+      "scope": [
+        ".agent-loop/",
+        "MEMORY.md",
+        "docs/"
+      ],
+      "tags": [
+        "learning",
+        "workflow",
+        "memory"
+      ],
+      "max_chars": 4400
+    }
+  ]
+}

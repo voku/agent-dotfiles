@@ -19,6 +19,7 @@ class RepositoryOwnershipTest(unittest.TestCase):
             "MEMORY.md",
             "docs/REPOSITORY_LAYOUT.md",
             "docs/STEADY_STATE_EVALUATION.md",
+            "docs/recall-documents.json",
             "docs/decisions/0001-product-boundaries.md",
             ".agent-loop/init.json",
             ".agent-loop/learning/config.json",
@@ -53,6 +54,14 @@ class RepositoryOwnershipTest(unittest.TestCase):
         self.assertEqual(init["paths"]["learning_root"], ".agent-loop/learning")
         self.assertEqual(config["schema_version"], "1.0")
         self.assertEqual(config["project_root"], "../..")
+        self.assertEqual(init["recall"]["document_manifests"], ["docs/recall-documents.json"])
+        manifest = json.loads((ROOT / "docs/recall-documents.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["schema_version"], "1.0")
+        self.assertEqual(len(manifest["documents"]), 3)
+        for document in manifest["documents"]:
+            with self.subTest(id=document["id"]):
+                self.assertIn(document["type"], ("adr", "skill"))
+                self.assertTrue((ROOT / "docs" / document["source"]).is_file())
         self.assertTrue(
             (ROOT / ".agent-loop/learning/findings/validated").is_dir()
         )

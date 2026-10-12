@@ -11,5 +11,10 @@
       "mode": "invest",
       "max_follow_up_slices": 2
     }
+  },
+  "recall": {
+    "document_manifests": [
+      "docs/recall-documents.json"
+    ]
   }
 }

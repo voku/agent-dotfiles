@@ -30,9 +30,9 @@ Agent-specific defaults belong in **reviewed, opt-in, namespaced** shell behavio
 
 `agent-loop` governs approved tasks, decisions, validation and Learning. This repo owns only its *own* versioned project knowledge:
 
-- `MEMORY.md` indexes durable, reviewed rules with executable sources.
+- `MEMORY.md` indexes durable, reviewed rules with executable sources. The project registers it, together with approved ADRs, in `docs/recall-documents.json` for bounded Recall retrieval (document type `adr` is the current provider-compatible representation of reviewed project rules, not automatic approval).
 - `docs/decisions/` contains architectural decisions and tradeoffs.
-- `.agent-loop/init.json` and `.agent-loop/learning/config.json` select a project-local Learning root, following the upstream shape.
+- `.agent-loop/init.json` and `.agent-loop/learning/config.json` select a project-local Learning root and register the repository's Recall manifest, following the upstream shape.
 - Only independently reviewed findings in `.agent-loop/learning/findings/validated/*.json` are eligible for Git. Raw task/session data and derived caches are excluded by `.gitignore`.
 
 These files establish a **storage convention**, not proof that an agent-loop run has completed or automatically promoted learning. Follow the installed agent-loop version's actual `enter` / `workflow` / `learning` contracts. Do not fabricate approvals, completed sessions, findings or useful outcomes.
