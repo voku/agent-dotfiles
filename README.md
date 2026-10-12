@@ -47,6 +47,8 @@ anything, replace the project path and invoke the CLI directly:
 ./bin/agent-dotfiles search 'TODO' --root /absolute/path/to/project --limit 20
 ```
 
+The `workspace` command needs a Git repository with at least one commit;
+an unborn `HEAD` is an explicit error (not a fabricated workspace identity).
 Search requires `rg` and may report incomplete results (exit `3`).
 See [the complete CLI/JSON/exit contract](docs/CLI.md). The checkout must be
 from an independently reviewed source revision before it is used for

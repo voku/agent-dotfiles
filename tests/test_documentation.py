@@ -132,6 +132,47 @@ class PublicDocumentationTest(unittest.TestCase):
             self.assertFalse((root / ".agent-loop").exists())
             self.assertFalse((root / "MEMORY.md").exists())
 
+    def test_guarded_manual_skill_projection_for_codex_and_claude(self) -> None:
+        instructions = (PROJECT_ROOT / "docs" / "PROJECT_ONBOARDING.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("test ! -e \\"$skill_target\\"", instructions)
+        self.assertIn("cp -R \\"$skill_source\\" \\"$skill_target\\"", instructions)
+        source = PROJECT_ROOT / "skills" / "project-onboarding"
+        script = (
+            "set -eu; "
+            'skill_source="$1"; skill_target="$2"; '
+            'test ! -e "$skill_target" || { echo "refusing existing skill" >&2; exit 2; }; '
+            'mkdir -p "${skill_target%/*}"; '
+            'cp -R "$skill_source" "$skill_target"; '
+            'cmp -s "$skill_source/SKILL.md" "$skill_target/SKILL.md"'
+        )
+        with tempfile.TemporaryDirectory(prefix="onboarding skill λ ") as tmp:
+            project = Path(tmp) / "fresh project"
+            project.mkdir()
+            for host in (".codex", ".claude"):
+                target = project / host / "skills" / "project-onboarding"
+                cmd = ["sh", "-c", script, "project-onboarding", str(source), str(target)]
+                first = subprocess.run(
+                    cmd, capture_output=True, text=True, timeout=20, check=False,
+                )
+                self.assertEqual(first.returncode, 0, first.stderr)
+                self.assertEqual(
+                    (target / "SKILL.md").read_bytes(),
+                    (source / "SKILL.md").read_bytes(),
+                )
+                (target / "SKILL.md").write_text("local override", encoding="utf-8")
+                repeated = subprocess.run(
+                    cmd, capture_output=True, text=True, timeout=20, check=False,
+                )
+                self.assertEqual(repeated.returncode, 2, repeated.stderr)
+                self.assertEqual(
+                    (target / "SKILL.md").read_text(encoding="utf-8"),
+                    "local override",
+                )
+            self.assertFalse((project / ".agent-loop").exists())
+            self.assertFalse((project / "MEMORY.md").exists())
+
     def test_setup_prompt_preserves_workflow_ownership(self) -> None:
         prompt = (PROJECT_ROOT / "prompts" / "setup-project.md").read_text(
             encoding="utf-8"
