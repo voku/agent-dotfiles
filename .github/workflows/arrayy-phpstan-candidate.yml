@@ -1,0 +1,70 @@
+name: Frozen Arrayy PHPStan failure proof
+on:
+  push:
+    branches:
+      - experiment/phpstan-arrayy-factory-20261012
+    paths:
+      - .github/workflows/arrayy-phpstan-candidate.yml
+      - experiments/php-maintenance/arrayy-factory-inference.json
+      - experiments/php-maintenance/arrayy-factory-inference.php
+
+permissions:
+  contents: read
+
+jobs:
+  verify-real-php-failure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: dotfiles
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          repository: voku/Arrayy
+          ref: de7df893f2dd33db50da67de210974ad9ce4bd18
+          path: arrayy
+          persist-credentials: false
+      - uses: shivammathur/setup-php@2.40.0
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+      - name: Verify exact source and prepare PHPStan
+        working-directory: arrayy
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = de7df893f2dd33db50da67de210974ad9ce4bd18
+          cp ../dotfiles/experiments/php-maintenance/arrayy-factory-inference.php .experiment-phpstan.php
+          composer require --dev --no-interaction --no-update 'phpstan/phpstan:2.3.1'
+          composer update --prefer-dist --no-interaction --no-progress
+          php vendor/bin/phpstan --version
+      - name: Require actual expected PHPStan diagnostic
+        working-directory: arrayy
+        run: |
+          set -euo pipefail
+          set +e
+          php vendor/bin/phpstan analyse -c phpstan.neon --no-progress --error-format=json .experiment-phpstan.php > diagnostic.json
+          status=$?
+          set -e
+          test "$status" -eq 1
+          php <<'PHP'
+          <?php
+          declare(strict_types=1);
+          $report = json_decode(file_get_contents('diagnostic.json'), true, 512, JSON_THROW_ON_ERROR);
+          $messages = [];
+          foreach ($report['files'] ?? [] as $file) {
+              foreach ($file['messages'] ?? [] as $message) {
+                  $messages[] = $message['message'] ?? '';
+              }
+          }
+          if (($report['totals']['errors'] ?? -1) !== 0
+              || count($messages) !== 1
+              || !str_contains($messages[0], 'Expected type DateTimeImmutable|null')
+              || !str_contains($messages[0], 'mixed')) {
+              fwrite(STDERR, 'Failure did not match the frozen PHPStan type regression: ' . json_encode($report) . PHP_EOL);
+              exit(1);
+          }
+          fwrite(STDOUT, "Observed expected real PHPStan failure on exact Arrayy source.\n");
+          PHP
