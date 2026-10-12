@@ -41,6 +41,73 @@ jobs:
             contract-tests.log
             capabilities.json
 
+  # Real distribution check. The only package installed here is Python,
+  # inside a disposable Debian container; target tools are never installed.
+  debian-bootstrap-plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Verify real Debian release, missing-tool plan and apt candidates
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha || github.sha }}"
+          evidence="$RUNNER_TEMP/debian-bootstrap"
+          mkdir -p "$evidence"
+          docker run --rm \
+            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/repo,readonly" \
+            --mount "type=bind,src=$evidence,dst=/evidence" \
+            debian:12-slim sh -ec "$(cat <<'CONTAINER'
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends python3 >/dev/null
+          cd /evidence
+          /repo/firstInstall.sh plan > default.json
+          /repo/firstInstall.sh plan --profile debug > debug.json
+          /repo/firstInstall.sh plan --profile php > php.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          default = json.loads(Path("default.json").read_text())
+          debug = json.loads(Path("debug.json").read_text())
+          php = json.loads(Path("php.json").read_text())
+          expected = ("python3", "git", "rg", "jq", "curl", "fd", "shellcheck", "hyperfine", "strace")
+          assert default["schema"] == "agent-dotfiles.v1.bootstrap-plan", default
+          assert default["operation"] == "plan" and default["profile"] == "minimal", default
+          assert default["system"] == "Linux" and default["distribution"] == "debian", default
+          assert default["manager"] == "apt", default
+          assert tuple(tool["name"] for tool in default["tools"]) == expected, default
+          assert all(tool["version"] is None for tool in default["tools"]), default
+          assert debug["tools"] == default["tools"] and debug["package_command_argv"] == default["package_command_argv"], debug
+          assert php["tools"][:len(expected)] == default["tools"], php
+          assert tuple(tool["name"] for tool in php["tools"][len(expected):]) == ("php", "composer"), php
+          assert set(php["unmanaged_missing"]) == {"php", "composer"}, php
+          command = default["package_command_argv"]
+          assert command and command[:3] == ["apt-get", "install", "--"], default
+          assert default["package_command_requires_approval"] is True
+          assert default["package_command_requires_privileges"] is True
+          assert {tool["suggested_package"] for tool in default["tools"] if not tool["available"]} == set(command[3:]), default
+          Path("packages.txt").write_text("\n".join(command[3:]) + "\n")
+          PY
+          # Validate the recommended names against this Debian release's
+          # actual APT indexes; do not install the suggested packages.
+          while IFS= read -r package; do
+            apt-cache show "$package" >/dev/null || exit 1
+          done < packages.txt
+          CONTAINER
+          )"
+      - name: Retain exact-head Debian plan receipts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: debian-bootstrap-${{ github.run_id }}
+          path: ${{ runner.temp }}/debian-bootstrap/*.json
+          if-no-files-found: warn
+          retention-days: 7
+
   bootstrap-legacy-python:
     runs-on: ubuntu-latest
     timeout-minutes: 10
