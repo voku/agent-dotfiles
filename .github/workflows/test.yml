@@ -109,6 +109,11 @@ jobs:
           done < packages.txt
           CONTAINER
           )"
+          # Tags intentionally follow current Debian/Ubuntu APT metadata.
+          # Retain the immutable image identity for this exact CI receipt;
+          # a later tag update must not be mistaken for an unchanged input.
+          docker image inspect --format '{{json .RepoDigests}}' "${{ matrix.image }}" > "$evidence/image-digests.json"
+          docker image inspect --format '{{json .Id}}' "${{ matrix.image }}" > "$evidence/image-id.json"
       - name: Retain exact-head Debian-family plan receipts
         if: always()
         uses: actions/upload-artifact@v7
