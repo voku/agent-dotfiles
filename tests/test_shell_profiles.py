@@ -72,6 +72,7 @@ before_args=$#
 agent_deactivate
 [ "${AGENT_DOTFILES_HOME+x}" != x ]
 ! typeset -f agent_search >/dev/null 2>&1
+! typeset -f agent_workspace >/dev/null 2>&1
 ''', ('space λ', str(self.home)), {'CDPATH': str(self.root)})
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual(result.stdout, '')
@@ -90,7 +91,8 @@ agent_deactivate
     def test_wrappers_preserve_argv_and_nonzero_exit(self):
         mapping = {'agent_search': 'search', 'agent_read': 'read', 'agent_patch': 'git-patch',
                    'agent_status': 'git-status', 'agent_files': 'files',
-                   'agent_tracked': 'tracked', 'agent_doctor': 'doctor'}
+                   'agent_tracked': 'tracked', 'agent_doctor': 'doctor',
+                   'agent_workspace': 'workspace'}
         args = ['--', 'spaces λ', 'line\nname', '[literal]*', '-leading', '']
         for shell, profile in self.shells():
             for helper, command in mapping.items():
@@ -103,6 +105,7 @@ agent_deactivate
     def test_collision_and_missing_assets_refuse_activation(self):
         for shell, profile in self.shells():
             for script in ['agent_search() { printf original; }; . "$1"',
+                           'agent_workspace() { printf original; }; . "$1"',
                            'AGENT_DOTFILES_HOME=existing; . "$1"',
                            'alias agent_read="printf original"; . "$1"']:
                 result = self.run_shell(shell, profile, script)
@@ -159,7 +162,7 @@ agent_source_status=$?
 activation_result=$?
 [ "$activation_result" = 2 ] || exit 10
 [ "${AGENT_DOTFILES_HOME+x}" != x ] || exit 11
-for helper in agent_dotfiles agent_doctor agent_files agent_search agent_read agent_tracked agent_status agent_patch agent_history agent_blame agent_deactivate; do
+for helper in agent_dotfiles agent_doctor agent_workspace agent_files agent_search agent_read agent_tracked agent_status agent_patch agent_history agent_blame agent_deactivate; do
     ! typeset -f "$helper" >/dev/null 2>&1 || exit 12
 done
 """)
