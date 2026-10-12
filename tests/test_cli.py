@@ -53,8 +53,8 @@ class AgentDotfilesCliTest(unittest.TestCase):
         self.assertFalse(report["required"]["rg"]["available"])
         self.assertEqual(report["missing_required"], ["rg", "git"])
         self.assertNotIn("profiles", report, "the baseline is available without selecting a profile")
-        self.assertFalse(report["optional"]["php"]["available"])
-        self.assertFalse(report["optional"]["composer"]["available"])
+        self.assertNotIn("php", report["optional"], "language tools must remain opt-in")
+        self.assertNotIn("composer", report["optional"], "language tools must remain opt-in")
         self.assertFalse(report["shell_startup_loaded"])
         self.assertFalse(report["installation_performed"])
         self.assertEqual(list(self.tools.iterdir()), [])
@@ -85,6 +85,8 @@ class AgentDotfilesCliTest(unittest.TestCase):
         code, report = self.cli("doctor", "--profile", "php", "--profile", "shell", "--strict")
         self.assertEqual(code, 0)
         self.assertEqual([profile["name"] for profile in report["profiles"]], ["php", "shell"])
+        self.assertNotIn("php", report["optional"])
+        self.assertNotIn("composer", report["optional"])
         php = report["profiles"][0]
         self.assertTrue(php["ready"])
         self.assertEqual(php["missing_required"], [])
@@ -116,13 +118,29 @@ class AgentDotfilesCliTest(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertTrue(report["profiles"][0]["ready"])
         self.assertIn("composer", report["profiles"][0]["unavailable"])
-        self.assertFalse(report["optional"]["composer"]["available"])
+        composer = next(tool for tool in report["profiles"][0]["tools"] if tool["name"] == "composer")
+        self.assertFalse(composer["available"])
+        self.assertNotIn("composer", report["optional"])
 
         self.executable("composer", "raise RuntimeError('composer was executed')")
         code, report = self.cli("doctor", "--profile", "php", "--strict")
         self.assertEqual(code, 0)
         self.assertNotIn("composer", report["profiles"][0]["unavailable"])
-        self.assertTrue(report["optional"]["composer"]["available"])
+        composer = next(tool for tool in report["profiles"][0]["tools"] if tool["name"] == "composer")
+        self.assertTrue(composer["available"])
+        self.assertNotIn("composer", report["optional"])
+
+    def test_doctor_legacy_profiles_keep_language_tools_out_of_baseline(self) -> None:
+        self.executable("php", "raise RuntimeError('php was executed')")
+        self.executable("composer", "raise RuntimeError('composer was executed')")
+        code, report = self.cli("doctor", "--profile", "minimal", "--profile", "git", "--profile", "shell")
+        self.assertEqual(code, 0)
+        self.assertEqual([item["name"] for item in report["profiles"]], ["minimal", "git", "shell"])
+        self.assertNotIn("php", report["optional"])
+        self.assertNotIn("composer", report["optional"])
+        for selected in report["profiles"]:
+            self.assertNotIn("php", {tool["name"] for tool in selected["tools"]})
+            self.assertNotIn("composer", {tool["name"] for tool in selected["tools"]})
 
     def test_doctor_profile_missing_required_is_strict_only(self) -> None:
         code, report = self.cli("doctor", "--profile", "git")
