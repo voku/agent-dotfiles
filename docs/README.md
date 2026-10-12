@@ -3,6 +3,7 @@
 ## Start here
 
 - [Project overview and safe first use](../README.md)
+- [Read-only developer-tool capability plan](FIRST_INSTALL.md)
 - [Pinned installation, verification, and rollback](INSTALLATION.md)
 - [Bash/Zsh activation and helper contract](SHELL.md)
 - [Tool capability matrix](TOOL_MATRIX.md)

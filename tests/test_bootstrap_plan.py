@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -62,6 +63,37 @@ class BootstrapPlanTest(unittest.TestCase):
             self.assertEqual(res.returncode, 0, res.stderr)
             self.assertEqual(json.loads(res.stdout)["operation"], "plan")
             self.assertEqual(tuple(Path(dirname).iterdir()), before)
+
+    def test_entrypoint_only_discovers_matching_tools_on_path(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        script = root / "firstInstall.sh"
+        tool_names = (
+            "apt-get", "brew", "composer", "curl", "fd", "fdfind", "git", "hyperfine",
+            "jq", "php", "rg", "shellcheck", "strace",
+        )
+        with tempfile.TemporaryDirectory() as dirname:
+            temporary = Path(dirname)
+            tools = temporary / "tools"
+            tools.mkdir()
+            marker = temporary / "executed"
+            for name in tool_names:
+                fake = tools / name
+                fake.write_text("#!/bin/sh\n: > \"$MARKER\"\nexit 99\n", encoding="utf-8")
+                fake.chmod(0o755)
+            (tools / "python3").symlink_to(sys.executable)
+            res = subprocess.run(
+                ["/bin/sh", str(script), "plan", "--profile", "debug"],
+                cwd=temporary,
+                env={"PATH": str(tools), "MARKER": str(marker)},
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(res.returncode, 0, res.stderr)
+            self.assertFalse(marker.exists(), "the planner must not execute discovered tools")
+            report = json.loads(res.stdout)
+            self.assertTrue(all(item["available"] for item in report["tools"]))
+            self.assertIsNone(report["package_command_argv"])
 
     def test_missing_python_has_actionable_error_without_mutation(self) -> None:
         root = Path(__file__).resolve().parents[1]

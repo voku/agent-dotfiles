@@ -9,5 +9,9 @@ if ! python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' 
   printf "%s\n" "Python 3.10+ is required to run the tool planner; the detected Python is too old or cannot start." >&2
   exit 2
 fi
-script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
+case "$0" in
+    */*) script_parent=${0%/*}; [ -n "$script_parent" ] || script_parent=/ ;;
+    *) script_parent=. ;;
+esac
+script_dir=$(CDPATH='' cd -P -- "$script_parent" && printf '%s' "$PWD")
 exec python3 "$script_dir/tools/bootstrap_plan.py" "$@"
