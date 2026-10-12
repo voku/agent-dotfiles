@@ -22,7 +22,7 @@ class InstallationTest(unittest.TestCase):
         self.root = Path(temporary.name).resolve()
         self.source = self.root / "source"
         self.source.mkdir()
-        for name in ("agent_dotfiles", "bin", "shell", "skills"):
+        for name in ("agent_dotfiles", "bin", "shell", "skills", "profiles"):
             shutil.copytree(PROJECT / name, self.source / name,
                             ignore=shutil.ignore_patterns("__pycache__"))
         shutil.copyfile(PROJECT / "LICENSE", self.source / "LICENSE")
@@ -74,6 +74,7 @@ class InstallationTest(unittest.TestCase):
         for name in ("bin/agent-dotfiles", ".bashrc", ".zshrc", ".shellrc",
                      "shell/modules/context.sh", "shell/modules/git.sh",
                      "shell/core/activation.sh", "shell/core/deactivation.sh",
+                     "profiles/minimal.json", "profiles/git.json", "profiles/php.json", "profiles/shell.json",
                      "skills/project-onboarding/SKILL.md", "skills/portable-skills.json",
                      "skills/coding-simplicity/SKILL.md",
                      "skills/testing-best-practices/rules/cov-regression-first.md",
@@ -250,6 +251,14 @@ class InstallationTest(unittest.TestCase):
         self.git("rm", ".zshrc")
         self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
                  "commit", "-qm", "missing profile")
+        self.revision = self.git("rev-parse", "HEAD").strip()
+        self.assertEqual(self.install()[0], 2)
+        self.assertFalse(self.prefix.exists())
+
+    def test_all_capability_profiles_required_for_new_installations(self):
+        self.git("rm", "profiles/php.json")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", "missing capability profile")
         self.revision = self.git("rev-parse", "HEAD").strip()
         self.assertEqual(self.install()[0], 2)
         self.assertFalse(self.prefix.exists())

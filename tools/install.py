@@ -19,6 +19,7 @@ MANIFEST = "installation.json"
 SHELL_FILES = {".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"}
 SHELL_MODULES = {"shell/modules/context.sh", "shell/modules/git.sh"}
 SHELL_CORE = {"shell/core/activation.sh", "shell/core/deactivation.sh"}
+PROFILE_FILES = {"profiles/minimal.json", "profiles/git.json", "profiles/php.json", "profiles/shell.json"}
 LOCAL_SKILL_FILES = {"skills/project-onboarding/SKILL.md"}
 PORTABLE_SKILLS = {
     "coding-simplicity",
@@ -84,7 +85,7 @@ def portable_skill_path(name: str) -> bool:
 
 def installation_path(name: str) -> bool:
     return (name in {"LICENSE", "bin/agent-dotfiles", "libexec/agent-dotfiles", PORTABLE_SKILL_MANIFEST}
-            | SHELL_FILES | SHELL_MODULES | SHELL_CORE | LOCAL_SKILL_FILES
+            | SHELL_FILES | SHELL_MODULES | SHELL_CORE | PROFILE_FILES | LOCAL_SKILL_FILES
             or runtime_path(name) or portable_skill_path(name))
 
 
@@ -142,7 +143,7 @@ def install(source: Path, revision: str, prefix: Path, *, preview: bool = False)
     required = ({"LICENSE", "bin/agent-dotfiles", "agent_dotfiles/__init__.py",
                  "agent_dotfiles/cli.py", PORTABLE_SKILL_MANIFEST}
                 | SHELL_FILES | SHELL_MODULES | SHELL_CORE | LOCAL_SKILL_FILES
-                | PORTABLE_SKILL_FILES)
+                | PROFILE_FILES | PORTABLE_SKILL_FILES)
     if not required.issubset(paths):
         raise SetupError("tracked runtime files are missing")
     contents = {}
@@ -218,6 +219,8 @@ def verify(prefix: Path) -> dict:
                                     or not SHELL_MODULES.issubset(files)
                                     or not SHELL_FILES.issubset(files)):
         raise SetupError("incomplete shell lifecycle manifest")
+    if set(files) & PROFILE_FILES and not PROFILE_FILES.issubset(files):
+        raise SetupError("incomplete capability profile manifest")
     portable_entries = {name for name in files
                         if name == PORTABLE_SKILL_MANIFEST or portable_skill_path(name)}
     if portable_entries and not (LOCAL_SKILL_FILES | {PORTABLE_SKILL_MANIFEST}

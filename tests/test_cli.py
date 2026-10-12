@@ -75,6 +75,31 @@ class AgentDotfilesCliTest(unittest.TestCase):
         self.assertEqual(report["optional"]["fd"]["executable"], "fdfind")
         self.assertTrue(report["optional"]["fd"]["available"])
 
+    def test_doctor_reports_explicit_profiles_without_host_mutation(self) -> None:
+        self.executable("rg", "pass")
+        self.executable("git", "pass")
+        code, report = self.cli("doctor", "--profile", "php", "--profile", "shell", "--strict")
+        self.assertEqual(code, 0)
+        self.assertEqual([profile["name"] for profile in report["profiles"]], ["php", "shell"])
+        php = report["profiles"][0]
+        self.assertTrue(php["ready"])
+        self.assertEqual(php["missing_required"], [])
+        self.assertIn("jq", php["unavailable"])
+        shell = report["profiles"][1]
+        strace = next(tool for tool in shell["tools"] if tool["name"] == "strace")
+        self.assertEqual(strace["role"], "optional")
+        self.assertIn("platform_supported", strace)
+        self.assertEqual(sorted(path.name for path in self.tools.iterdir()), ["git", "rg"])
+
+    def test_doctor_profile_missing_required_is_strict_only(self) -> None:
+        code, report = self.cli("doctor", "--profile", "git")
+        self.assertEqual(code, 0)
+        self.assertFalse(report["profiles"][0]["ready"])
+        self.assertEqual(report["profiles"][0]["missing_required"], ["git"])
+        code, report = self.cli("doctor", "--profile", "git", "--strict")
+        self.assertEqual(code, 2)
+        self.assertEqual(report["profiles"][0]["missing_required"], ["git"])
+
     def test_files_preserves_spaces_and_newlines(self) -> None:
         self.executable("rg", "import sys\nsys.stdout.buffer.write(b'normal path.php\\0name\\nwith newline.php\\0')")
         code, report = self.cli("files", "--root", str(self.project))

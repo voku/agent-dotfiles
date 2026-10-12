@@ -74,6 +74,7 @@ docs/                concise contracts, examples and historical evidence links
 ## What works now
 
 - Read-only `doctor` inventory for `rg`, `git`, `jq`, `fd`/`fdfind`, `shellcheck`, `strace`, `hyperfine`.
+- Explicit `minimal`, `git`, `php`, and `shell` capability profiles. They are packaged JSON declarations for a read-only `doctor` report, never shell hooks, installers, aliases, or automatic routing.
 - Bounded file discovery, using direct `rg --files --null` by default or explicit `fd`/`fdfind`.
 - Bounded Git status, using `git status --porcelain=v1 -z` with rename/copy paths decoded in order.
 - Read-only `workspace` identity: canonical Git checkout root, HEAD, branch/detached state, local tool path/version and bounded original status entries. The requested root must belong to the reported checkout; inherited `GIT_DIR`, `GIT_WORK_TREE` and `GIT_INDEX_FILE` overrides are refused. HEAD is checked before and after the scan, but the worktree scan is not atomic; truncated status exits 3 and never claims a clean tree. Unavailable HEAD and invalid repository roots produce distinct errors. The reported tool path is not a verified installation signature.
@@ -115,6 +116,7 @@ From the checkout:
 ```sh
 ./bin/agent-dotfiles doctor
 ./bin/agent-dotfiles doctor --strict
+./bin/agent-dotfiles doctor --profile php --profile git
 ./bin/agent-dotfiles files --root . --limit 50
 ./bin/agent-dotfiles git-status --root . --limit 50
 ./bin/agent-dotfiles workspace --root . --limit 50
