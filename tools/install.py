@@ -24,7 +24,7 @@ CURRENT_SHELL_PAYLOAD = SHELL_ENTRYPOINTS | SHELL_ALIASES | REDPILL_MODULES | RE
 # Retain these identifiers only to verify and remove older pinned installations.
 LEGACY_SHELL_MODULES = {"shell/modules/context.sh", "shell/modules/git.sh"}
 LEGACY_SHELL_CORE = {"shell/core/activation.sh", "shell/core/deactivation.sh"}
-PROFILE_FILES = {"profiles/minimal.json", "profiles/git.json", "profiles/php.json", "profiles/shell.json"}
+PROFILE_FILES = {"profiles/minimal.json", "profiles/git.json", "profiles/php.json", "profiles/shell.json", "profiles/debug.json"}
 LOCAL_SKILL_FILES = {"skills/project-onboarding/SKILL.md"}
 PORTABLE_SKILLS = {
     "coding-simplicity",
