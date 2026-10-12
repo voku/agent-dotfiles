@@ -223,6 +223,7 @@ class InstallationTest(unittest.TestCase):
                                   'agent_deactivate; [ "${AGENT_DOTFILES_HOME+x}" != x ]; '
                                   '! typeset -f agent_read >/dev/null 2>&1',
                                   "consumer", str(prefix), str(project)]))
+            self.assertEqual(json.loads(behaviors[-1])["content"], "answer = 42\n")
             run([frontend, "verify", *arguments])
             run([frontend, "uninstall", *arguments])
             self.assertFalse(prefix.exists())
