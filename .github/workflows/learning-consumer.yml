@@ -71,6 +71,18 @@ jobs:
               --output-dir "$evidence/recall" \
               > "$evidence/recall-compile.txt" 2>&1
           )
+          # Verify that agent-loop itself resolves the manifest from project
+          # configuration, not merely because the CLI was passed a path.
+          php -r '
+            require $argv[1];
+            $actual = (new \voku\AgentLoop\ProjectLayout($argv[2]))->recallDocumentManifests();
+            if ($actual !== [$argv[3]]) {
+                fwrite(STDERR, "Owner did not resolve project-local Recall manifest.\n");
+                exit(2);
+            }
+            echo $actual[0], "\n";
+          ' "$owner/vendor/autoload.php" "$project" "$project/docs/recall-documents.json" \
+            > "$evidence/configured-recall-path.txt"
           grep -F 'Validated agent learning root:' "$evidence/learning-validation.txt"
           grep -R -F -q 'One owner per file' "$evidence/recall"
           grep -R -F -q 'No implicit' "$evidence/recall" || grep -R -F -q 'private-prefix' "$evidence/recall"
