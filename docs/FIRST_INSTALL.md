@@ -1,7 +1,9 @@
 # First install: developer tool capability plan (S0)
 
-The current `firstInstall.sh` is **read-only**. It detects binaries and supported
-platform package managers and prints one JSON recommendation. It does not
+The current `firstInstall.sh` is **read-only**. Without an explicit profile
+it plans the universal Git, search and utility baseline, not a special
+programming environment. It detects binaries and supported platform
+package managers and prints one JSON recommendation. It does not
 execute a package manager, install tools, change HOME or global Git, or contact
 the network. Installation of the agent-dotfiles runtime is separately handled by
 [`install.sh`](INSTALLATION.md), using reviewed full Git commits.
@@ -14,7 +16,11 @@ the network. Installation of the agent-dotfiles runtime is separately handled by
 
 `firstInstall.sh` uses its own small **planning selections** for package
 recommendations. They are not files, local configuration, shell startup scripts
-or the diagnostic `profiles/*.json` catalog used by `doctor`:
+or the diagnostic `profiles/*.json` catalog used by `doctor`. The baseline
+is the default in both commands; legacy `doctor --profile minimal|git|shell`
+views do not need selecting to use Git/search/shell capabilities.
+`doctor --profile php` and `plan --profile php` both diagnose `php` and
+`composer`, but preserve their different JSON schemas and roles:
 
 - `minimal`: Python 3, Git, ripgrep, jq, curl.
 - `php`: minimal plus PHP and Composer (detected only: no assumed correct system PHP packages).

@@ -41,7 +41,7 @@ class PublicDocumentationTest(unittest.TestCase):
     def test_readme_keeps_the_safe_entry_points_visible(self) -> None:
         readme = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
         for expected in (
-            "doctor --profile minimal",
+            "./bin/agent-dotfiles doctor",
             "firstInstall.sh plan",
             "docs/FIRST_INSTALL.md",
             "docs/INSTALLATION.md",

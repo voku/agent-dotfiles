@@ -25,12 +25,19 @@ anything:
 It recommends only missing tools from the selected profile and leaves any
 package action for explicit review. See [the first-install plan](docs/FIRST_INSTALL.md).
 
-The `minimal` runtime profile is the recommended next step: it reports only
-the capabilities needed for the basic workflow and does not change the shell.
+The default `doctor` inventory already includes the universal Git and search
+baseline. No `minimal`, `git` or `shell` profile selection is needed for
+coding or administration work. Their existing `--profile` names remain
+available as backwards-compatible diagnostic views, not activation modes.
 
 ```sh
-./bin/agent-dotfiles doctor --profile minimal
+./bin/agent-dotfiles doctor
+./bin/agent-dotfiles doctor --profile php
 ```
+
+The optional PHP diagnostic checks whether `php` is available (required for
+PHP work) and whether `composer` is available (useful but not mandatory for
+every PHP project). A diagnostic never runs these discovered executables.
 
 For an explicit, temporary Bash session, source the profile and remove it when
 the task ends:
@@ -62,7 +69,7 @@ instead of fragile interactive aliases. No command overrides `git` or `rg`.
 | You need the complete patch for one literal file | `agent-dotfiles git-patch` or `agent_patch` |
 | You need a bounded checkout identity and current worktree state | `agent-dotfiles workspace` or `agent_workspace` |
 | You need PHP symbols or callers | [agent-map](https://github.com/voku/agent-map) through the current agent-loop workflow |
-| You need a capability/readiness report | `agent-dotfiles doctor --profile minimal` |
+| You need a capability/readiness report | `agent-dotfiles doctor` (add `--profile php` for PHP-specific readiness) |
 
 The profile is optional. Do not rerun a successful native command just to use a
 helper. Search output can be incomplete: exit code `3` and `truncated: true`
@@ -94,8 +101,9 @@ before using it in a consumer environment.
 - Stable JSON envelopes, meaningful exit statuses, and visible truncation.
 - Read-only capability discovery for native and optional tools, including
   `fd`/`fdfind`, `jq`, `curl`, `ShellCheck`, `strace`, and `hyperfine`.
-- Explicit `minimal`, `git`, `php`, and `shell` profiles. They are diagnostic
-  declarations, not installers, plugin loaders, aliases, or automatic routing.
+- A common baseline plus opt-in PHP diagnostics; legacy `minimal`, `git`, and
+  `shell` views remain available. None is an installer, plugin loader, alias,
+  or automatic routing mechanism.
 - A project-onboarding skill for PHP work plus a selected, pinned set of
   portable skills from [agent-skills](https://github.com/voku/agent-skills).
 
