@@ -1,5 +1,13 @@
 # Selected portable skills
 
+## Consumers and maintainers
+
+Consumers use the reviewed skills already carried by a pinned agent-dotfiles
+installation; they do not synchronize this directory or install anything
+globally. Maintainers update the selected snapshot only through the local,
+pinned process below. The canonical source and semantic ownership remain in
+[`voku/agent-skills`](https://github.com/voku/agent-skills).
+
 `agent-dotfiles` keeps its product-specific `project-onboarding` skill beside a
 small, reviewed selection from [`voku/agent-skills`](https://github.com/voku/agent-skills).
 The selection gives a fresh coding agent useful engineering guidance without
@@ -41,9 +49,19 @@ copied diff, then commit the synchronized result. A changed target file is a
 refusal, not a silent overwrite. To deliberately advance an existing snapshot,
 repeat the reviewed dry run with `--replace`; it accepts only the exact prior
 provenance manifest and byte-identical selected files, then replaces the same
-selected file set. Consumer installation uses the ordinary pinned agent-dotfiles
-installer; it verifies every copied file and the provenance manifest before
-activation or removal.
+selected file set:
+
+```sh
+python3 tools/sync_portable_skills.py \
+  --source /absolute/trusted/agent-skills \
+  --revision APPROVED_AGENT_SKILLS_FULL_COMMIT_SHA \
+  --destination /absolute/agent-dotfiles \
+  --replace --dry-run
+```
+
+Consumer installation uses the ordinary pinned agent-dotfiles installer; it
+verifies every copied file and the provenance manifest before activation or
+removal.
 
 ## Consumer projection
 

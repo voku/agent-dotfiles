@@ -1,5 +1,16 @@
 # Security and operational contract
 
+## Reporting a vulnerability
+
+Do not publish exploit details in an issue. Use GitHub's
+[private vulnerability reporting form](https://github.com/voku/agent-dotfiles/security/advisories/new)
+for this repository. If that form is unavailable, contact the maintainer
+privately through the [voku GitHub profile](https://github.com/voku). Include a
+minimal reproduction, affected revision, impact, and any safe mitigation you
+have verified. Do not include credentials or sensitive source material.
+
+## Operational boundaries
+
 - **Read-only CLI** operations: no external installer, network fetch, `sudo`,
   `chsh`, `eval`, startup-file loading, or changes to shell/Git configuration.
 - Shell activation is separate and explicit: source only the reviewed agent-owned
