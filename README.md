@@ -124,6 +124,13 @@ and [full-cycle evidence](docs/FULL_CYCLE.md) for methods and limits.
 
 ## Documentation and community
 
+The [repository layout and ownership guide](docs/REPOSITORY_LAYOUT.md) separates
+consumer-installed tools from source-only examples and documentation. See
+[the product boundary](docs/decisions/0001-product-boundaries.md):
+`agent-dotfiles` provides an optional execution environment; `agent-loop`
+independently owns task workflow, Learning, Recall and memory. Neither
+is installed or configured implicitly by the other.
+
 Start with the [documentation index](docs/README.md). The public project paths
 are [contributing](CONTRIBUTING.md), [code of conduct](CODE_OF_CONDUCT.md),
 [security reporting](docs/SECURITY.md), and [support](SUPPORT.md). The project

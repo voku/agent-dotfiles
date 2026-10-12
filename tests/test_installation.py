@@ -89,6 +89,45 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(report["entries"], manifest["files"])
         self.assertEqual(self.command("uninstall")[0], 0)
 
+    def test_existing_project_learning_is_never_shipped_as_environment(self):
+        # The source repository may run agent-loop itself. Do not forbid that:
+        # assert the immutable installed payload is independent of these files.
+        project_only = {
+            ".agent-loop/init.json": '{"version": 1}\n',
+            ".agent-loop/learning/config.json": '{"schema_version": "1.0"}\n',
+            ".agent-loop/learning/findings/validated/fixture.json": '{"id": "fixture"}\n',
+            "MEMORY.md": "# Project-maintainer knowledge\n",
+            "docs/recall-documents.json": '{"schema_version": "1.0", "documents": []}\n',
+        }
+        for relative, content in project_only.items():
+            file = self.source / relative
+            file.parent.mkdir(parents=True, exist_ok=True)
+            file.write_text(content, encoding="utf-8")
+        self.git("add", "--", *project_only)
+        self.git(
+            "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+            "commit", "-qm", "Source checkout legitimately runs agent-loop",
+        )
+        revision = self.git("rev-parse", "HEAD").strip()
+        status, plan = self.command(
+            "plan", "--source", str(self.source), "--revision", revision
+        )
+        self.assertEqual(status, 0, plan)
+        self.assertTrue(plan["ok"])
+        for relative in project_only:
+            with self.subTest(path=relative):
+                self.assertTrue((self.source / relative).is_file())
+                self.assertNotIn(relative, plan["entries"])
+        self.assertEqual(self.install(revision)[0], 0)
+        manifest = json.loads((self.prefix / "installation.json").read_text())
+        self.assertEqual(set(plan["entries"]), set(manifest["files"]))
+        for relative in project_only:
+            with self.subTest(path=relative):
+                self.assertNotIn(relative, manifest["files"])
+                self.assertFalse((self.prefix / relative).exists())
+        self.assertEqual(self.command("verify")[0], 0)
+        self.assertEqual(self.command("uninstall")[0], 0)
+
     def test_plan_refuses_bad_pin_dirty_checkout_and_occupied_prefix(self):
         self.assertEqual(self.command("plan", "--source", str(self.source),
                                       "--revision", self.revision[:8])[0], 2)

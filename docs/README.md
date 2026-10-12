@@ -22,6 +22,7 @@
 - [Mutation-testing scope](MUTATION_TESTING.md)
 - [Full-cycle maintenance evidence](FULL_CYCLE.md)
 - [Controlled evaluation record](EVALUATION_2026-10-11.md)
+- [Steady-state multi-task evaluation protocol](STEADY_STATE_EVALUATION.md)
 - [Follow-up momentum experiments](MOMENTUM_EXPERIMENTS.md)
 
 ## Historical implementation notes
@@ -32,3 +33,9 @@
 
 For contribution, conduct, security reporting, and support, see the public links
 in the [repository README](../README.md).
+
+## Repository ownership and decisions
+
+- [Runtime versus maintainer-owned paths](REPOSITORY_LAYOUT.md).
+- [Product boundaries (ADR 0001)](decisions/0001-product-boundaries.md).
+- [Optional agent-loop integration and owner contract](AGENT_LOOP.md).

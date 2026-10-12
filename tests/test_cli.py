@@ -373,7 +373,7 @@ class AgentDotfilesCliTest(unittest.TestCase):
         self.assertNotIn("patch", report)
 
     def test_aliases_are_optional_and_read_only(self) -> None:
-        config_path = PROJECT / "config" / "gitconfig.agent.example"
+        config_path = PROJECT / "examples" / "gitconfig.agent.example"
         config_text = config_path.read_text(encoding="utf-8")
         self.assertNotIn("!", config_text.split("[alias]", 1)[1])
         self.assertNotIn("push", config_text.split("[alias]", 1)[1])

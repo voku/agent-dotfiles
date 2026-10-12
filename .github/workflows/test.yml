@@ -256,11 +256,52 @@ jobs:
           done
           test ! -e "$repo/.git/index.lock"
 
+          # Warm, multi-project contract: one installed prefix services a fresh
+          # second checkout. Fresh shell sessions are per task, installer is not.
+          other_repo="$root/another checkout [λ]"
+          mkdir -p "$other_repo"
+          git init -q "$other_repo"
+          printf 'second project\n' > "$other_repo/independent.txt"
+          git -C "$other_repo" add -- independent.txt
+          git -C "$other_repo" -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm 'second baseline'
+          other_head="$(git -C "$other_repo" rev-parse HEAD)"
+          env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc" || exit $?; agent_workspace --root "$2"' \
+            warm-bash "$prefix" "$other_repo" > "$root/warm-other-bash.json"
+          env -u ZDOTDIR zsh -f -c '. "$1/.zshrc" || exit $?; agent_workspace --root "$2"' \
+            warm-zsh "$prefix" "$other_repo" > "$root/warm-other-zsh.json"
+          python3 - "$root/warm-other-bash.json" "$root/warm-other-zsh.json" "$other_repo" "$other_head" "$prefix" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          bash_report, zsh_report, root, head, prefix = sys.argv[1:]
+          for pathname in (bash_report, zsh_report):
+              report = json.loads(Path(pathname).read_text())
+              assert report["schema"] == "agent-dotfiles.v1.workspace", report
+              assert report["root"] == root and report["head"] == head, report
+              assert report["tool_home"] == prefix, report
+              assert report["clean"] is True and report["truncated"] is False, report
+              assert report["changes"] == [], report
+          PY
+          # The earlier checkout remains dirty/truncated, proving we did not
+          # accidentally cache the second checkout's clean status as global state.
+          earlier_status=0
+          "$prefix/bin/agent-dotfiles" workspace --root "$repo" --limit 1 > "$root/warm-first-after-other.json" || earlier_status=$?
+          python3 - "$root/warm-first-after-other.json" "$earlier_status" "$repo" "$head" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          report = json.loads(Path(sys.argv[1]).read_text())
+          assert int(sys.argv[2]) == 3, report
+          assert report["root"] == sys.argv[3] and report["head"] == sys.argv[4], report
+          assert report["clean"] is None and report["truncated"] is True, report
+          PY
+          cmp "$root/manifest.json" "$prefix/installation.json"
+
           ./install.sh verify --prefix "$prefix" --revision "$CANDIDATE_SHA" > "$root/verify-after.json"
           ./install.sh uninstall --prefix "$prefix" --revision "$CANDIDATE_SHA" > "$root/uninstall.json"
           python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["ok"] is True and r["operation"] == "uninstall" and r["source_revision"] == sys.argv[2]' "$root/uninstall.json" "$CANDIDATE_SHA"
           test ! -e "$prefix"
-          echo "Verified candidate $CANDIDATE_SHA: immutable install preview and manifest parity, Bash/Zsh doctor + native Git workspace identity, post-use verification, uninstall" >> "$GITHUB_STEP_SUMMARY"
+          echo "Verified candidate $CANDIDATE_SHA: immutable install preview and manifest parity, Bash/Zsh doctor + native Git workspace identity, warm reuse across isolated projects, post-use verification, uninstall" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Retain exact-commit cold consumer receipts
         if: always()
