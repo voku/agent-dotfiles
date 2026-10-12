@@ -1,0 +1,98 @@
+{
+  "version": "2.0.0",
+  "skill": {
+    "name": "php-static-analysis",
+    "version": "2.0.0",
+    "description": "Implementation guidance for making PHP code provably typed under a strict static analyzer.",
+    "author": "Agent Skills Team",
+    "license": "MIT",
+    "keywords": [
+      "php",
+      "static-analysis",
+      "phpstan",
+      "psalm",
+      "type-precision",
+      "array-shape",
+      "class-string",
+      "baseline"
+    ]
+  },
+  "name": "php-static-analysis",
+  "description": "Native types first, precise shapes and generics, honest contracts, root-cause typing, scoped ignores, and analyzer extensions.",
+  "license": "MIT",
+  "author": {
+    "name": "Agent Skills Team",
+    "url": "https://github.com/AsyrafHussin/agent-skills"
+  },
+  "tags": [
+    "php",
+    "sa-contract-honesty",
+    "sa-native-types-first",
+    "sa-root-cause-typing",
+    "sa-scoped-ignores-extensions",
+    "sa-shape-precision",
+    "static-analysis"
+  ],
+  "categories": [
+    {
+      "id": "sa-native-types-first",
+      "name": "Native Types First",
+      "priority": "critical",
+      "prefix": "sa-native-types-first",
+      "count": 1,
+      "description": "Prefer enforceable native PHP types and strict comparisons before PHPDoc workarounds"
+    },
+    {
+      "id": "sa-shape-precision",
+      "name": "Shape & Generic Precision",
+      "priority": "critical",
+      "prefix": "sa-shape-precision",
+      "count": 1,
+      "description": "Use precise shapes, lists, generics, class-strings, and refined strings instead of loose mixed values"
+    },
+    {
+      "id": "sa-contract-honesty",
+      "name": "Contract Honesty",
+      "priority": "high",
+      "prefix": "sa-contract-honesty",
+      "count": 1,
+      "description": "Preserve correct strict contracts and prove boundary validity instead of widening types to silence analysis"
+    },
+    {
+      "id": "sa-root-cause-typing",
+      "name": "Root-Cause Typing",
+      "priority": "high",
+      "prefix": "sa-root-cause-typing",
+      "count": 1,
+      "description": "Type producers and factories at the source instead of repeating inline assertions at callers"
+    },
+    {
+      "id": "sa-scoped-ignores-extensions",
+      "name": "Scoped Ignores & Analyzer Extensions",
+      "priority": "medium",
+      "prefix": "sa-scoped-ignores-extensions",
+      "count": 1,
+      "description": "Keep suppressions narrow and teach analyzers reusable dynamic behavior through supported extensions"
+    }
+  ],
+  "references": [],
+  "meta": {
+    "created": "2026-08-07",
+    "last_updated": "2026-09-14",
+    "rule_count": 5,
+    "structure_version": "2.0",
+    "canonical_sources": [
+      "SKILL.md",
+      "rules/"
+    ],
+    "compatibility": {
+      "platforms": [
+        "GitHub Copilot",
+        "Codex",
+        "Claude Code",
+        "Cursor",
+        "Gemini CLI"
+      ]
+    }
+  }
+}

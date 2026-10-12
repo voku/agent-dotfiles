@@ -45,3 +45,19 @@ https://git-scm.com/docs/git-log , https://git-scm.com/docs/git-blame .
 
 **Tool inventory is detection, not endorsement.** `doctor` reports optional
 binaries; their mere presence does not change workflow routing or authorization.
+
+## Explicit coding-agent profiles
+
+`profiles/*.json` defines the non-executable `minimal`, `git`, `php`, and
+`shell` profiles. Select one or more through `agent-dotfiles doctor --profile`.
+The JSON report states each declared required/optional tool, observed executable,
+unavailable capability, and platform limit. It never installs a package, changes
+PATH, sources user/project files, adds an alias, or picks a command for the
+agent. `--strict` also fails when a selected profile lacks a required tool;
+optional tools remain diagnostic-only.
+
+For project commands, choose noninteractive, no-color and no-progress options
+only after verifying the tool's actual supported flags. Keep error locations,
+rule identifiers, complete selected diffs, and enough failure trace to diagnose
+the next step. Output-byte reductions do not establish model-token or task-quality
+improvements.
