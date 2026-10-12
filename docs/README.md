@@ -22,6 +22,7 @@
 - [Mutation-testing scope](MUTATION_TESTING.md)
 - [Full-cycle maintenance evidence](FULL_CYCLE.md)
 - [Controlled evaluation record](EVALUATION_2026-10-11.md)
+- [Steady-state multi-task evaluation protocol](STEADY_STATE_EVALUATION.md)
 - [Follow-up momentum experiments](MOMENTUM_EXPERIMENTS.md)
 
 ## Historical implementation notes

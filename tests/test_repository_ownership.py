@@ -18,6 +18,7 @@ class RepositoryOwnershipTest(unittest.TestCase):
         for name in (
             "MEMORY.md",
             "docs/REPOSITORY_LAYOUT.md",
+            "docs/STEADY_STATE_EVALUATION.md",
             "docs/decisions/0001-product-boundaries.md",
             ".agent-loop/init.json",
             ".agent-loop/learning/config.json",
