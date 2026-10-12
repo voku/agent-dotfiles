@@ -169,8 +169,8 @@ def sync(source: Path, revision: str, destination: Path, *, preview: bool = Fals
          replace: bool = False) -> dict[str, object]:
     source = regular_directory(source, "source")
     destination = regular_directory(destination, "destination")
-    if source == destination:
-        raise SyncError("source and destination must be separate checkouts")
+    if source == destination or source in destination.parents or destination in source.parents:
+        raise SyncError("source and destination must be separate, non-overlapping checkouts")
     files = source_files(source, revision)
     manifest = {
         "schema": SCHEMA,

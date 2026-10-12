@@ -94,6 +94,26 @@ class PortableSkillSyncTest(unittest.TestCase):
         self.assertEqual(self.sync()[0], 2)
         self.assertEqual(target.read_text(), "local change\n")
 
+    def test_sync_refuses_nested_or_parent_destination_without_mutation(self):
+        nested = self.source / "nested-consumer"
+        nested.mkdir()
+        original_destination = self.destination
+        before = {p.relative_to(self.source): p.read_bytes()
+                  for p in self.source.rglob("*") if p.is_file()}
+        try:
+            for destination in (nested, self.root):
+                with self.subTest(destination=destination):
+                    self.destination = destination
+                    status, report = self.sync()
+                    self.assertEqual(status, 2, report)
+                    self.assertFalse(report["ok"])
+                    self.assertIn("non-overlapping", report["error"])
+                    self.assertFalse((destination / "skills").exists())
+                    self.assertEqual(before, {p.relative_to(self.source): p.read_bytes()
+                                              for p in self.source.rglob("*") if p.is_file()})
+        finally:
+            self.destination = original_destination
+
     def test_sync_refuses_a_supplied_symlink_root(self):
         linked = self.root / "linked-source"
         linked.symlink_to(self.source, target_is_directory=True)
