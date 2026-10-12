@@ -30,8 +30,16 @@ instruction or policy files belongs to agent-loop and requires its own review.
 
 - For shell/CLI integration changes run `bashunit test tests/shell --strict` (Bashunit 0.50.1) alongside the Python suite. Bashunit does not replace Python contract tests.
 
-## Project memory and architectural decisions
+## Responsibility boundary
 
-Read [MEMORY.md](MEMORY.md) and [docs/REPOSITORY_LAYOUT.md](docs/REPOSITORY_LAYOUT.md) before changing activation, profile meaning or install paths. An approved project-specific decision belongs under `docs/decisions/`, not in global agent preferences. This checkout's `.agent-loop/init.json` points at a **project-local** Learning root; do not invent findings or claim a completed Learning/Recall workflow without executing its owner contracts. Review validated Learning records for private data before committing.
+`agent-dotfiles` owns optional tools and the shell execution environment only.
+`agent-loop` is an independently selected, separately installed workflow owner
+for planning, sessions, review, Learning, Recall and memory. Do not create a
+parallel project memory store, promote Learning findings, or modify Loop policy
+as part of an environment change. See
+[repository layout](docs/REPOSITORY_LAYOUT.md) and
+[agent-loop integration](docs/AGENT_LOOP.md).
 
-Before recommending any automatic alias/default activation, re-run the independent agent task comparison owned by [evaluation #12](https://github.com/voku/agent-dotfiles/issues/12). Correctness and complete evidence outrank fewer bytes of output.
+Before recommending any default tool/profile activation, use the controlled
+real-task evaluation owned by [#12](https://github.com/voku/agent-dotfiles/issues/12).
+Correctness and complete evidence outrank output-byte reductions.

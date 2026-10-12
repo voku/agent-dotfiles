@@ -9,7 +9,6 @@ This is an **agent environment**, not a general-purpose dotfile manager. The che
 | Optional curated skills | `skills/project-onboarding/`, selected portable `skills/`, `skills/portable-skills.json` | Pinned payload; portable skill content is owned upstream and is never silently installed into a host |
 | Repository-only build/test tools | `tools/`, `tests/`, `.github/`, `mutation.toml`, `requirements-mutation.txt` | Used to develop and validate this repository; not consumer dotfiles |
 | Examples and maintenance documentation | `examples/gitconfig.agent.example`, `docs/`, `README.md`, `AGENTS.md` | Source references only; the Git alias example is **not** installed or activated |
-| Reviewed project knowledge | `MEMORY.md`, `docs/decisions/`, `.agent-loop/init.json`, selected `.agent-loop/learning/` records | Versioned in this repository, not copied to a consumer's home |
 
 ## The currently confusing names
 
@@ -26,16 +25,21 @@ A future physical layout may group shipped payload under a single `dotfiles/` or
 
 Agent-specific defaults belong in **reviewed, opt-in, namespaced** shell behavior or narrow per-command Git options. Do not globally set `PAGER`, `GIT_PAGER`, `NO_COLOR`, `GIT_OPTIONAL_LOCKS` or replace common native commands merely to claim fewer output bytes. Preserve full patches, errors and truncation evidence.
 
-## Project-local workflow knowledge
+## External workflow owner: agent-loop
 
-`agent-loop` governs approved tasks, decisions, validation and Learning. This repo owns only its *own* versioned project knowledge:
+`agent-dotfiles` packages **only the optional tools and shell environment**.
+It does not ship `agent-loop`, a Loop project scaffold, `.agent-loop/` state,
+`MEMORY.md`, a Recall manifest, Learning records or rules for promoting findings.
+A host may use this environment to execute a *separately installed and pinned*
+`agent-loop`; Loop remains responsible for tasks, sessions, approvals, review,
+Learning, Recall and persisted project memory in the **consumer's actual project**.
+Its configuration and owner workflow are not copied into a consumer by the
+dotfiles installer. Consult the
+[documented integration boundary](AGENT_LOOP.md).
 
-- `MEMORY.md` indexes durable, reviewed rules with executable sources. The project registers it, together with approved ADRs, in `docs/recall-documents.json` for bounded Recall retrieval (document type `adr` is the current provider-compatible representation of reviewed project rules, not automatic approval).
-- `docs/decisions/` contains architectural decisions and tradeoffs.
-- `.agent-loop/init.json` and `.agent-loop/learning/config.json` select a project-local Learning root and register the repository's Recall manifest, following the upstream shape.
-- Only independently reviewed findings in `.agent-loop/learning/findings/validated/*.json` are eligible for Git. Raw task/session data and derived caches are excluded by `.gitignore`.
-
-These files establish a **storage convention**, not proof that an agent-loop run has completed or automatically promoted learning. Follow the installed agent-loop version's actual `enter` / `workflow` / `learning` contracts. Do not fabricate approvals, completed sessions, findings or useful outcomes.
+Repository maintainers may independently adopt agent-loop for development
+work, but that is a maintainer workflow decision, not a feature or default
+installation behavior of this product.
 
 ## Product acceptance gate
 

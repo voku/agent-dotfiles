@@ -13,18 +13,3 @@ mutation-summary.md
 # Generated evaluations and release payloads belong in CI artifacts or pinned history.
 docs/benchmarks/
 docs/releases/
-
-# Project-local agent-loop state. Keep reviewed settings and validated findings.
-# Raw sessions, generated context, checkpoints and task history are not product data.
-/.agent-loop/*
-!/.agent-loop/init.json
-!/.agent-loop/learning/
-/.agent-loop/learning/*
-!/.agent-loop/learning/config.json
-!/.agent-loop/learning/findings/
-/.agent-loop/learning/findings/*
-!/.agent-loop/learning/findings/validated/
-/.agent-loop/learning/findings/validated/*
-!/.agent-loop/learning/findings/validated/*.json
-!/.agent-loop/learning/findings/validated/.gitkeep
-/.agent-loop/learning/history/
