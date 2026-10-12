@@ -68,6 +68,59 @@ Practical held-out workloads:
 - A misleading path with newlines, binary patch, or truncated output (safety and honest evidence; verify error detection).
 - An intentionally absent optional capability (degradation should be explicit and native fallback should work).
 
+## Bounded acceptance evidence: 2026-10-12
+
+Four useful cycles were completed from remote main
+`103bd188ae92b805823a204bb07ffbd7df679caa`, after confirming no open PRs and
+inspecting merged #51/#52 plus Redpill source
+`79333d8dda8131732e44574e0dc089a8b47f70cf`. Changes add lifecycle proof,
+complete onboarding commands, portable test execution and a controlled search
+comparison. The full multi-agent warm-task protocol above remains **unexecuted**.
+
+| Criterion | Observable evidence and scope |
+| --- | --- |
+| Onboarding | [Complete recipe](INSTALLATION.md#complete-fresh-project-walkthrough): explicit parent creation, pinned plan/install/verify, strict doctor, fresh Bash/Zsh activation, deactivate and uninstall. |
+| Reproducibility | [Two-consumer regression](../tests/test_installation.py): byte-identical manifests and source-read output at one pin, both consumers verified and removed. Equivalent behavior is for the same inputs/host, not identical absolute paths on different machines. |
+| Safety | The same regression snapshots HOME, project and source before/after; existing tests reject occupied prefixes and modified removals. [Ownership tests](../tests/test_repository_ownership.py) and tracked-state installation fixtures exclude Loop state and project memory. |
+| Compatibility | Require the **exact final PR commit**, not its base or synthetic merge, to pass [the entire matrix](../.github/workflows/test.yml). The final run URL/SHA and artifacts are recorded in the PR. Local validation alone cannot satisfy this gate. |
+| Usability | The current real Codex session explicitly installed and used the candidate below to verify a real Python-only-host regression: doctor, workspace, search, hashed read and the targeted test. This is one operator session, not an independently graded agent comparison. |
+| Value | The fixed search correctness oracle below measured 1/4 native vs 4/4 preset. Explicit native `--no-config` also scored 4/4; broader productivity and efficiency remain **INCONCLUSIVE**. |
+
+Consumer task pin: `1f7e809d173c1f36c22e31bf11d28a29a3a2ea45` (52 payload files).
+Codex session: `01a13056-e86b-76d2-bb41-41d9515b1b7f`; Loop source:
+`d1a6939a8ecb671dbe17f46e86a6fcdae63ef309`. Installed commands found
+`symlink_to(sys.executable)` at `tests/test_mutation_workflow.py:28`, retrieved
+lines 21–33 with whole-file digest
+`1135f22e41a7bcda9e1ad303c2be61fc6f52e70e3c40cddd40af4b7d1442729d`,
+and the representative verification test passed. Verify also passed after use;
+uninstall removed only the 52-file temporary consumer. No new LLM process or
+provider credentials were required. Final-commit CI independently repeats cold
+installation; the operator task pin is recorded separately and is not final CI.
+
+Predefined metric: exact case-sensitive literal match lines, stdout, stderr and
+exit status for `TOKEN` in a three-line `TOKEN / token / TOKEN` fixture.
+Four configurations: empty, `--ignore-case`, `--glob=!*.py`, `--max-count=1`.
+All arms use the same fixture, PATH, shell and arguments; only the invocation
+changes. Native configuration contamination causes an extra match, no matches,
+or a missing match respectively. The oracle is fixed expected text, not output
+copied from the treatment. No output-byte or timing proxy is graded.
+
+| Arm | Correct cases on local Bash | Interpretation |
+| --- | ---: | --- |
+| Plain native `rg` | 1/4 | Inherits deliberately supplied host configuration. |
+| Reviewed `agent_rg` preset | 4/4 | Isolates configuration per invocation. |
+| Native `rg --no-config` | 4/4 | Same correctness when isolation is explicit. |
+
+Reproduce with `python3 -m unittest discover -s tests -p test_shell_profiles.py -v`.
+The test emits all 12 raw command-result receipts per available shell as JSON;
+CI contract-test artifacts preserve them. Local versions: Python 3.11.2,
+Bash 5.2.15, ripgrep 15.2.0; Zsh is absent locally and required in CI.
+This demonstrates a narrow reliability property of an existing preset, not a
+unique algorithm or real-agent throughput advantage. Both guided implementation
+and Learning closeout used Loop; read-only Dream after meaningful steps reported
+0 evaluated guidance, 0 warnings, 0 decisions, 0 suppressed decisions and no
+outcome coverage. An empty Learning root is not evidence of effective Learning.
+
 ## Decision gate
 
 Publish per-task results and aggregate results, including all failed trials. Adopt by default only if the whole environment increases correctly completed tasks or otherwise demonstrates an independently verified improvement for the stated use case, without unacceptable safety/context loss. No compulsory global aliases or automatic package downloads on the strength of setup timing, CLI output size or a green CI alone. A null result is useful evidence against unnecessary wrappers; it does not imply specialized tooling has no value in other tasks. Claims about cross-task memory effectiveness belong to the agent-loop owner and require a separate controlled comparison.
