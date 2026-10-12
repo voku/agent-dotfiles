@@ -27,6 +27,7 @@ the task ends:
 
 ```sh
 source /absolute/path/to/agent-dotfiles/.bashrc
+agent_workspace --root /absolute/path/to/project
 agent_search 'function save(' --root /absolute/path/to/project --glob '*.php'
 agent_deactivate
 ```
@@ -44,6 +45,7 @@ namespaced helpers, exit statuses, and activation guarantees.
 | You need match coordinates and explicit completeness | `agent-dotfiles search` or `agent_search` |
 | You need exact lines tied to a file identity | `agent-dotfiles read` or `agent_read` |
 | You need the complete patch for one literal file | `agent-dotfiles git-patch` or `agent_patch` |
+| You need a bounded checkout identity and current worktree state | `agent-dotfiles workspace` or `agent_workspace` |
 | You need PHP symbols or callers | [agent-map](https://github.com/voku/agent-map) through the current agent-loop workflow |
 | You need a capability/readiness report | `agent-dotfiles doctor --profile minimal` |
 
