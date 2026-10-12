@@ -136,8 +136,8 @@ class PublicDocumentationTest(unittest.TestCase):
         instructions = (PROJECT_ROOT / "docs" / "PROJECT_ONBOARDING.md").read_text(
             encoding="utf-8"
         )
-        self.assertIn("test ! -e \\"$skill_target\\"", instructions)
-        self.assertIn("cp -R \\"$skill_source\\" \\"$skill_target\\"", instructions)
+        self.assertIn('test ! -e "$skill_target"', instructions)
+        self.assertIn('cp -R "$skill_source" "$skill_target"', instructions)
         source = PROJECT_ROOT / "skills" / "project-onboarding"
         script = (
             "set -eu; "
