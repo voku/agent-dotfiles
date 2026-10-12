@@ -4,6 +4,7 @@ from pathlib import Path
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import textwrap
 import unittest
@@ -22,6 +23,9 @@ class MutationWorkflowTest(unittest.TestCase):
             executable = root / 'cosmic-ray'
             executable.write_text('#!/bin/sh\nprintf \'%s\\n\' \'[{"mutations": []}, null]\'\n')
             executable.chmod(0o755)
+            # setup-python supplies this CI name; local hosts may only have
+            # python3. Supply it inside this fixture, never in the host PATH.
+            (root / 'python').symlink_to(sys.executable)
             summary = root / 'step-summary.md'
             result = subprocess.run(
                 ['bash', '-e', '-o', 'pipefail', '-c', script], cwd=root,

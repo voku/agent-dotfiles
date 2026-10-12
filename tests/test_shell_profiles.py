@@ -234,6 +234,40 @@ done
             self.assertEqual(report['schema'], 'agent-dotfiles.v1.read')
             self.assertEqual(report['content'], 'second\n')
 
+    @unittest.skipUnless(shutil.which('rg'), 'Real ripgrep needed for controlled comparison')
+    def test_controlled_rg_configuration_reliability(self):
+        """Predefined correctness metric: exact lines plus exit status, not bytes saved."""
+        project = self.root / 'project'
+        project.mkdir()
+        (project / 'sample.py').write_text('TOKEN\ntoken\nTOKEN\n')
+        config = self.root / 'rg-config'
+        oracle = (0, 'project/sample.py:1:TOKEN\nproject/sample.py:3:TOKEN\n', '')
+        cases = {'clean': '', 'case-folding': '--ignore-case\n',
+                 'file-exclusion': '--glob=!*.py\n', 'match-limit': '--max-count=1\n'}
+        arguments = ('--with-filename', '-n', '--color=never', '-F', '--', 'TOKEN', 'project')
+        arms = {'native': 'command rg "$@"', 'preset': 'agent_rg "$@"',
+                'explicit-native': 'command rg --no-config "$@"'}
+        for shell, profile in self.shells():
+            correct = dict.fromkeys(arms, 0)
+            receipts = []
+            for case, configuration in cases.items():
+                config.write_text(configuration)
+                for arm, invocation in arms.items():
+                    result = self.run_shell(shell, profile, '. "$1"; shift; ' + invocation,
+                                            arguments, {'RIPGREP_CONFIG_PATH': str(config)})
+                    observed = (result.returncode, result.stdout, result.stderr)
+                    matched = observed == oracle
+                    correct[arm] += int(matched)
+                    receipts.append({'case': case, 'arm': arm, 'correct': matched,
+                                     'exit': result.returncode, 'stdout': result.stdout,
+                                     'stderr': result.stderr})
+                    if arm != 'native':
+                        self.assertEqual(observed, oracle, (case, arm))
+                self.assertEqual(config.read_text(), configuration)
+            print(json.dumps({'evaluation': 'rg-config-reliability', 'shell': Path(shell).name,
+                              'correct': correct, 'cases_per_arm': len(cases), 'receipts': receipts}))
+            self.assertEqual(correct, {'native': 1, 'preset': 4, 'explicit-native': 4})
+
 
 if __name__ == '__main__':
     unittest.main()

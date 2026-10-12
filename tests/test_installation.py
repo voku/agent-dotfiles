@@ -175,6 +175,63 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.command("uninstall")[0], 0)
         self.assertFalse(self.prefix.exists())
 
+    def test_two_clean_consumers_reproduce_lifecycle_without_host_writes(self):
+        self.frontend_fixture()
+        for name in (".bashrc", ".zshrc", ".shellrc", ".exports", ".functions", ".aliases"):
+            shutil.copyfile(PROJECT / name, self.source / name)
+        self.git("add", ".")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", "real consumer profiles")
+        revision = self.git("rev-parse", "HEAD").strip()
+        user = self.root / "user home"
+        user.mkdir()
+        (user / ".gitconfig").write_text('[color]\n\tui = always\n')
+        (user / ".bashrc").write_text('printf unsafe-startup >&2; exit 91\n')
+        project = self.root / "fresh project 雪"
+        project.mkdir()
+        (project / "example.py").write_text("answer = 42\n")
+        (project / "AGENTS.md").write_text("Existing instructions\n")
+        environment = {**os.environ, "HOME": str(user)}
+        for name in ("BASH_ENV", "ENV", "AGENT_DOTFILES_HOME"):
+            environment.pop(name, None)
+
+        def snapshot(root):
+            return {p.relative_to(root).as_posix(): (p.read_bytes() if p.is_file() else None)
+                    for p in root.rglob("*")}
+
+        def run(arguments):
+            result = subprocess.run(arguments, cwd=project, env=environment,
+                                    capture_output=True, text=True, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(result.stderr, "")
+            return result.stdout
+
+        before = {root: snapshot(root) for root in (user, project, self.source)}
+        manifests, behaviors = [], []
+        for name in ("consumer one", "consumer two 雪"):
+            prefix = self.root / name
+            arguments = ["--prefix", str(prefix), "--revision", revision]
+            frontend = str(self.source / "install.sh")
+            plan = json.loads(run([frontend, "plan", *arguments]))
+            self.assertFalse(prefix.exists())
+            run([frontend, *arguments])
+            run([frontend, "verify", *arguments])
+            manifests.append((prefix / "installation.json").read_bytes())
+            self.assertEqual(plan["entries"], json.loads(manifests[-1])["files"])
+            behaviors.append(run([shutil.which("bash"), "--noprofile", "--norc", "-c",
+                                  'set -eu; . "$1/.bashrc"; agent_read example.py --root "$2" --start 1 --end 1; '
+                                  'agent_deactivate; [ "${AGENT_DOTFILES_HOME+x}" != x ]; '
+                                  '! typeset -f agent_read >/dev/null 2>&1',
+                                  "consumer", str(prefix), str(project)]))
+            self.assertEqual(json.loads(behaviors[-1])["content"], "answer = 42\n")
+            run([frontend, "verify", *arguments])
+            run([frontend, "uninstall", *arguments])
+            self.assertFalse(prefix.exists())
+            for root, expected in before.items():
+                self.assertEqual(snapshot(root), expected, str(root))
+        self.assertEqual(manifests[0], manifests[1])
+        self.assertEqual(behaviors[0], behaviors[1])
+
     def test_revision_must_be_full_and_match_head(self):
         for revision in (self.revision[:8], "0" * 40, "main"):
             with self.subTest(revision=revision):
