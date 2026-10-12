@@ -27,7 +27,11 @@ Agent-specific defaults belong in **reviewed, opt-in, namespaced** shell behavio
 
 ## External workflow owner: agent-loop
 
-`agent-dotfiles` packages **only the optional tools and shell environment**.
+`agent-dotfiles` distributes **optional tools, an explicit shell environment,
+and a pinned set of opt-in skill files**. This package owns the
+`project-onboarding` skill; curated portable skills remain sourced and maintained
+by `voku/agent-skills` and are distributed without silently activating them.
+Package contents and content ownership are separate from agent-loop governance.
 It does not ship `agent-loop`, a Loop project scaffold, `.agent-loop/` state,
 `MEMORY.md`, a Recall manifest, Learning records or rules for promoting findings.
 A host may use this environment to execute a *separately installed and pinned*
