@@ -114,6 +114,13 @@ class PortableSkillSyncTest(unittest.TestCase):
         self.git("remote", "set-url", "origin", "https://github.com/example/other-skills.git")
         self.assertEqual(self.sync()[0], 2)
 
+    def test_sync_refuses_a_symlinked_destination_component(self):
+        outside = self.root / "outside"
+        outside.mkdir()
+        (self.destination / "skills").symlink_to(outside, target_is_directory=True)
+        self.assertEqual(self.sync()[0], 2)
+        self.assertEqual(list(outside.iterdir()), [])
+
 
 if __name__ == "__main__":
     unittest.main()

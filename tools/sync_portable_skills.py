@@ -104,6 +104,16 @@ def source_files(source: Path, revision: str) -> dict[str, bytes]:
     return dict(sorted(files.items()))
 
 
+def destination_path(destination: Path, relative: str) -> Path:
+    """Return a target below destination only when no existing component is a symlink."""
+    target = destination
+    for part in PurePosixPath(relative).parts:
+        target /= part
+        if target.is_symlink():
+            raise SyncError("destination must not contain symlinked path components")
+    return target
+
+
 def sync(source: Path, revision: str, destination: Path, *, preview: bool = False) -> dict[str, object]:
     source = regular_directory(source, "source")
     destination = regular_directory(destination, "destination")
@@ -121,13 +131,13 @@ def sync(source: Path, revision: str, destination: Path, *, preview: bool = Fals
     manifest_bytes = (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode()
     expected = {**files, MANIFEST: manifest_bytes}
     for path, data in expected.items():
-        target = destination / path
+        target = destination_path(destination, path)
         if target.exists() or target.is_symlink():
             if not target.is_file() or target.is_symlink() or target.read_bytes() != data:
                 raise SyncError(f"refusing to replace existing portable skill file: {path}")
     if not preview:
         for path, data in expected.items():
-            target = destination / path
+            target = destination_path(destination, path)
             target.parent.mkdir(parents=True, exist_ok=True)
             if not target.exists():
                 target.write_bytes(data)

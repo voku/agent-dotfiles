@@ -286,6 +286,17 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.install()[0], 2)
         self.assertFalse(self.prefix.exists())
 
+    def test_portable_installation_requires_project_onboarding_skill(self):
+        self.assertEqual(self.install()[0], 0)
+        manifest = self.prefix / "installation.json"
+        data = json.loads(manifest.read_text())
+        skill = "skills/project-onboarding/SKILL.md"
+        (self.prefix / skill).unlink()
+        del data["files"][skill]
+        manifest.write_text(json.dumps(data))
+        self.assertEqual(self.command("verify")[0], 2)
+        self.assertEqual(self.command("uninstall")[0], 2)
+
     def test_modified_core_refuses_verify_and_uninstall(self):
         self.assertEqual(self.install()[0], 0)
         target = self.prefix / "shell/core/activation.sh"

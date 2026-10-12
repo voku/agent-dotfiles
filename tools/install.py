@@ -220,7 +220,8 @@ def verify(prefix: Path) -> dict:
         raise SetupError("incomplete shell lifecycle manifest")
     portable_entries = {name for name in files
                         if name == PORTABLE_SKILL_MANIFEST or portable_skill_path(name)}
-    if portable_entries and not ({PORTABLE_SKILL_MANIFEST} | PORTABLE_SKILL_FILES).issubset(files):
+    if portable_entries and not (LOCAL_SKILL_FILES | {PORTABLE_SKILL_MANIFEST}
+                                 | PORTABLE_SKILL_FILES).issubset(files):
         raise SetupError("incomplete portable skill manifest")
     directories = set()
     for name, entry in files.items():
