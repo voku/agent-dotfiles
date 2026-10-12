@@ -25,10 +25,18 @@ class RepositoryOwnershipTest(unittest.TestCase):
                 self.assertTrue((ROOT / name).is_file(), name)
                 self.assertFalse(installation_path(name), name)
 
-    def test_workflow_and_memory_belong_to_independent_agent_loop(self) -> None:
-        for name in (".agent-loop/init.json", "MEMORY.md", "docs/recall-documents.json"):
+    def test_external_workflow_state_is_never_installed(self) -> None:
+        # A maintainer may dogfood agent-loop in this very checkout.
+        # Source-file existence is NOT a product boundary: projection is.
+        for name in (
+            ".agent-loop/init.json",
+            ".agent-loop/learning/config.json",
+            ".agent-loop/learning/findings/validated/example.json",
+            "MEMORY.md",
+            "docs/recall-documents.json",
+            "docs/decisions/example.md",
+        ):
             with self.subTest(path=name):
-                self.assertFalse((ROOT / name).exists(), name)
                 self.assertFalse(installation_path(name), name)
 
     def test_git_example_path_is_copyable(self) -> None:
