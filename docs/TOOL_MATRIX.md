@@ -55,6 +55,9 @@ already checks Git and ripgrep and inventories optional tools. The existing
 `minimal`, `git`, and `shell` profile names remain backward-compatible
 diagnostic views, not separate environments users must opt into. The
 non-executable `php` profile adds PHP readiness and optional Composer detection.
+The opt-in `debug` profile reports `fd`/`fdfind`, ShellCheck, hyperfine and
+Linux-only strace. Debugging tools remain optional: `ready` indicates only
+required Git/search availability, not tracing permission or tool completeness.
 Select additional views through `agent-dotfiles doctor --profile`.
 The JSON report states each declared required/optional tool, observed executable,
 unavailable capability, and platform limit. It never installs a package, changes

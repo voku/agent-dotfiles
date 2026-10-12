@@ -96,6 +96,7 @@ class InstallationTest(unittest.TestCase):
                      ".redpill/modules/context.sh", ".redpill/modules/git.sh",
                      ".redpill/core/activation.sh", ".redpill/core/deactivation.sh",
                      "profiles/minimal.json", "profiles/git.json", "profiles/php.json", "profiles/shell.json",
+                     "profiles/debug.json",
                      "skills/project-onboarding/SKILL.md", "skills/portable-skills.json",
                      "skills/coding-simplicity/SKILL.md",
                      "skills/testing-best-practices/rules/cov-regression-first.md",
@@ -170,6 +171,12 @@ class InstallationTest(unittest.TestCase):
                                 capture_output=True, text=True, timeout=15)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(result.stdout)["schema"], "agent-dotfiles.v1.doctor")
+        debug = subprocess.run([str(self.prefix / "bin/agent-dotfiles"), "doctor", "--profile", "debug"],
+                               capture_output=True, text=True, timeout=15)
+        self.assertEqual(debug.returncode, 0, debug.stderr)
+        profile = json.loads(debug.stdout)["profiles"][0]
+        self.assertEqual(profile["name"], "debug")
+        self.assertIn("strace", {tool["name"] for tool in profile["tools"]})
         self.assertFalse(list(self.prefix.rglob("__pycache__")))
         self.assertEqual(self.command("verify")[0], 0)
         self.assertEqual(self.command("uninstall")[0], 0)

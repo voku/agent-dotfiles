@@ -1,0 +1,25 @@
+{
+  "schema": "agent-dotfiles.v1.profile",
+  "name": "debug",
+  "description": "Opt-in scoped diagnostics; optional tools are inspected, never executed.",
+  "required_tools": [
+    "rg",
+    "git"
+  ],
+  "optional_tools": [
+    "jq",
+    "curl",
+    "fd",
+    "shellcheck",
+    "hyperfine",
+    "strace"
+  ],
+  "platform_limits": {
+    "strace": {
+      "platforms": [
+        "linux"
+      ],
+      "reason": "strace is a Linux syscall tracer; presence does not prove ptrace permission or safe trace output."
+    }
+  }
+}

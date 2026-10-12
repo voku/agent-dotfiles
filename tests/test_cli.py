@@ -142,6 +142,53 @@ class AgentDotfilesCliTest(unittest.TestCase):
             self.assertNotIn("php", {tool["name"] for tool in selected["tools"]})
             self.assertNotIn("composer", {tool["name"] for tool in selected["tools"]})
 
+    def test_debug_profile_is_explicit_non_executing_and_platform_aware(self) -> None:
+        self.executable("rg", "raise RuntimeError('rg executed')")
+        self.executable("git", "raise RuntimeError('git executed')")
+        self.executable("fdfind", "raise RuntimeError('fdfind executed')")
+        self.executable("shellcheck", "raise RuntimeError('shellcheck executed')")
+        self.executable("hyperfine", "raise RuntimeError('hyperfine executed')")
+        self.executable("strace", "raise RuntimeError('strace executed')")
+
+        base_code, baseline = self.cli("doctor")
+        code, report = self.cli("doctor", "--profile", "debug", "--strict")
+        self.assertEqual(base_code, 0)
+        self.assertEqual(code, 0)
+        self.assertEqual({key: value for key, value in report.items() if key != "profiles"}, baseline)
+        self.assertEqual(len(report["profiles"]), 1)
+        debug = report["profiles"][0]
+        self.assertEqual(debug["name"], "debug")
+        self.assertTrue(debug["ready"])
+        self.assertEqual(debug["missing_required"], [])
+        tools = {tool["name"]: tool for tool in debug["tools"]}
+        self.assertEqual(set(tools), {"rg", "git", "jq", "curl", "fd", "shellcheck", "hyperfine", "strace"})
+        self.assertTrue(tools["fd"]["available"])
+        self.assertEqual(tools["fd"]["executable"], "fdfind")
+        self.assertTrue(tools["hyperfine"]["available"])
+        self.assertTrue(tools["shellcheck"]["available"])
+        self.assertTrue(tools["strace"]["available"])
+        self.assertEqual(tools["strace"]["platform_supported"], sys.platform == "linux")
+        self.assertEqual(tools["strace"]["platform_limit"]["platforms"], ["linux"])
+        self.assertEqual(tools["fd"]["role"], "optional")
+        self.assertEqual(tools["strace"]["role"], "optional")
+        self.assertEqual(sorted(path.name for path in self.tools.iterdir()),
+                         ["fdfind", "git", "hyperfine", "rg", "shellcheck", "strace"])
+
+    def test_debug_missing_optional_tools_does_not_fail_strict(self) -> None:
+        code, report = self.cli("doctor", "--profile", "debug", "--strict")
+        self.assertEqual(code, 2)
+        self.assertEqual(report["profiles"][0]["missing_required"], ["rg", "git"])
+
+        self.executable("rg", "raise RuntimeError('rg executed')")
+        self.executable("git", "raise RuntimeError('git executed')")
+        code, report = self.cli("doctor", "--profile", "debug", "--strict")
+        self.assertEqual(code, 0)
+        debug = report["profiles"][0]
+        self.assertTrue(debug["ready"], "ready describes the required base, not optional tracers")
+        self.assertEqual(debug["missing_required"], [])
+        for tool in ("fd", "shellcheck", "hyperfine", "strace"):
+            self.assertIn(tool, debug["unavailable"])
+
     def test_doctor_profile_missing_required_is_strict_only(self) -> None:
         code, report = self.cli("doctor", "--profile", "git")
         self.assertEqual(code, 0)

@@ -33,7 +33,7 @@ MAX_CONTEXT_FILE_BYTES = 16 * 1024 * 1024
 REQUIRED_TOOLS = ("rg", "git")
 OPTIONAL_TOOLS = ("jq", "curl", "fd", "shellcheck", "strace", "hyperfine", "ast-grep", "ctags", "difft", "delta")
 PROFILE_ONLY_TOOLS = ("php", "composer")
-PROFILE_NAMES = ("minimal", "git", "php", "shell")
+PROFILE_NAMES = ("minimal", "git", "php", "shell", "debug")
 PROFILE_SCHEMA = SCHEMA_VERSION + ".profile"
 
 

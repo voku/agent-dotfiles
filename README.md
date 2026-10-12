@@ -33,7 +33,13 @@ available as backwards-compatible diagnostic views, not activation modes.
 ```sh
 ./bin/agent-dotfiles doctor
 ./bin/agent-dotfiles doctor --profile php
+./bin/agent-dotfiles doctor --profile debug
 ```
+
+The opt-in debug diagnostic checks `fd`/`fdfind`, `shellcheck`, `hyperfine`,
+and Linux-only `strace` without executing them. All advanced debuggers are
+optional: `ready` and `--strict` reflect missing required Git/search tools,
+not whether every tracing utility exists or is permitted to run.
 
 The optional PHP diagnostic checks whether `php` is available (required for
 PHP work) and whether `composer` is available (useful but not mandatory for
@@ -101,9 +107,9 @@ before using it in a consumer environment.
 - Stable JSON envelopes, meaningful exit statuses, and visible truncation.
 - Read-only capability discovery for native and optional tools, including
   `fd`/`fdfind`, `jq`, `curl`, `ShellCheck`, `strace`, and `hyperfine`.
-- A common baseline plus opt-in PHP diagnostics; legacy `minimal`, `git`, and
-  `shell` views remain available. None is an installer, plugin loader, alias,
-  or automatic routing mechanism.
+- A common baseline plus opt-in `php` and `debug` diagnostics; legacy
+  `minimal`, `git`, and `shell` views remain available. None is an installer,
+  plugin loader, alias, or automatic routing mechanism.
 - A project-onboarding skill for PHP work plus a selected, pinned set of
   portable skills from [agent-skills](https://github.com/voku/agent-skills).
 

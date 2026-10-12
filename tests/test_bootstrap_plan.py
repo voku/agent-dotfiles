@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.bootstrap_plan import PHP, main, package_manager, plan
+from tools.bootstrap_plan import DEBUG, PHP, main, package_manager, plan
 
 
 class BootstrapPlanTest(unittest.TestCase):
@@ -56,6 +56,16 @@ class BootstrapPlanTest(unittest.TestCase):
         self.assertTrue(planner_names.issubset(diagnostic_names))
         self.assertIn("php", profile["required_tools"])
         self.assertIn("composer", profile["optional_tools"])
+
+    def test_debug_planner_and_diagnostic_names_agree(self) -> None:
+        profile_path = Path(__file__).resolve().parents[1] / "profiles" / "debug.json"
+        profile = json.loads(profile_path.read_text(encoding="utf-8"))
+        planner_names = {tool.name for tool in DEBUG}
+        diagnostic_optional = set(profile["optional_tools"])
+        self.assertEqual(planner_names, {"fd", "shellcheck", "hyperfine", "strace"})
+        self.assertTrue(planner_names.issubset(diagnostic_optional))
+        self.assertEqual(profile["required_tools"], ["rg", "git"])
+        self.assertEqual(profile["platform_limits"]["strace"]["platforms"], ["linux"])
 
     def test_fdfind_is_recognized(self) -> None:
         result = plan("debug", system="Linux", os_release={"ID": "debian"}, found={"apt-get": "/usr/bin/apt-get", "fdfind": "/usr/bin/fdfind"})

@@ -20,7 +20,9 @@ or the diagnostic `profiles/*.json` catalog used by `doctor`. The baseline
 is the default in both commands; legacy `doctor --profile minimal|git|shell`
 views do not need selecting to use Git/search/shell capabilities.
 `doctor --profile php` and `plan --profile php` both diagnose `php` and
-`composer`, but preserve their different JSON schemas and roles:
+`composer`. The opt-in `doctor --profile debug` checks the same specialized
+tools as `plan --profile debug` without installing or running them. The
+planner and doctor retain their different JSON schemas and roles:
 
 - `minimal`: Python 3, Git, ripgrep, jq, curl.
 - `php`: minimal plus PHP and Composer (detected only: no assumed correct system PHP packages).
