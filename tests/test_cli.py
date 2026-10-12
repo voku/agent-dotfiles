@@ -96,7 +96,7 @@ class AgentDotfilesCliTest(unittest.TestCase):
         strace = next(tool for tool in shell["tools"] if tool["name"] == "strace")
         self.assertEqual(strace["role"], "optional")
         self.assertIn("platform_supported", strace)
-        self.assertEqual(sorted(path.name for path in self.tools.iterdir()), ["git", "rg"])
+        self.assertEqual(sorted(path.name for path in self.tools.iterdir()), ["git", "php", "rg"])
 
     def test_doctor_php_profile_adds_php_without_making_composer_mandatory(self) -> None:
         self.executable("rg", "pass")
