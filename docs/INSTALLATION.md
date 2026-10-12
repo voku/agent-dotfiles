@@ -14,6 +14,52 @@ by the current CI matrix. Windows is not supported by this installation contract
 On macOS use a canonical parent path (for example `/private/var/...` rather than
 the `/var` symlink). Symlink ancestors are refused on every platform.
 
+## Complete fresh-project walkthrough
+
+Install once per reviewed version and reuse the prefix across projects/sessions.
+Replace the absolute paths and full review-supplied pin below. The existing
+project is only inspected. Creating the private parent is an explicit setup step;
+installation never creates it implicitly. Run these commands in Bash:
+
+```bash
+source_checkout=/absolute/path/to/reviewed/agent-dotfiles
+project_root=/absolute/path/to/existing/project
+approved_revision=APPROVED_FULL_COMMIT_SHA
+install_parent=/absolute/path/to/private/agent-tools
+mkdir -p -- "$install_parent"
+install_parent=$(CDPATH='' cd -- "$install_parent" && pwd -P)
+installed_prefix="$install_parent/agent-dotfiles-$approved_revision"
+
+"$source_checkout/install.sh" plan --prefix "$installed_prefix" --revision "$approved_revision"
+"$source_checkout/install.sh" --prefix "$installed_prefix" --revision "$approved_revision"
+"$source_checkout/install.sh" verify --prefix "$installed_prefix" --revision "$approved_revision"
+"$installed_prefix/bin/agent-dotfiles" doctor --profile minimal --strict
+
+env -u BASH_ENV bash --noprofile --norc -c '
+  set -eu
+  . "$1/.bashrc"
+  agent_workspace --root "$2"
+  agent_deactivate
+  [ "${AGENT_DOTFILES_HOME+x}" != x ]
+' consumer "$installed_prefix" "$project_root"
+
+# Keep the prefix for future tasks, or remove after all consumers have exited.
+"$source_checkout/install.sh" verify --prefix "$installed_prefix" --revision "$approved_revision"
+"$source_checkout/install.sh" uninstall --prefix "$installed_prefix" --revision "$approved_revision"
+```
+
+For Zsh use `env -u ZDOTDIR zsh -f -c` and source `"$1/.zshrc"`. System-wide
+Zsh `zshenv` may still execute: system startup policy belongs to the host.
+If strict doctor fails, inspect `missing_required` and run the read-only
+`firstInstall.sh plan` for provisioning advice before continuing.
+
+Two installs at the same clean pin must have byte-identical `installation.json`
+files. Reports for the same input must agree on the same host; project paths and
+tool availability are intentionally host-dependent. The regression
+`test_two_clean_consumers_reproduce_lifecycle_without_host_writes` exercises real
+installed Bash profiles and confirms unchanged HOME, source and project trees.
+Zsh and workflow-payload exclusions also have separate required CI contracts.
+
 ## Preview the exact installation without writing files
 
 The upstream human-oriented dotfiles bootstrap includes a dry run. This agent
