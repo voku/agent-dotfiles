@@ -32,7 +32,11 @@ instruction or policy files belongs to agent-loop and requires its own review.
 
 ## Responsibility boundary
 
-`agent-dotfiles` owns optional tools and the shell execution environment only.
+`agent-dotfiles` owns the optional CLI and shell execution environment, plus its
+pinned distribution of reviewed opt-in skills. The `project-onboarding` skill is
+maintained here; selected portable skill content originates in `voku/agent-skills`
+and retains upstream ownership. Packaging a skill does not grant it control over
+project workflow, approvals, Learning, Recall or memory.
 `agent-loop` is an independently selected, separately installed workflow owner
 for planning, sessions, review, Learning, Recall and memory. Do not create a
 parallel project memory store, promote Learning findings, or modify Loop policy
