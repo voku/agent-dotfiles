@@ -2,11 +2,12 @@
 
 **A safe, optional shell environment for coding agents.**
 
-`agent-dotfiles` helps a coding agent inspect an unfamiliar repository without
-turning partial output into invented certainty. Its reviewed `.redpill/` runtime
-provides explicit Bash/Zsh entry points plus a small Python CLI for bounded search, exact source ranges,
-file-scoped Git patches, repository state, and machine-readable capability
-reports.
+The product is a reviewed shell environment for the tools agents already use:
+`git`, `rg`, `grep`, `sed` and the project's developer tools. Its `.redpill/`
+runtime provides explicit Bash/Zsh entry points and optional per-command presets.
+The Python CLI remains an optional evidence/diagnostic API for coordinates,
+whole-file hashes and explicit completeness; agents do not need to learn its
+commands to do ordinary development work.
 
 It takes inspiration from [voku/dotfiles](https://github.com/voku/dotfiles),
 but is designed for non-interactive agents: no prompt hooks, startup-file edits,
@@ -39,13 +40,27 @@ The optional PHP diagnostic checks whether `php` is available (required for
 PHP work) and whether `composer` is available (useful but not mandatory for
 every PHP project). A diagnostic never runs these discovered executables.
 
-For an explicit, temporary Bash session, source the profile and remove it when
-the task ends:
+Start with familiar native commands, scoped to the actual project and file:
+
+```sh
+git --no-pager -c color.ui=false -C /project status --short
+rg --no-config -n --color=never -F -- 'function save(' /project
+sed -n '20,60p' /project/src/example.php
+git --no-pager -c color.ui=false -C /project diff --no-ext-diff --no-textconv -- src/example.php
+```
+
+These invocations preserve native stdout, stderr and exit status. Use structured
+output where the tool and task support it (`rg --json`, Git porcelain), rather
+than assuming every command benefits from a JSON wrapper. Patches, source ranges
+and failing-test details must remain complete. No measured token/time advantage
+is claimed for a compact format.
+
+The existing optional presets can be used in an explicit, temporary shell:
 
 ```sh
 source /absolute/path/to/agent-dotfiles/.bashrc
-agent_workspace --root /absolute/path/to/project
-agent_search 'function save(' --root /absolute/path/to/project --glob '*.php'
+agent_git -C /absolute/path/to/project status --short
+agent_rg -n -F -- 'function save(' /absolute/path/to/project
 agent_deactivate
 ```
 
