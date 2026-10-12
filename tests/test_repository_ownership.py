@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import subprocess
 import unittest
 
 from tools.install import installation_path
@@ -62,6 +63,28 @@ class RepositoryOwnershipTest(unittest.TestCase):
         self.assertIn("!/.agent-loop/learning/config.json", rules)
         self.assertIn("!/.agent-loop/learning/findings/validated/*.json", rules)
         self.assertIn("/.agent-loop/learning/history/", rules)
+
+    def test_git_excludes_raw_state_but_allows_reviewed_findings(self) -> None:
+        cases = {
+            ".agent-loop/private-session.json": True,
+            ".agent-loop/learning/history/session.json": True,
+            ".agent-loop/learning/notes/unreviewed.json": True,
+            ".agent-loop/learning/findings/consolidated/unreviewed.json": True,
+            ".agent-loop/init.json": False,
+            ".agent-loop/learning/config.json": False,
+            ".agent-loop/learning/findings/validated/finding.test.json": False,
+        }
+        for path, ignored in cases.items():
+            with self.subTest(path=path):
+                result = subprocess.run(
+                    ["git", "-C", str(ROOT), "check-ignore", "--no-index",
+                     "--quiet", "--", path],
+                    capture_output=True,
+                    check=False,
+                    timeout=10,
+                )
+                self.assertIn(result.returncode, (0, 1), result.stderr)
+                self.assertEqual(result.returncode == 0, ignored, path)
 
 
 if __name__ == "__main__":
