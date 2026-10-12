@@ -14,9 +14,19 @@ package installation, global Git changes, or automatic activation.
 
 ## Start safely
 
-Use a reviewed checkout directly. The `minimal` profile is the recommended
-starting point: it reports only the capabilities needed for the basic workflow
-and does not change the shell.
+Use a reviewed checkout directly. First inspect the small, fixed host-tool
+baseline; this is read-only and prints a JSON plan rather than installing
+anything:
+
+```sh
+./firstInstall.sh plan
+```
+
+It recommends only missing tools from the selected profile and leaves any
+package action for explicit review. See [the first-install plan](docs/FIRST_INSTALL.md).
+
+The `minimal` runtime profile is the recommended next step: it reports only
+the capabilities needed for the basic workflow and does not change the shell.
 
 ```sh
 ./bin/agent-dotfiles doctor --profile minimal
