@@ -51,6 +51,17 @@ class InstallationTest(unittest.TestCase):
         return self.command("install", "--source", str(self.source),
                             "--revision", revision or self.revision)
 
+    def remove_skills_from_legacy_manifest(self, data):
+        skill_paths = sorted(name for name in data["files"] if name.startswith("skills/"))
+        for name in skill_paths:
+            (self.prefix / name).unlink()
+            del data["files"][name]
+        directories = sorted({(self.prefix / Path(name).parent) for name in skill_paths},
+                             key=lambda path: len(path.parts), reverse=True)
+        for directory in directories:
+            if directory.exists():
+                directory.rmdir()
+
     def test_plan_is_read_only_and_matches_exact_install_manifest(self):
         status, report = self.command("plan", "--source", str(self.source),
                                       "--revision", self.revision)
@@ -63,7 +74,11 @@ class InstallationTest(unittest.TestCase):
         for name in ("bin/agent-dotfiles", ".bashrc", ".zshrc", ".shellrc",
                      "shell/modules/context.sh", "shell/modules/git.sh",
                      "shell/core/activation.sh", "shell/core/deactivation.sh",
-                     "skills/project-onboarding/SKILL.md"):
+                     "skills/project-onboarding/SKILL.md", "skills/portable-skills.json",
+                     "skills/coding-simplicity/SKILL.md",
+                     "skills/testing-best-practices/rules/cov-regression-first.md",
+                     "skills/php-static-analysis/rules/sa-contract-honesty.md",
+                     "skills/language-onboarding-authoring/SKILL.md"):
             self.assertIn(name, report["entries"])
         self.assertEqual(report["entries"]["bin/agent-dotfiles"]["mode"], 0o755)
         self.assertFalse(self.prefix.exists())
@@ -263,6 +278,25 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.install()[0], 2)
         self.assertFalse(self.prefix.exists())
 
+    def test_portable_skill_manifest_is_required_for_new_installations(self):
+        self.git("rm", "skills/portable-skills.json")
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", "missing portable skill manifest")
+        self.revision = self.git("rev-parse", "HEAD").strip()
+        self.assertEqual(self.install()[0], 2)
+        self.assertFalse(self.prefix.exists())
+
+    def test_portable_installation_requires_project_onboarding_skill(self):
+        self.assertEqual(self.install()[0], 0)
+        manifest = self.prefix / "installation.json"
+        data = json.loads(manifest.read_text())
+        skill = "skills/project-onboarding/SKILL.md"
+        (self.prefix / skill).unlink()
+        del data["files"][skill]
+        manifest.write_text(json.dumps(data))
+        self.assertEqual(self.command("verify")[0], 2)
+        self.assertEqual(self.command("uninstall")[0], 2)
+
     def test_modified_core_refuses_verify_and_uninstall(self):
         self.assertEqual(self.install()[0], 0)
         target = self.prefix / "shell/core/activation.sh"
@@ -320,10 +354,7 @@ class InstallationTest(unittest.TestCase):
             (self.prefix / name).unlink()
             del data["files"][name]
         (self.prefix / "shell/core").rmdir()
-        (self.prefix / "skills/project-onboarding/SKILL.md").unlink()
-        del data["files"]["skills/project-onboarding/SKILL.md"]
-        (self.prefix / "skills/project-onboarding").rmdir()
-        (self.prefix / "skills").rmdir()
+        self.remove_skills_from_legacy_manifest(data)
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
         self.assertEqual(self.command("uninstall", "--revision", self.revision)[0], 0)
@@ -340,10 +371,7 @@ class InstallationTest(unittest.TestCase):
         (self.prefix / "shell/modules").rmdir()
         (self.prefix / "shell/core").rmdir()
         (self.prefix / "shell").rmdir()
-        (self.prefix / "skills/project-onboarding/SKILL.md").unlink()
-        del data["files"]["skills/project-onboarding/SKILL.md"]
-        (self.prefix / "skills/project-onboarding").rmdir()
-        (self.prefix / "skills").rmdir()
+        self.remove_skills_from_legacy_manifest(data)
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
         self.assertEqual(self.command("uninstall", "--revision", self.revision)[0], 0)
@@ -361,10 +389,7 @@ class InstallationTest(unittest.TestCase):
         (self.prefix / "shell/modules").rmdir()
         (self.prefix / "shell/core").rmdir()
         (self.prefix / "shell").rmdir()
-        (self.prefix / "skills/project-onboarding/SKILL.md").unlink()
-        del data["files"]["skills/project-onboarding/SKILL.md"]
-        (self.prefix / "skills/project-onboarding").rmdir()
-        (self.prefix / "skills").rmdir()
+        self.remove_skills_from_legacy_manifest(data)
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
         self.assertEqual(self.command("uninstall", "--revision", self.revision)[0], 0)

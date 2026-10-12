@@ -52,6 +52,11 @@ class ProjectOnboardingSkillTest(unittest.TestCase):
         self.assertNotIn("init sync-skills --agent=codex", documentation)
         self.assertNotIn("--skills-root=", documentation)
 
+    def test_agent_loop_documentation_uses_additive_skill_projection(self):
+        documentation = (PROJECT / "docs/AGENT_LOOP.md").read_text()
+        self.assertIn("init install-assets", documentation)
+        self.assertNotIn("init sync-skills", documentation)
+
 
 if __name__ == "__main__":
     unittest.main()

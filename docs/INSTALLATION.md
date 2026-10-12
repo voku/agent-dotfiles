@@ -31,8 +31,9 @@ a file count and `entries` mapping manifest-tracked payload paths to SHA-256
 hashes and numeric Unix permission modes (493 means 0755, 420 means 0644).
 The generated `installation.json` is written only during installation; it is
 not counted among these payload entries. The plan includes the generated launcher,
-all fixed shell modules and lifecycle files, and the reviewed project-onboarding
-skill source. Review it before installation; it is not an approval
+all fixed shell modules and lifecycle files, the reviewed project-onboarding
+skill source, and the selected portable-skill provenance set. Review it before
+installation; it is not an approval
 token. The later installation repeats provenance checks against the same
 approved full commit and may refuse if the source or destination changed.
 Plan never installs packages, sources profiles or alters user configuration.
@@ -56,7 +57,8 @@ must be clean; untracked and ignored files are excluded. The installer reads the
 pinned Git objects and checks the runtime files against the working copy. It copies
 only tracked Python package files, the original entry point, the five agent-owned
 shell profiles/shared files, the two fixed `shell/modules/` helper files, the two `shell/core/` lifecycle files,
-`skills/project-onboarding/SKILL.md`, and the license, plus
+`skills/project-onboarding/SKILL.md`, the selected portable skill directories
+and `skills/portable-skills.json`, and the license, plus
 a small generated launcher and a versioned installation manifest. It refuses
 tracked runtime symlinks. Installation is staged beside the prefix and renamed
 only after validation, leaving an existing installation untouched on failure.
@@ -92,7 +94,8 @@ and an error. Exit status 0 means success, 2 means refusal or operational failur
 Argument syntax errors use standard argparse diagnostics and exit status 2.
 Verification checks every file, mode, symlink, missing entry and unknown file or
 directory. New installations must include both modules, both lifecycle files,
-and the reviewed project-onboarding skill; partial lifecycle manifests fail
+the reviewed project-onboarding skill, and the complete portable-skill
+provenance set; partial lifecycle manifests fail
 closed. Older pre-core, pre-modular, and pre-skill manifests
 remain verifiable and safely removable. The optional `--revision` asserts the independently recorded pin.
 
