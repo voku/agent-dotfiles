@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "task_id": "real-php-arrayy-factory-inference-2026-10-12",
+  "source": {
+    "repository": "voku/Arrayy",
+    "commit": "de7df893f2dd33db50da67de210974ad9ce4bd18",
+    "issue": "https://github.com/voku/Arrayy/issues/194"
+  },
+  "runtime": {
+    "php": "8.3",
+    "phpstan": "2.3.1",
+    "composer": "2",
+    "config": "phpstan.neon",
+    "fixture": "experiments/php-maintenance/arrayy-factory-inference.php"
+  },
+  "failure_command": "php vendor/bin/phpstan analyse -c phpstan.neon --no-progress --error-format=json .experiment-phpstan.php",
+  "failure_gate": "Nonzero PHPStan exit due to an assertType mismatch: the typed DateTimeImmutable value from Arrayy\\\\create(array<string, DateTimeImmutable>) is inferred as mixed, not DateTimeImmutable|null.",
+  "independent_oracle": "Evaluator-held outside this public branch. Do not provide hold-out cases, expected patch, or scoring keys to implementers.",
+  "boundaries": "Freeze source at the exact commit. No upstream patch, seeded PHP code defect, CI command-parity fixture, or task-level efficiency claim. Fix belongs to Arrayy. Future A/B/C arms use identical source/runtime/model/Loop/knowledge/prompts.",
+  "evidence": "Pending exact-source CI run at branch experiment/phpstan-arrayy-factory-20261012."
+}
