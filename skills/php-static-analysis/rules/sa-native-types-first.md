@@ -22,7 +22,7 @@ class AccountActiveRow
     public $is_active; // Untyped property
 }
 
-// Bypassing itportal.activerow.unsafeStrictComparison by loosening to ==:
+// Bypassing the strict-comparison analyzer error by loosening to ==:
 if ($row->is_active == 1) { ... } // ❌ Loose equality bypasses analyzer but introduces coercion bugs!
 
 // ❌ Using inline @var instead of declaring the property type
@@ -37,6 +37,7 @@ class AccountActiveRow
 {
     public int $id;
     public int $is_active;
+    public int $count;
     public ?string $email = null;
 }
 
@@ -46,5 +47,5 @@ if ($row->is_active === 1) {
 }
 
 // ✅ Declared on source, so every reader inherits the type without inline casting
-$count = $row->id;
+$count = $row->count;
 ```

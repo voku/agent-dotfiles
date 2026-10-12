@@ -38,9 +38,12 @@ python3 tools/sync_portable_skills.py \
 
 Run it first with `--dry-run`, review `skills/portable-skills.json` and the
 copied diff, then commit the synchronized result. A changed target file is a
-refusal, not a silent overwrite. Consumer installation uses the ordinary pinned
-agent-dotfiles installer; it verifies every copied file and the provenance
-manifest before activation or removal.
+refusal, not a silent overwrite. To deliberately advance an existing snapshot,
+repeat the reviewed dry run with `--replace`; it accepts only the exact prior
+provenance manifest and byte-identical selected files, then replaces the same
+selected file set. Consumer installation uses the ordinary pinned agent-dotfiles
+installer; it verifies every copied file and the provenance manifest before
+activation or removal.
 
 ## Consumer projection
 

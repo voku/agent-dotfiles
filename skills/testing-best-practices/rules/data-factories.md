@@ -36,7 +36,7 @@ test('calculates total for single item', () => {
 const OrderFactory = {
   create(overrides: Partial<Order> = {}): Order {
     return {
-      id: `ord-${Math.random().toString(36).slice(2)}`,
+      id: 'ord-default',
       customer: { id: 'c-1', email: 'c@test.com', address: { city: 'Springfield', zip: '62701' } },
       items: [{ id: 'i-1', name: 'Widget', price: 29.99, qty: 1 }],
       status: 'pending',
@@ -45,6 +45,10 @@ const OrderFactory = {
     };
   }
 };
+
+// Multi-order scenarios provide distinct stable IDs through overrides.
+const first = OrderFactory.create({ id: 'ord-first' });
+const second = OrderFactory.create({ id: 'ord-second' });
 
 test('calculates total for single item', () => {
   const order = OrderFactory.create({ items: [{ id: 'i-1', name: 'Book', price: 15.00, qty: 2 }] });

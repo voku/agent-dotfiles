@@ -27,6 +27,7 @@ $result = $magicProxy->callDynamicMethod();
 ### Good
 ```php
 // ✅ Scoped ignore with explicit identifier and explanatory comment
+// PHPStan 1.11+ is required for an identifier on @phpstan-ignore.
 // @phpstan-ignore method.notFound (Dynamic method handled by legacy magic __call fallback)
 $result = $magicProxy->callDynamicMethod();
 

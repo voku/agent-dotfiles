@@ -44,7 +44,12 @@ class ServiceFactory
      */
     public function make(string $service): object
     {
-        return $this->container->get($service);
+        $instance = $this->container->get($service);
+        if (!$instance instanceof $service) {
+            throw new \UnexpectedValueException(sprintf('Service %s has an unexpected type.', $service));
+        }
+
+        return $instance;
     }
 }
 

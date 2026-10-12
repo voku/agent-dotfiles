@@ -18,11 +18,11 @@
         "SKILL.md": "d578040beb1c1b6e8437e44b8dc47f948ffcb120fce6a10778d912bd67c9823c",
         "metadata.json": "c1e052c9d595f685c5c4ca408cef9efecdd0c8c4dd41db65106b6f2ec99f08b1",
         "rules/_sections.md": "063934d0d17b37e8e312882d72a0daceecf85662d8979ed66ac8b3ba660c8170",
-        "rules/sa-contract-honesty.md": "9de4db56c1879c55df844807feb7987101a962fe9776c3e5103f137e9b65e48e",
-        "rules/sa-native-types-first.md": "7c2647d883f97e4925ceb63d33ba23d81271eccd22cac0534e2ca7b151ba3afb",
-        "rules/sa-root-cause-typing.md": "489544b84a0520fe9af0e9a84ad31fccc846cbea0b2728a3566a3b0b9981b69d",
-        "rules/sa-scoped-ignores-extensions.md": "c5720a59db93d70f4abf5c79f1dfb2edd558303310e0c51bb5818e63ba598c0b",
-        "rules/sa-shape-precision.md": "4cafb6347f7d3183fa59eda347aa863ba650c907d738bc038ba4dc1db1e2a1a9"
+        "rules/sa-contract-honesty.md": "979d5d818f3cf5d6110b60240894382dc5dad924ea7f950ee608a1ca13dfcbe1",
+        "rules/sa-native-types-first.md": "91c6f8380c86519fbf8220dcfd042d114eb3de4f9c1654e83e144894c2b53946",
+        "rules/sa-root-cause-typing.md": "9634b58b912dafe9da2cfe014f8973e6b9fdb20373c8b465512a033608dff149",
+        "rules/sa-scoped-ignores-extensions.md": "f9201a2c92f6941b97c9d27d840a95c63132bb23c9e8762693a36ec47fa40c38",
+        "rules/sa-shape-precision.md": "83d645dbdeba0bd132b02137f27b4d0384998fca5a9618aa61690b06235c2e35"
       }
     },
     "testing-best-practices": {
@@ -33,10 +33,10 @@
         "metadata.json": "217e2c34bac72f8743a7555b56d7735f989238344d3cbacfcd05b57ec9c46516",
         "rules/_sections.md": "d1c8a9b7c181f9ca3cda419db6f3e7c98ee117e3baf4860e76ac79433022bffb",
         "rules/_template.md": "8398d2f067b3fb12f522cb08964a7ade4b1de28c8105597544dc5fe5a3a2af07",
-        "rules/assert-specific.md": "749e3f2a46ebd8b0798a7103f5da5100196d2e957d11c698ccd89337d5bfcd67",
+        "rules/assert-specific.md": "153e82b4526dc61224264737ea7b981ccbe489fd01628d59b4f9348efe611235",
         "rules/cov-edge-cases.md": "ac8540a0fab8795c837677d2fb15cb52489b941dcaea7794f94d444b0a0cd76d",
         "rules/cov-regression-first.md": "71dad647132178eba500456f9a088cd5b0658445a905a2e39f36b697d8c16acb",
-        "rules/data-factories.md": "d5fe6fe138a5a30586e7e42120245a736617102b46e6246f9fc14150a8bf469b",
+        "rules/data-factories.md": "a815d1a9aeb4228d3cb313ee89d42c7af5813e136c6a51948a0b833d92acf846",
         "rules/data-minimal.md": "5e1d3068858313383df1562af1ac02ed27017205ce948418d5c8eccaccaf3047",
         "rules/iso-cleanup.md": "531f91f4916d7490aadb961c7b9c161eb061bf66567d0214a3a83d9e057e2313",
         "rules/iso-independence.md": "14be2f16ba0ff25180689ffa22629de32f8f130c0c310c9e9ed45fea731251e3",
@@ -49,6 +49,6 @@
   },
   "source": {
     "repository": "voku/agent-skills",
-    "revision": "e4d1aff0a6beab574476dccfc955f0f656aa141c"
+    "revision": "1e965b08037c629ee21f41456f2d9ee8c6376998"
   }
 }

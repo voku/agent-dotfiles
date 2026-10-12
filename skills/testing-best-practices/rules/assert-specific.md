@@ -83,7 +83,8 @@ test('order status is pending', () => {
 // ✅ Custom domain matcher with expressive failure messages
 expect.extend({
   toBePendingOrder(received: Order) {
-    const pass = received.status === 'pending' && received.paidAt === null && received.items.length > 0;
+    const pass = received.status === 'pending' && received.paidAt === null
+      && received.shippedAt === null && received.items.length > 0;
     return {
       pass,
       message: () => `Expected order to be in pending state with items, but got status="${received.status}"`

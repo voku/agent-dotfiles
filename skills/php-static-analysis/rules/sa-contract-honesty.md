@@ -28,8 +28,7 @@ class TableMetadata
 // ❌ Bypassing null check by falsely claiming method always returns entity
 class OrderFinder
 {
-    // Analyzer warns that DB::find can return null, so dev relaxes or forces type:
-    /** @var Order */
+    // Analyzer warns that DB::find can return null, but this signature excludes it:
     public function find(int $id): Order // Lies about nullability!
     {
         return DB::find($id); // Actually returns ?Order!

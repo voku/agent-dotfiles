@@ -114,7 +114,57 @@ def destination_path(destination: Path, relative: str) -> Path:
     return target
 
 
-def sync(source: Path, revision: str, destination: Path, *, preview: bool = False) -> dict[str, object]:
+def verify_previous_snapshot(destination: Path) -> set[str]:
+    """Return the verified current snapshot paths before an explicit replacement."""
+    manifest_path = destination_path(destination, MANIFEST)
+    if manifest_path.is_symlink() or not manifest_path.is_file():
+        raise SyncError("portable skill replacement requires the current provenance manifest")
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise SyncError("portable skill replacement requires a valid provenance manifest") from error
+    if not isinstance(manifest, dict):
+        raise SyncError("portable skill replacement requires a valid provenance manifest")
+    source = manifest.get("source")
+    skills = manifest.get("skills")
+    if (manifest.get("schema") != SCHEMA or not isinstance(source, dict)
+            or not isinstance(skills, dict)
+            or source.get("repository") != "voku/agent-skills"
+            or not re.fullmatch(r"[0-9a-f]{40}", source.get("revision", ""))
+            or set(skills) != set(SKILLS)):
+        raise SyncError("portable skill replacement requires a complete provenance manifest")
+
+    known: set[str] = set()
+    for skill in SKILLS:
+        entries = skills[skill].get("files") if isinstance(skills[skill], dict) else None
+        if not isinstance(entries, dict) or f"SKILL.md" not in entries:
+            raise SyncError("portable skill replacement requires complete provenance files")
+        for relative, expected_digest in entries.items():
+            pure = PurePosixPath(relative)
+            if (not isinstance(relative, str) or pure.is_absolute() or not pure.parts
+                    or ".." in pure.parts or not re.fullmatch(r"[0-9a-f]{64}", expected_digest)):
+                raise SyncError("portable skill replacement has unsafe provenance files")
+            path = f"skills/{skill}/{relative}"
+            target = destination_path(destination, path)
+            if target.is_symlink() or not target.is_file() or digest(target.read_bytes()) != expected_digest:
+                raise SyncError("portable skill replacement refuses a changed snapshot")
+            known.add(path)
+
+        root = destination_path(destination, f"skills/{skill}")
+        actual: set[str] = set()
+        for base, dirs, names in os.walk(root, followlinks=False):
+            for name in dirs + names:
+                child = Path(base) / name
+                if child.is_symlink():
+                    raise SyncError("portable skill replacement refuses symlinked snapshot files")
+            actual.update((Path(base) / name).relative_to(destination).as_posix() for name in names)
+        if actual != {path for path in known if path.startswith(f"skills/{skill}/")}:
+            raise SyncError("portable skill replacement refuses an incomplete or expanded snapshot")
+    return known
+
+
+def sync(source: Path, revision: str, destination: Path, *, preview: bool = False,
+         replace: bool = False) -> dict[str, object]:
     source = regular_directory(source, "source")
     destination = regular_directory(destination, "destination")
     if source == destination:
@@ -130,18 +180,31 @@ def sync(source: Path, revision: str, destination: Path, *, preview: bool = Fals
     }
     manifest_bytes = (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode()
     expected = {**files, MANIFEST: manifest_bytes}
+    replacement_needed = any(
+        (target := destination_path(destination, path)).exists()
+        and (target.is_symlink() or not target.is_file() or target.read_bytes() != data)
+        for path, data in expected.items()
+    )
+    if replacement_needed:
+        if not replace:
+            raise SyncError("refusing to replace existing portable skill file without --replace")
+        previous = verify_previous_snapshot(destination)
+        if previous != set(files):
+            raise SyncError("portable skill replacement requires the same selected file set")
     for path, data in expected.items():
         target = destination_path(destination, path)
         if target.exists() or target.is_symlink():
-            if not target.is_file() or target.is_symlink() or target.read_bytes() != data:
+            if (not target.is_file() or target.is_symlink()
+                    or (target.read_bytes() != data and not replace)):
                 raise SyncError(f"refusing to replace existing portable skill file: {path}")
     if not preview:
         for path, data in expected.items():
             target = destination_path(destination, path)
             target.parent.mkdir(parents=True, exist_ok=True)
-            if not target.exists():
+            if not target.exists() or target.read_bytes() != data:
                 target.write_bytes(data)
-    return {"source_revision": revision, "skills": list(SKILLS), "files": len(files)}
+    return {"source_revision": revision, "skills": list(SKILLS), "files": len(files),
+            "replaced": replacement_needed}
 
 
 def main() -> int:
@@ -150,9 +213,12 @@ def main() -> int:
     parser.add_argument("--revision", required=True, help="full source commit SHA")
     parser.add_argument("--destination", required=True, help="agent-dotfiles checkout root")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--replace", action="store_true",
+                        help="replace only an unchanged, verified existing portable snapshot")
     args = parser.parse_args()
     try:
-        result = sync(Path(args.source), args.revision, Path(args.destination), preview=args.dry_run)
+        result = sync(Path(args.source), args.revision, Path(args.destination), preview=args.dry_run,
+                      replace=args.replace)
         print(json.dumps({"schema": SCHEMA, "operation": "sync", "ok": True, **result}))
         return 0
     except (SyncError, OSError, UnicodeError, subprocess.SubprocessError) as error:

@@ -121,6 +121,36 @@ class PortableSkillSyncTest(unittest.TestCase):
         self.assertEqual(self.sync()[0], 2)
         self.assertEqual(list(outside.iterdir()), [])
 
+    def test_sync_replaces_only_an_unchanged_verified_snapshot(self):
+        self.assertEqual(self.sync()[0], 0)
+        changed = self.source / "skills/testing-best-practices/rules/example.md"
+        changed.write_text("revised fixture\n")
+        self.git("add", str(changed.relative_to(self.source)))
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", "revised fixture")
+        self.revision = self.git("rev-parse", "HEAD").strip()
+        self.assertEqual(self.sync()[0], 2)
+        status, report = self.sync("--replace", "--dry-run")
+        self.assertEqual(status, 0, report)
+        self.assertTrue(report["replaced"])
+        self.assertEqual(self.sync("--replace")[0], 0)
+        self.assertEqual(changed.read_bytes(), (self.destination / changed.relative_to(self.source)).read_bytes())
+        manifest = json.loads((self.destination / "skills/portable-skills.json").read_text())
+        self.assertEqual(manifest["source"]["revision"], self.revision)
+
+    def test_sync_replace_refuses_a_changed_current_snapshot(self):
+        self.assertEqual(self.sync()[0], 0)
+        changed = self.source / "skills/testing-best-practices/rules/example.md"
+        changed.write_text("revised fixture\n")
+        self.git("add", str(changed.relative_to(self.source)))
+        self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-qm", "revised fixture")
+        self.revision = self.git("rev-parse", "HEAD").strip()
+        current = self.destination / "skills/testing-best-practices/rules/example.md"
+        current.write_text("local change\n")
+        self.assertEqual(self.sync("--replace")[0], 2)
+        self.assertEqual(current.read_text(), "local change\n")
+
 
 if __name__ == "__main__":
     unittest.main()

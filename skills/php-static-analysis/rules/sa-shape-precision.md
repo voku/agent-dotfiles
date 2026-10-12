@@ -40,7 +40,7 @@ class UserExporter
 class UserExporter
 {
     /**
-     * @param list<array{id: int, email: non-empty-string, name?: string}> $users
+     * @param list<array{id: int, email: string, name?: string}> $users
      * @return list<string>
      */
     public function formatExport(array $users): array
