@@ -39,11 +39,36 @@ jobs:
             contract-tests.log
             capabilities.json
 
+  bootstrap-legacy-python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.9'
+      - name: Reject unsupported Python 3.9 without executing planner
+        run: |
+          set -euo pipefail
+          python3 -c 'import sys; assert sys.version_info[:2] == (3, 9)'
+          cd "$RUNNER_TEMP"
+          status=0
+          "$GITHUB_WORKSPACE/firstInstall.sh" plan > bootstrap.json 2> bootstrap.err || status=$?
+          test "$status" -eq 2
+          test ! -s bootstrap.json
+          grep -F 'Python 3.10+ is required' bootstrap.err
+
   macos-installation:
     runs-on: macos-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
       - uses: actions/setup-python@v7
         with:
           python-version: '3.15'
@@ -51,6 +76,21 @@ jobs:
         env:
           REQUIRE_ZSH: "1"
         run: python -m unittest discover -s tests -v
+      - name: Verify real macOS bootstrap capability plan
+        run: |
+          ./firstInstall.sh plan --profile php > "$RUNNER_TEMP/bootstrap-macos.json"
+          python3 - "$RUNNER_TEMP/bootstrap-macos.json" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          report = json.loads(Path(sys.argv[1]).read_text())
+          assert report["schema"] == "agent-dotfiles.v1.bootstrap-plan"
+          assert report["system"] == "Darwin"
+          assert report["profile"] == "php" and report["operation"] == "plan"
+          assert report["manager"] in ("brew", None)
+          argv = report["package_command_argv"]
+          assert argv is None or (argv[:2] == ["brew", "install"] and report["package_command_requires_approval"])
+          PY
 
   bashunit-integration:
     runs-on: ubuntu-latest
@@ -77,7 +117,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y zsh shellcheck
       - name: ShellCheck and Bash/Zsh syntax
         run: |
-          shellcheck --severity=warning -s sh install.sh
+          shellcheck --severity=warning -s sh install.sh firstInstall.sh
+          sh -n firstInstall.sh
           shellcheck --severity=warning -s bash .bashrc .shellrc .functions .exports shell/modules/context.sh shell/modules/git.sh shell/core/activation.sh shell/core/deactivation.sh
           for file in .bashrc .shellrc .functions .exports shell/modules/context.sh shell/modules/git.sh shell/core/activation.sh shell/core/deactivation.sh; do bash -n "$file"; done
           for file in .zshrc .shellrc .functions .exports shell/modules/context.sh shell/modules/git.sh shell/core/activation.sh shell/core/deactivation.sh; do zsh -n "$file"; done
@@ -215,11 +256,52 @@ jobs:
           done
           test ! -e "$repo/.git/index.lock"
 
+          # Warm, multi-project contract: one installed prefix services a fresh
+          # second checkout. Fresh shell sessions are per task, installer is not.
+          other_repo="$root/another checkout [λ]"
+          mkdir -p "$other_repo"
+          git init -q "$other_repo"
+          printf 'second project\n' > "$other_repo/independent.txt"
+          git -C "$other_repo" add -- independent.txt
+          git -C "$other_repo" -c user.name=Fixture -c user.email=fixture@example.invalid commit -qm 'second baseline'
+          other_head="$(git -C "$other_repo" rev-parse HEAD)"
+          env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc" || exit $?; agent_workspace --root "$2"' \
+            warm-bash "$prefix" "$other_repo" > "$root/warm-other-bash.json"
+          env -u ZDOTDIR zsh -f -c '. "$1/.zshrc" || exit $?; agent_workspace --root "$2"' \
+            warm-zsh "$prefix" "$other_repo" > "$root/warm-other-zsh.json"
+          python3 - "$root/warm-other-bash.json" "$root/warm-other-zsh.json" "$other_repo" "$other_head" "$prefix" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          bash_report, zsh_report, root, head, prefix = sys.argv[1:]
+          for pathname in (bash_report, zsh_report):
+              report = json.loads(Path(pathname).read_text())
+              assert report["schema"] == "agent-dotfiles.v1.workspace", report
+              assert report["root"] == root and report["head"] == head, report
+              assert report["tool_home"] == prefix, report
+              assert report["clean"] is True and report["truncated"] is False, report
+              assert report["changes"] == [], report
+          PY
+          # The earlier checkout remains dirty/truncated, proving we did not
+          # accidentally cache the second checkout's clean status as global state.
+          earlier_status=0
+          "$prefix/bin/agent-dotfiles" workspace --root "$repo" --limit 1 > "$root/warm-first-after-other.json" || earlier_status=$?
+          python3 - "$root/warm-first-after-other.json" "$earlier_status" "$repo" "$head" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          report = json.loads(Path(sys.argv[1]).read_text())
+          assert int(sys.argv[2]) == 3, report
+          assert report["root"] == sys.argv[3] and report["head"] == sys.argv[4], report
+          assert report["clean"] is None and report["truncated"] is True, report
+          PY
+          cmp "$root/manifest.json" "$prefix/installation.json"
+
           ./install.sh verify --prefix "$prefix" --revision "$CANDIDATE_SHA" > "$root/verify-after.json"
           ./install.sh uninstall --prefix "$prefix" --revision "$CANDIDATE_SHA" > "$root/uninstall.json"
           python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["ok"] is True and r["operation"] == "uninstall" and r["source_revision"] == sys.argv[2]' "$root/uninstall.json" "$CANDIDATE_SHA"
           test ! -e "$prefix"
-          echo "Verified candidate $CANDIDATE_SHA: immutable install preview and manifest parity, Bash/Zsh doctor + native Git workspace identity, post-use verification, uninstall" >> "$GITHUB_STEP_SUMMARY"
+          echo "Verified candidate $CANDIDATE_SHA: immutable install preview and manifest parity, Bash/Zsh doctor + native Git workspace identity, warm reuse across isolated projects, post-use verification, uninstall" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Retain exact-commit cold consumer receipts
         if: always()

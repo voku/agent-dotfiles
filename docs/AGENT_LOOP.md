@@ -7,8 +7,14 @@ Source issue: https://github.com/voku/agent-loop/issues/756
 `agent-dotfiles` exposes optional, read-only CLI helpers and one portable
 project-onboarding skill. It does not patch agent-loop hooks, ban grep/find
 itself, decide whether to use Map, or install skills by itself in external
-repositories. A consumer may explicitly pass its reviewed `skills/` root to
+repositories. A consumer may explicitly add its reviewed `skills/` root through
 agent-loop's existing `init install-assets` owner; see [project onboarding](PROJECT_ONBOARDING.md).
+`agent-loop` may be run *inside* a separately installed and approved
+`agent-dotfiles` execution environment; it remains independently installed,
+pinned and responsible for its own project state and memory. No `.agent-loop`
+scaffolding, Learning, Recall or task policy is created by the dotfiles setup
+prompt.
+
 Initial integration remains manual and opt-in: invoke this tool by its path when
 a bounded literal/file-search experiment benefits from it.
 

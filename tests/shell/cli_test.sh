@@ -61,6 +61,22 @@ file.php"
   assert_same 'agent-dotfiles.v1.git-status 1 1 False' "$result"
 }
 
+function test_explicit_shell_workspace_helper_returns_real_receipt() {
+  local output status result
+  git init -q "$TEST_ROOT"
+  printf 'baseline\n' > "$TEST_ROOT/source.php"
+  git -C "$TEST_ROOT" add -- source.php
+  git -C "$TEST_ROOT" -c user.email=test@example.test -c user.name=Test commit -qm baseline
+  if output="$(env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc" || exit $?; agent_workspace --root "$2"' consumer "$PROJECT_ROOT" "$TEST_ROOT")"; then
+    status=0
+  else
+    status=$?
+  fi
+  assert_same '0' "$status"
+  result="$(printf '%s' "$output" | python3 -c 'import json,sys; x=json.load(sys.stdin); print(x["schema"], x["root"], x["truncated"])')"
+  assert_same "agent-dotfiles.v1.workspace $TEST_ROOT False" "$result"
+}
+
 function test_git_patch_is_full_patch_not_diffstat() {
   local output status result
   git init -q "$TEST_ROOT"
@@ -76,7 +92,7 @@ function test_git_patch_is_full_patch_not_diffstat() {
 }
 
 function test_source_checkout_has_no_automatic_publish_or_install() {
-  assert_file_exists "$PROJECT_ROOT/config/gitconfig.agent.example"
+  assert_file_exists "$PROJECT_ROOT/examples/gitconfig.agent.example"
   assert_file_not_exists "$PROJECT_ROOT/scripts/publish.sh"
   assert_file_exists "$PROJECT_ROOT/agent_dotfiles/cli.py"
 }

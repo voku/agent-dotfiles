@@ -19,7 +19,16 @@ MANIFEST = "installation.json"
 SHELL_FILES = {".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"}
 SHELL_MODULES = {"shell/modules/context.sh", "shell/modules/git.sh"}
 SHELL_CORE = {"shell/core/activation.sh", "shell/core/deactivation.sh"}
-SKILL_FILES = {"skills/project-onboarding/SKILL.md"}
+PROFILE_FILES = {"profiles/minimal.json", "profiles/git.json", "profiles/php.json", "profiles/shell.json"}
+LOCAL_SKILL_FILES = {"skills/project-onboarding/SKILL.md"}
+PORTABLE_SKILLS = {
+    "coding-simplicity",
+    "testing-best-practices",
+    "php-static-analysis",
+    "language-onboarding-authoring",
+}
+PORTABLE_SKILL_MANIFEST = "skills/portable-skills.json"
+PORTABLE_SKILL_FILES = {f"skills/{skill}/SKILL.md" for skill in PORTABLE_SKILLS}
 LAUNCHER = b'''#!/usr/bin/env python3
 """Explicitly activated isolated agent-dotfiles; do not create bytecode."""
 import sys
@@ -67,6 +76,48 @@ def runtime_path(name: str) -> bool:
                     for part in (*path.parts[1:-1], path.stem)))
 
 
+def portable_skill_path(name: str) -> bool:
+    path = PurePosixPath(name)
+    return (len(path.parts) >= 3 and path.parts[0] == "skills"
+            and path.parts[1] in PORTABLE_SKILLS and ".." not in path.parts
+            and all(part not in {"", "."} for part in path.parts))
+
+
+def installation_path(name: str) -> bool:
+    return (name in {"LICENSE", "bin/agent-dotfiles", "libexec/agent-dotfiles", PORTABLE_SKILL_MANIFEST}
+            | SHELL_FILES | SHELL_MODULES | SHELL_CORE | PROFILE_FILES | LOCAL_SKILL_FILES
+            or runtime_path(name) or portable_skill_path(name))
+
+
+def portable_skill_digests(data: bytes) -> dict[str, str]:
+    try:
+        manifest = json.loads(data.decode("utf-8"))
+        source = manifest["source"]
+        skills = manifest["skills"]
+        if (set(manifest) != {"schema", "source", "skills"}
+                or manifest["schema"] != "agent-dotfiles.v1.portable-skills"
+                or source.get("repository") != "voku/agent-skills"
+                or not re.fullmatch(r"[0-9a-f]{40}", source.get("revision", ""))
+                or set(skills) != PORTABLE_SKILLS):
+            raise ValueError
+        files = {}
+        for skill, entry in skills.items():
+            if not isinstance(entry, dict) or set(entry) != {"files"} or not isinstance(entry["files"], dict):
+                raise ValueError
+            for relative, expected in entry["files"].items():
+                path = PurePosixPath(relative)
+                if (not isinstance(relative, str) or not isinstance(expected, str)
+                        or not re.fullmatch(r"[0-9a-f]{64}", expected)
+                        or path.is_absolute() or ".." in path.parts or relative in {"", "."}):
+                    raise ValueError
+                files[f"skills/{skill}/{relative}"] = expected
+        if not PORTABLE_SKILL_FILES.issubset(files):
+            raise ValueError
+        return files
+    except (AttributeError, KeyError, TypeError, UnicodeDecodeError, ValueError) as error:
+        raise SetupError("invalid portable skill provenance manifest") from error
+
+
 def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -88,8 +139,11 @@ def install(source: Path, revision: str, prefix: Path, *, preview: bool = False)
         raise SetupError("existing prefix must be an empty directory")
     tracked = git(source, "ls-files", "-z").split(b"\0")
     paths = [os.fsdecode(name) for name in tracked if name]
-    paths = [name for name in paths if name in {"LICENSE", "bin/agent-dotfiles"} | SHELL_FILES | SHELL_MODULES | SHELL_CORE | SKILL_FILES or runtime_path(name)]
-    required = {"LICENSE", "bin/agent-dotfiles", "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"} | SHELL_FILES | SHELL_MODULES | SHELL_CORE | SKILL_FILES
+    paths = [name for name in paths if installation_path(name)]
+    required = ({"LICENSE", "bin/agent-dotfiles", "agent_dotfiles/__init__.py",
+                 "agent_dotfiles/cli.py", PORTABLE_SKILL_MANIFEST}
+                | SHELL_FILES | SHELL_MODULES | SHELL_CORE | LOCAL_SKILL_FILES
+                | PROFILE_FILES | PORTABLE_SKILL_FILES)
     if not required.issubset(paths):
         raise SetupError("tracked runtime files are missing")
     contents = {}
@@ -104,6 +158,11 @@ def install(source: Path, revision: str, prefix: Path, *, preview: bool = False)
             raise SetupError("runtime source differs from pinned commit")
         installed = "libexec/agent-dotfiles" if name == "bin/agent-dotfiles" else name
         contents[installed] = (data, 0o644)
+    expected_portable = portable_skill_digests(contents[PORTABLE_SKILL_MANIFEST][0])
+    actual_portable = {name: digest(data) for name, (data, _mode) in contents.items()
+                       if portable_skill_path(name)}
+    if actual_portable != expected_portable:
+        raise SetupError("portable skill files do not match their provenance manifest")
     contents["bin/agent-dotfiles"] = (LAUNCHER, 0o755)
     manifest = {"schema": SCHEMA, "source_revision": revision,
                 "files": {name: {"sha256": digest(data), "mode": mode}
@@ -160,9 +219,16 @@ def verify(prefix: Path) -> dict:
                                     or not SHELL_MODULES.issubset(files)
                                     or not SHELL_FILES.issubset(files)):
         raise SetupError("incomplete shell lifecycle manifest")
+    if set(files) & PROFILE_FILES and not PROFILE_FILES.issubset(files):
+        raise SetupError("incomplete capability profile manifest")
+    portable_entries = {name for name in files
+                        if name == PORTABLE_SKILL_MANIFEST or portable_skill_path(name)}
+    if portable_entries and not (LOCAL_SKILL_FILES | {PORTABLE_SKILL_MANIFEST}
+                                 | PORTABLE_SKILL_FILES).issubset(files):
+        raise SetupError("incomplete portable skill manifest")
     directories = set()
     for name, entry in files.items():
-        if name not in required | SHELL_FILES | SHELL_MODULES | SHELL_CORE | SKILL_FILES and not runtime_path(name):
+        if not installation_path(name):
             raise SetupError("unsafe or unknown installation entry")
         if (not isinstance(entry, dict) or set(entry) != {"sha256", "mode"}
                 or not isinstance(entry["sha256"], str)
@@ -176,6 +242,12 @@ def verify(prefix: Path) -> dict:
         directories.update(str(parent) for parent in PurePosixPath(name).parents if str(parent) != ".")
     if files["bin/agent-dotfiles"]["sha256"] != digest(LAUNCHER):
         raise SetupError("unknown installation launcher")
+    if portable_entries:
+        expected_portable = portable_skill_digests((prefix / PORTABLE_SKILL_MANIFEST).read_bytes())
+        actual_portable = {name: digest((prefix / name).read_bytes()) for name in files
+                           if portable_skill_path(name)}
+        if actual_portable != expected_portable:
+            raise SetupError("installed portable skill files do not match provenance")
     expected = set(files) | directories | {MANIFEST}
     actual = set()
     for base, dirs, names in os.walk(prefix, followlinks=False):

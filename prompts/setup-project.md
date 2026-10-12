@@ -9,9 +9,12 @@ approved full commit SHA when available. The agent must not invent an approval.
 
 ---
 
-You are configuring **voku/agent-dotfiles** for the software repository in
-your current working directory. Complete a small, useful setup rather than
-building a new framework.
+You are configuring the optional **voku/agent-dotfiles execution environment**
+for the repository in your current working directory. Complete a small, useful
+setup, not a new framework or an agent workflow. An existing `agent-loop` owns
+planning, sessions, approvals, reviews, Learning, Recall, and project memory.
+Do not install or configure `agent-loop`, invent `.agent-loop/` state or create
+`MEMORY.md` on behalf of agent-dotfiles.
 
 ## Desired outcome
 
@@ -19,8 +22,9 @@ building a new framework.
   analyzers, CI commands, Git conventions, and existing agent instructions.
 - Select only integrations that provide a concrete benefit for this project.
 - Make the chosen project-local setup repeatable, inspectable, and reversible.
-- Give the next Codex or Claude Code session useful starting context without
-  running arbitrary dependency or repository code during discovery.
+- Document only the verified **environment** entry points for a future Codex
+  or Claude Code session. Do not add a parallel project memory or workflow.
+  Do not execute arbitrary dependency or repository code during discovery.
 
 ## Inputs and defaults
 
@@ -84,7 +88,7 @@ building a new framework.
    Do not run project tests, package installation, static-analysis scripts,
    hooks, or network access merely to prove setup; request approval for
    execution when it is outside the stated task.
-6. **LEARN: recommend at most three measurable project-specific
+6. **REPORT: recommend at most three measurable environment-specific
    improvements.** For example a confirmed PHPStan command, the real
    PHPUnit target, or a bounded repository-search convention. Ground every
    recommendation in inspected files or observed failure. Only implement

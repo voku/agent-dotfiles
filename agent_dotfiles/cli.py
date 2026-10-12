@@ -31,7 +31,9 @@ MAX_CONTEXT_LINES = 400
 MAX_CONTEXT_FILE_BYTES = 16 * 1024 * 1024
 
 REQUIRED_TOOLS = ("rg", "git")
-OPTIONAL_TOOLS = ("jq", "fd", "shellcheck", "strace", "hyperfine", "ast-grep", "ctags", "difft", "delta")
+OPTIONAL_TOOLS = ("jq", "curl", "fd", "shellcheck", "strace", "hyperfine", "ast-grep", "ctags", "difft", "delta")
+PROFILE_NAMES = ("minimal", "git", "php", "shell")
+PROFILE_SCHEMA = SCHEMA_VERSION + ".profile"
 
 
 def _resolve_executable(name: str) -> str | None:
@@ -48,7 +50,8 @@ def _find_fd() -> tuple[str | None, str | None]:
     return None, None
 
 
-def _doctor(strict: bool) -> tuple[dict[str, Any], int]:
+def _tool_inventory() -> tuple[dict[str, Any], dict[str, Any]]:
+    """Report executable paths without invoking shells, installers, or aliases."""
     required: dict[str, Any] = {}
     optional: dict[str, Any] = {}
     for name in REQUIRED_TOOLS:
@@ -65,6 +68,64 @@ def _doctor(strict: bool) -> tuple[dict[str, Any], int]:
         else:
             executable = _resolve_executable(name)
             optional[name] = {"available": executable is not None, "path": executable}
+    return required, optional
+
+
+def _profile_definition(name: str) -> dict[str, Any]:
+    """Load one fixed, packaged profile while rejecting executable or malformed data."""
+    path = Path(__file__).resolve().parent.parent / "profiles" / f"{name}.json"
+    try:
+        data: Any = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise CommandFailure("invalid_profile", f"Unable to load packaged profile {name!r}") from exc
+    known_tools = set(REQUIRED_TOOLS) | set(OPTIONAL_TOOLS)
+    if (not isinstance(data, dict) or set(data) != {"schema", "name", "description", "required_tools", "optional_tools", "platform_limits"}
+            or data["schema"] != PROFILE_SCHEMA or data["name"] != name or not isinstance(data["description"], str)
+            or not isinstance(data["required_tools"], list) or not isinstance(data["optional_tools"], list)
+            or not all(isinstance(value, str) and value in known_tools for value in data["required_tools"])
+            or not all(isinstance(value, str) and value in known_tools for value in data["optional_tools"])
+            or set(data["required_tools"]) & set(data["optional_tools"])
+            or not isinstance(data["platform_limits"], dict)):
+        raise CommandFailure("invalid_profile", f"Packaged profile {name!r} is invalid")
+    for tool, limit in data["platform_limits"].items():
+        if (tool not in known_tools or not isinstance(limit, dict) or set(limit) != {"platforms", "reason"}
+                or not isinstance(limit["platforms"], list)
+                or not all(isinstance(platform, str) for platform in limit["platforms"])
+                or not isinstance(limit["reason"], str)):
+            raise CommandFailure("invalid_profile", f"Packaged profile {name!r} has invalid platform limits")
+    return data
+
+
+def _profile_report(name: str, inventory: dict[str, Any]) -> dict[str, Any]:
+    """Describe one selected profile from observed binaries and declared platform bounds."""
+    definition = _profile_definition(name)
+    limits = definition["platform_limits"]
+    tools: list[dict[str, Any]] = []
+    unavailable: list[str] = []
+    for role in ("required", "optional"):
+        for tool in definition[f"{role}_tools"]:
+            limit = limits.get(tool)
+            platform_supported = limit is None or sys.platform in limit["platforms"]
+            detail = {"name": tool, "role": role, "available": inventory[tool]["available"],
+                      "platform_supported": platform_supported}
+            if inventory[tool].get("path") is not None:
+                detail["path"] = inventory[tool]["path"]
+            if inventory[tool].get("executable") is not None:
+                detail["executable"] = inventory[tool]["executable"]
+            if limit is not None:
+                detail["platform_limit"] = {"platforms": limit["platforms"], "reason": limit["reason"]}
+            tools.append(detail)
+            if not detail["available"] or not platform_supported:
+                unavailable.append(tool)
+    missing_required = [entry["name"] for entry in tools
+                        if entry["role"] == "required" and (not entry["available"] or not entry["platform_supported"])]
+    return {"name": name, "description": definition["description"], "tools": tools,
+            "unavailable": unavailable, "missing_required": missing_required,
+            "ready": not missing_required}
+
+
+def _doctor(strict: bool, profiles: list[str]) -> tuple[dict[str, Any], int]:
+    required, optional = _tool_inventory()
 
     missing_required = [name for name in REQUIRED_TOOLS if not required[name]["available"]]
     report = {
@@ -76,7 +137,11 @@ def _doctor(strict: bool) -> tuple[dict[str, Any], int]:
         "shell_startup_loaded": False,
         "installation_performed": False,
     }
-    return report, 2 if strict and missing_required else 0
+    if profiles:
+        inventory = {**required, **optional}
+        report["profiles"] = [_profile_report(name, inventory) for name in profiles]
+    profile_missing = [name for profile in report.get("profiles", []) for name in profile["missing_required"]]
+    return report, 2 if strict and (missing_required or profile_missing) else 0
 
 
 def _files_command(args: argparse.Namespace) -> tuple[dict[str, Any], int]:
@@ -578,6 +643,8 @@ def _parser() -> argparse.ArgumentParser:
 
     doctor = subcommands.add_parser("doctor", help="Read-only executable inventory")
     doctor.add_argument("--strict", action="store_true", help="Exit 2 if rg or git is missing")
+    doctor.add_argument("--profile", action="append", choices=PROFILE_NAMES, default=[],
+                        help="Report one fixed capability profile; repeatable and non-mutating")
 
     files = subcommands.add_parser("files", help="Bounded NUL-safe file discovery")
     files.add_argument("--root", default=".")
@@ -624,7 +691,7 @@ def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
         if args.command == "doctor":
-            report, exit_code = _doctor(args.strict)
+            report, exit_code = _doctor(args.strict, args.profile)
         elif args.command == "files":
             report, exit_code = _files_command(args)
         elif args.command == "search":

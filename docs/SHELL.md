@@ -62,6 +62,7 @@ symbols and callers still belong to agent-map and the Loop investigation skill.
 Scope discovery before reducing its output limit:
 
 ```bash
+agent_workspace --root /project
 agent_search 'sha256' --root /project --path agent_dotfiles --glob '*.py'
 agent_read agent_dotfiles/cli.py --root /project --start 220 --end 285
 ```
@@ -84,6 +85,7 @@ Use `--help` on a helper for the corresponding CLI contract.
 | --- | --- |
 | `agent_dotfiles` | Invoke any standalone CLI subcommand |
 | `agent_doctor` | Actual executable capability inventory |
+| `agent_workspace` | Bounded Git checkout identity and worktree status |
 | `agent_files` | Ignore-aware file discovery |
 | `agent_search` | Literal search by default; explicit regex/glob/path options |
 | `agent_read` | Exact source ranges and whole-file hash |
@@ -96,6 +98,7 @@ Use `--help` on a helper for the corresponding CLI contract.
 
 ```bash
 agent_files --root /project --hidden --limit 100
+agent_workspace --root /project
 agent_search 'invoice.total' --root /project --path templates --glob '*.twig'
 agent_read 'src/name [v2].php' --root /project --start 20 --end 70
 agent_tracked --root /project

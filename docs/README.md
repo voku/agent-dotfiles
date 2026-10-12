@@ -1,58 +1,50 @@
 # Documentation map
 
-The root [README](../README.md) is the product entry point. This index keeps
-setup and reference material separate from experiment history, so a first-time
-user does not need to read every CI receipt before trying the tools.
+Use the [project-first README](../README.md) for a minimal checkout-based
+quick start. This index separates consumer setup, reference contracts and
+historical measurements. Previous CI receipts are not merge approval.
 
 ## Start here
 
-- [Getting started](../README.md): who this is for, a safe first run, and the
-  smallest way to enable project-local agent skills
-- [Agent-assisted project setup prompt](../prompts/setup-project.md): paste into
-  Codex or Claude Code in the **target project** to discover and set up useful
-  optional integrations
-- [PHP project-onboarding skill](PROJECT_ONBOARDING.md): canonical source,
-  explicit Codex/Claude projection, and guarded manual fallback
-- [Installation, verification and rollback](INSTALLATION.md): pin source,
-  preview contents, install to a private prefix and verify without altering HOME
+- [Project overview and safe first use](../README.md)
+- [Agent-assisted Codex/Claude setup prompt](../prompts/setup-project.md) (opt-in;
+  never installs agent-loop or project memory)
+- [CLI commands, machine-readable schemas and exit codes](CLI.md)
+- [Read-only developer-tool capability plan](FIRST_INSTALL.md)
+- [Pinned installation, verification, and rollback](INSTALLATION.md)
+- [Bash/Zsh activation and helper contract](SHELL.md)
+- [Tool capability matrix](TOOL_MATRIX.md)
 
-## Reference and operational contracts
+## Coding-agent integrations
 
-- [CLI commands and exit codes](CLI.md)
-- [Bash/Zsh modules and activation](SHELL.md)
-- [Git context helpers](GIT_CONTEXT.md)
-- [Tool matrix](TOOL_MATRIX.md)
-- [Context and completeness policy](CONTEXT_POLICY.md)
-- [Security](SECURITY.md)
-- [agent-loop integration boundary](AGENT_LOOP.md)
+- [Optional agent-loop consumer boundary](AGENT_LOOP.md)
+- [Project onboarding skill for Codex and Claude Code](PROJECT_ONBOARDING.md)
+- [Selected portable agent-skills guidance](AGENT_SKILLS.md)
 
-## Evaluation and implementation history
+## Evidence, safety, and maintenance
 
-These documents record scoped experiments, historical source pins and
-investigations. Do not treat their old status statements as today's release,
-current HEAD or authorization to change the host.
+- [Security and operational contract](SECURITY.md)
+- [Context and truncation policy](CONTEXT_POLICY.md)
+- [Git evidence contract](GIT_CONTEXT.md)
+- [Mutation-testing scope](MUTATION_TESTING.md)
+- [Full-cycle maintenance evidence](FULL_CYCLE.md)
+- [Controlled evaluation record](EVALUATION_2026-10-11.md)
+- [Steady-state multi-task evaluation protocol](STEADY_STATE_EVALUATION.md)
+- [Follow-up momentum experiments](MOMENTUM_EXPERIMENTS.md)
 
-- [Full-cycle baseline](FULL_CYCLE.md)
-- [Controlled shell/CLI evaluation](EVALUATION_2026-10-11.md)
-- [Real owner-capability experiments](MOMENTUM_EXPERIMENTS.md)
-- [Governed PHP quality cycle](QUALITY_CYCLE_17.md)
+## Historical implementation notes
+
+- [Shell modularization](SHELL_REFACTOR.md)
+- [Quality cycle 17](QUALITY_CYCLE_17.md)
 - [Quality-first preflight](QUALITY_FIRST_PREFLIGHT.md)
-- [Mutation testing](MUTATION_TESTING.md)
-- [Shell refactor record](SHELL_REFACTOR.md)
-- [Upstream inspiration and differences](../UPSTREAM.md)
 
-## Repository areas
+For contribution, conduct, security reporting, and support, see the public links
+in the [repository README](../README.md).
 
-| Path | Ownership |
-| --- | --- |
-| `.bashrc`, `.zshrc`, `.shellrc`, `.functions`, `.exports` | Explicit shell entry points |
-| `shell/core/`, `shell/modules/` | Reviewed runtime activation and namespaced functions |
-| `bin/`, `agent_dotfiles/` | JSON CLI entry point and implementation |
-| `skills/` | Portable, opt-in coding-agent skills |
-| `prompts/` | Copyable human-to-agent setup instructions; **not** auto-executed |
-| `tools/`, `install.sh` | Offline pinned installer and development tooling |
-| `tests/`, `.github/workflows/` | Unit, integration and CI validation |
-| `docs/` | Guides, operational contracts and historical evidence |
+## Repository ownership and decisions
 
-Runtime paths are intentionally stable because the installer pins their bytes
-and manifests. Do not move them solely for cosmetic directory symmetry.
+- [Runtime versus maintainer-owned paths](REPOSITORY_LAYOUT.md).
+- [Opt-in setup prompt](../prompts/setup-project.md) is a maintainer-only
+  document, not part of the immutable consumer installation.
+- [Product boundaries (ADR 0001)](decisions/0001-product-boundaries.md).
+- [Optional agent-loop integration and owner contract](AGENT_LOOP.md).
