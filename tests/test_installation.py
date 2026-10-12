@@ -93,11 +93,11 @@ class InstallationTest(unittest.TestCase):
         # The source repository may run agent-loop itself. Do not forbid that:
         # assert the immutable installed payload is independent of these files.
         project_only = {
-            ".agent-loop/init.json": '{"version": 1}\\n',
-            ".agent-loop/learning/config.json": '{"schema_version": "1.0"}\\n',
-            ".agent-loop/learning/findings/validated/fixture.json": '{"id": "fixture"}\\n',
-            "MEMORY.md": "# Project-maintainer knowledge\\n",
-            "docs/recall-documents.json": '{"schema_version": "1.0", "documents": []}\\n",
+            ".agent-loop/init.json": '{"version": 1}\n',
+            ".agent-loop/learning/config.json": '{"schema_version": "1.0"}\n',
+            ".agent-loop/learning/findings/validated/fixture.json": '{"id": "fixture"}\n',
+            "MEMORY.md": "# Project-maintainer knowledge\n",
+            "docs/recall-documents.json": '{"schema_version": "1.0", "documents": []}\n",
         }
         for relative, content in project_only.items():
             file = self.source / relative
