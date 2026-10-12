@@ -32,3 +32,10 @@
 
 For contribution, conduct, security reporting, and support, see the public links
 in the [repository README](../README.md).
+
+## Repository ownership and decisions
+
+- [Runtime versus maintainer-owned paths](REPOSITORY_LAYOUT.md).
+- [Product boundaries (ADR 0001)](decisions/0001-product-boundaries.md).
+- [Project-local Learning and memory (ADR 0002)](decisions/0002-repository-learning.md).
+- [Durable repository memory](../MEMORY.md).

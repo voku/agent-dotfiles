@@ -124,6 +124,8 @@ and [full-cycle evidence](docs/FULL_CYCLE.md) for methods and limits.
 
 ## Documentation and community
 
+The [repository layout and ownership guide](docs/REPOSITORY_LAYOUT.md) explains exactly which files are deployed, which are maintainer-only, and why capability profiles are not shell settings. The [reviewed project memory](MEMORY.md) and [architectural decisions](docs/decisions/0001-product-boundaries.md) stay in this repository, not in consumer home directories.
+
 Start with the [documentation index](docs/README.md). The public project paths
 are [contributing](CONTRIBUTING.md), [code of conduct](CODE_OF_CONDUCT.md),
 [security reporting](docs/SECURITY.md), and [support](SUPPORT.md). The project

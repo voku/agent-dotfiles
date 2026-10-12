@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "paths": {
+    "learning_root": ".agent-loop/learning"
+  },
+  "interaction": {
+    "human_explanations": "ask"
+  },
+  "workflow": {
+    "future_work": {
+      "mode": "invest",
+      "max_follow_up_slices": 2
+    }
+  }
+}

@@ -29,3 +29,9 @@ that all machines or coding hosts share the local PATH. Updating agent-loop
 instruction or policy files belongs to agent-loop and requires its own review.
 
 - For shell/CLI integration changes run `bashunit test tests/shell --strict` (Bashunit 0.50.1) alongside the Python suite. Bashunit does not replace Python contract tests.
+
+## Project memory and architectural decisions
+
+Read [MEMORY.md](MEMORY.md) and [docs/REPOSITORY_LAYOUT.md](docs/REPOSITORY_LAYOUT.md) before changing activation, profile meaning or install paths. An approved project-specific decision belongs under `docs/decisions/`, not in global agent preferences. This checkout's `.agent-loop/init.json` points at a **project-local** Learning root; do not invent findings or claim a completed Learning/Recall workflow without executing its owner contracts. Review validated Learning records for private data before committing.
+
+Before recommending any automatic alias/default activation, re-run the independent agent task comparison owned by [evaluation #12](https://github.com/voku/agent-dotfiles/issues/12). Correctness and complete evidence outrank fewer bytes of output.
