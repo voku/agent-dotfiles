@@ -1,5 +1,6 @@
 """Pinned, isolated installation and fail-closed rollback contracts."""
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -22,11 +23,11 @@ class InstallationTest(unittest.TestCase):
         self.root = Path(temporary.name).resolve()
         self.source = self.root / "source"
         self.source.mkdir()
-        for name in ("agent_dotfiles", "bin", "shell", "skills", "profiles"):
+        for name in ("agent_dotfiles", "bin", ".redpill", "skills", "profiles"):
             shutil.copytree(PROJECT / name, self.source / name,
                             ignore=shutil.ignore_patterns("__pycache__"))
         shutil.copyfile(PROJECT / "LICENSE", self.source / "LICENSE")
-        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"):
+        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports", ".aliases"):
             (self.source / name).write_text(f"# independently known fixture: {name}\n")
         self.git("init", "-q")
         self.git("add", ".")
@@ -62,6 +63,25 @@ class InstallationTest(unittest.TestCase):
             if directory.exists():
                 directory.rmdir()
 
+    def remove_current_redpill_payload(self, data):
+        for name in (".aliases", ".redpill/modules/context.sh", ".redpill/modules/git.sh",
+                     ".redpill/core/activation.sh", ".redpill/core/deactivation.sh"):
+            (self.prefix / name).unlink()
+            del data["files"][name]
+        (self.prefix / ".redpill/modules").rmdir()
+        (self.prefix / ".redpill/core").rmdir()
+        (self.prefix / ".redpill").rmdir()
+
+    def add_legacy_shell_file(self, data, name):
+        target = self.prefix / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("# legacy shell payload\n")
+        target.chmod(0o644)
+        data["files"][name] = {
+            "sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
+            "mode": 0o644,
+        }
+
     def test_plan_is_read_only_and_matches_exact_install_manifest(self):
         status, report = self.command("plan", "--source", str(self.source),
                                       "--revision", self.revision)
@@ -72,8 +92,9 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(report["files"], len(report["entries"]))
         self.assertNotIn("installation.json", report["entries"])
         for name in ("bin/agent-dotfiles", ".bashrc", ".zshrc", ".shellrc",
-                     "shell/modules/context.sh", "shell/modules/git.sh",
-                     "shell/core/activation.sh", "shell/core/deactivation.sh",
+                     ".exports", ".functions", ".aliases",
+                     ".redpill/modules/context.sh", ".redpill/modules/git.sh",
+                     ".redpill/core/activation.sh", ".redpill/core/deactivation.sh",
                      "profiles/minimal.json", "profiles/git.json", "profiles/php.json", "profiles/shell.json",
                      "skills/project-onboarding/SKILL.md", "skills/portable-skills.json",
                      "skills/coding-simplicity/SKILL.md",
@@ -274,9 +295,9 @@ class InstallationTest(unittest.TestCase):
                  "commit", "-qm", "profile fixture")
         self.revision = self.git("rev-parse", "HEAD").strip()
         self.assertEqual(self.install()[0], 0)
-        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports",
-                     "shell/modules/context.sh", "shell/modules/git.sh",
-                     "shell/core/activation.sh", "shell/core/deactivation.sh",
+        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports", ".aliases",
+                     ".redpill/modules/context.sh", ".redpill/modules/git.sh",
+                     ".redpill/core/activation.sh", ".redpill/core/deactivation.sh",
                      "skills/project-onboarding/SKILL.md"):
             self.assertEqual((self.prefix / name).read_bytes(), (self.source / name).read_bytes())
         self.assertFalse(marker.exists())
@@ -303,7 +324,7 @@ class InstallationTest(unittest.TestCase):
         self.assertFalse(self.prefix.exists())
 
     def test_all_modules_required_for_new_installations(self):
-        self.git("rm", "shell/modules/git.sh")
+        self.git("rm", ".redpill/modules/git.sh")
         self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
                  "commit", "-qm", "missing shell module")
         self.revision = self.git("rev-parse", "HEAD").strip()
@@ -311,7 +332,7 @@ class InstallationTest(unittest.TestCase):
         self.assertFalse(self.prefix.exists())
 
     def test_all_core_files_required_for_new_installations(self):
-        self.git("rm", "shell/core/deactivation.sh")
+        self.git("rm", ".redpill/core/deactivation.sh")
         self.git("-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
                  "commit", "-qm", "missing shell core")
         self.revision = self.git("rev-parse", "HEAD").strip()
@@ -347,7 +368,7 @@ class InstallationTest(unittest.TestCase):
 
     def test_modified_core_refuses_verify_and_uninstall(self):
         self.assertEqual(self.install()[0], 0)
-        target = self.prefix / "shell/core/activation.sh"
+        target = self.prefix / ".redpill/core/activation.sh"
         target.write_text("# modified\n")
         self.assertEqual(self.command("verify")[0], 2)
         self.assertEqual(self.command("uninstall")[0], 2)
@@ -355,7 +376,7 @@ class InstallationTest(unittest.TestCase):
 
     def test_modified_module_refuses_verify_and_uninstall(self):
         self.assertEqual(self.install()[0], 0)
-        target = self.prefix / "shell/modules/git.sh"
+        target = self.prefix / ".redpill/modules/git.sh"
         target.write_text("# modified\n")
         self.assertEqual(self.command("verify")[0], 2)
         self.assertEqual(self.command("uninstall")[0], 2)
@@ -365,8 +386,8 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.install()[0], 0)
         manifest = self.prefix / "installation.json"
         data = json.loads(manifest.read_text())
-        (self.prefix / "shell/core/deactivation.sh").unlink()
-        del data["files"]["shell/core/deactivation.sh"]
+        (self.prefix / ".redpill/core/deactivation.sh").unlink()
+        del data["files"][".redpill/core/deactivation.sh"]
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify")[0], 2)
         self.assertEqual(self.command("uninstall")[0], 2)
@@ -375,8 +396,8 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.install()[0], 0)
         manifest = self.prefix / "installation.json"
         data = json.loads(manifest.read_text())
-        (self.prefix / "shell/modules/context.sh").unlink()
-        del data["files"]["shell/modules/context.sh"]
+        (self.prefix / ".redpill/modules/context.sh").unlink()
+        del data["files"][".redpill/modules/context.sh"]
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify")[0], 2)
         self.assertEqual(self.command("uninstall")[0], 2)
@@ -398,10 +419,9 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.install()[0], 0)
         manifest = self.prefix / "installation.json"
         data = json.loads(manifest.read_text())
-        for name in ("shell/core/activation.sh", "shell/core/deactivation.sh"):
-            (self.prefix / name).unlink()
-            del data["files"][name]
-        (self.prefix / "shell/core").rmdir()
+        self.remove_current_redpill_payload(data)
+        self.add_legacy_shell_file(data, "shell/modules/context.sh")
+        self.add_legacy_shell_file(data, "shell/modules/git.sh")
         self.remove_skills_from_legacy_manifest(data)
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
@@ -412,13 +432,7 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.install()[0], 0)
         manifest = self.prefix / "installation.json"
         data = json.loads(manifest.read_text())
-        for name in ("shell/modules/context.sh", "shell/modules/git.sh",
-                     "shell/core/activation.sh", "shell/core/deactivation.sh"):
-            (self.prefix / name).unlink()
-            del data["files"][name]
-        (self.prefix / "shell/modules").rmdir()
-        (self.prefix / "shell/core").rmdir()
-        (self.prefix / "shell").rmdir()
+        self.remove_current_redpill_payload(data)
         self.remove_skills_from_legacy_manifest(data)
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
@@ -429,14 +443,10 @@ class InstallationTest(unittest.TestCase):
         self.assertEqual(self.install()[0], 0)
         manifest = self.prefix / "installation.json"
         data = json.loads(manifest.read_text())
-        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports",
-                     "shell/modules/context.sh", "shell/modules/git.sh",
-                     "shell/core/activation.sh", "shell/core/deactivation.sh"):
+        self.remove_current_redpill_payload(data)
+        for name in (".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"):
             (self.prefix / name).unlink()
             del data["files"][name]
-        (self.prefix / "shell/modules").rmdir()
-        (self.prefix / "shell/core").rmdir()
-        (self.prefix / "shell").rmdir()
         self.remove_skills_from_legacy_manifest(data)
         manifest.write_text(json.dumps(data))
         self.assertEqual(self.command("verify", "--revision", self.revision)[0], 0)
@@ -477,7 +487,7 @@ class InstallationTest(unittest.TestCase):
         plan = json.loads(result.stdout)
         self.assertEqual(plan["operation"], "plan")
         self.assertEqual(plan["source_revision"], self.revision)
-        self.assertIn("shell/modules/context.sh", plan["entries"])
+        self.assertIn(".redpill/modules/context.sh", plan["entries"])
         self.assertFalse(self.prefix.exists())
 
     def test_frontend_default_install_and_explicit_lifecycle_unusual_root(self):

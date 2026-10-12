@@ -9,9 +9,9 @@ import tempfile
 import unittest
 
 PROJECT = Path(__file__).resolve().parent.parent
-ASSETS = ('.bashrc', '.zshrc', '.shellrc', '.exports', '.functions',
-          'shell/modules/context.sh', 'shell/modules/git.sh',
-          'shell/core/activation.sh', 'shell/core/deactivation.sh')
+ASSETS = ('.bashrc', '.zshrc', '.shellrc', '.exports', '.functions', '.aliases',
+          '.redpill/modules/context.sh', '.redpill/modules/git.sh',
+          '.redpill/core/activation.sh', '.redpill/core/deactivation.sh')
 
 
 class ShellProfilesTest(unittest.TestCase):
@@ -73,6 +73,8 @@ agent_deactivate
 [ "${AGENT_DOTFILES_HOME+x}" != x ]
 ! typeset -f agent_search >/dev/null 2>&1
 ! typeset -f agent_workspace >/dev/null 2>&1
+! typeset -f agent_git >/dev/null 2>&1
+! typeset -f agent_rg >/dev/null 2>&1
 ''', ('space λ', str(self.home)), {'CDPATH': str(self.root)})
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual(result.stdout, '')
@@ -106,6 +108,8 @@ agent_deactivate
         for shell, profile in self.shells():
             for script in ['agent_search() { printf original; }; . "$1"',
                            'agent_workspace() { printf original; }; . "$1"',
+                           'agent_git() { printf original; }; . "$1"',
+                           'agent_rg() { printf original; }; . "$1"',
                            'AGENT_DOTFILES_HOME=existing; . "$1"',
                            'alias agent_read="printf original"; . "$1"']:
                 result = self.run_shell(shell, profile, script)
@@ -117,14 +121,20 @@ agent_deactivate
             self.assertEqual(result.returncode, 2)
             self.assertIn('.functions', result.stderr)
         shutil.copyfile(PROJECT / '.functions', self.home / '.functions')
-        (self.home / 'shell/modules/context.sh').unlink()
+        (self.home / '.aliases').unlink()
         for shell, profile in self.shells():
             result = self.run_shell(shell, profile, '. "$1"')
             self.assertEqual(result.returncode, 2)
-            self.assertIn('shell/modules/context.sh', result.stderr)
+            self.assertIn('.aliases', result.stderr)
+        shutil.copyfile(PROJECT / '.aliases', self.home / '.aliases')
+        (self.home / '.redpill/modules/context.sh').unlink()
+        for shell, profile in self.shells():
+            result = self.run_shell(shell, profile, '. "$1"')
+            self.assertEqual(result.returncode, 2)
+            self.assertIn('.redpill/modules/context.sh', result.stderr)
 
     def test_missing_core_refuses_without_partial_namespace(self):
-        for name in ('shell/core/activation.sh', 'shell/core/deactivation.sh'):
+        for name in ('.redpill/core/activation.sh', '.redpill/core/deactivation.sh'):
             target = self.home / name
             content = target.read_bytes()
             try:
@@ -146,9 +156,9 @@ agent_source_status=$?
 
     def test_directory_assets_refuse_without_partial_namespace(self):
         # Readable/searchable directories are not source files or executables.
-        for name in ('.shellrc', '.exports', '.functions',
-                     'shell/core/activation.sh', 'shell/core/deactivation.sh',
-                     'shell/modules/context.sh', 'shell/modules/git.sh',
+        for name in ('.shellrc', '.exports', '.functions', '.aliases',
+                     '.redpill/core/activation.sh', '.redpill/core/deactivation.sh',
+                     '.redpill/modules/context.sh', '.redpill/modules/git.sh',
                      'bin/agent-dotfiles'):
             target = self.home / name
             content, mode = target.read_bytes(), target.stat().st_mode & 0o777
@@ -162,7 +172,7 @@ agent_source_status=$?
 activation_result=$?
 [ "$activation_result" = 2 ] || exit 10
 [ "${AGENT_DOTFILES_HOME+x}" != x ] || exit 11
-for helper in agent_dotfiles agent_doctor agent_workspace agent_files agent_search agent_read agent_tracked agent_status agent_patch agent_history agent_blame agent_deactivate; do
+for helper in agent_dotfiles agent_doctor agent_workspace agent_files agent_search agent_read agent_tracked agent_status agent_patch agent_history agent_blame agent_git agent_rg agent_deactivate; do
     ! typeset -f "$helper" >/dev/null 2>&1 || exit 12
 done
 """)
@@ -191,7 +201,26 @@ done
                 result = self.run_shell(shell, profile, '. "$1"; "$2" -- "$3"', (helper, 'path [λ]\n'),
                                         {'PATH': str(git.parent) + os.pathsep + os.environ['PATH']})
                 self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertEqual(json.loads(result.stdout), ['--no-pager', '--literal-pathspecs', '-c', 'color.ui=false', operation, *extra, '--', 'path [λ]\n'])
+                self.assertEqual(json.loads(result.stdout), ['--no-pager', '-c', 'color.ui=false', '--literal-pathspecs', operation, *extra, '--', 'path [λ]\n'])
+
+    def test_scoped_agent_native_defaults_are_explicit_and_reversible(self):
+        rg = self.home / 'bin/rg'
+        rg.write_text(f'#!{sys.executable}\nimport json,os,sys\nprint(json.dumps({{"argv": sys.argv[1:], "config": os.environ.get("RIPGREP_CONFIG_PATH")}}))\n')
+        rg.chmod(0o755)
+        git = self.home / 'bin/git'
+        git.write_text(f'#!{sys.executable}\nimport json,os,sys\nprint(json.dumps({{"argv": sys.argv[1:], "pager": os.environ.get("GIT_PAGER"), "prompt": os.environ.get("GIT_TERMINAL_PROMPT")}}))\n')
+        git.chmod(0o755)
+        for shell, profile in self.shells():
+            result = self.run_shell(
+                shell, profile,
+                '. "$1"; agent_rg --json needle; agent_git status; agent_deactivate',
+                environment={'PATH': str(rg.parent) + os.pathsep + os.environ['PATH'],
+                             'RIPGREP_CONFIG_PATH': '/unsafe/config'},
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            lines = [json.loads(line) for line in result.stdout.splitlines()]
+            self.assertEqual(lines[0], {'argv': ['--no-config', '--color=never', '--json', 'needle'], 'config': '/dev/null'})
+            self.assertEqual(lines[1], {'argv': ['--no-pager', '-c', 'color.ui=false', 'status'], 'pager': 'cat', 'prompt': '0'})
 
     def test_real_checkout_source_evidence(self):
         source = self.root / 'literal [λ]\n.py'

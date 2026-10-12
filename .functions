@@ -1,7 +1,9 @@
 # Explicit module order; no plugin search, globbing, user startup, or eval.
-# shellcheck source=shell/modules/context.sh
-. "$AGENT_DOTFILES_HOME/shell/modules/context.sh"
-# shellcheck source=shell/modules/git.sh
-. "$AGENT_DOTFILES_HOME/shell/modules/git.sh"
-# shellcheck source=shell/core/deactivation.sh
-. "$AGENT_DOTFILES_HOME/shell/core/deactivation.sh"
+# shellcheck source=.redpill/modules/context.sh
+. "$AGENT_DOTFILES_HOME/.redpill/modules/context.sh"
+# shellcheck source=.redpill/modules/git.sh
+. "$AGENT_DOTFILES_HOME/.redpill/modules/git.sh"
+# shellcheck source=.aliases
+. "$AGENT_DOTFILES_HOME/.aliases"
+# shellcheck source=.redpill/core/deactivation.sh
+. "$AGENT_DOTFILES_HOME/.redpill/core/deactivation.sh"

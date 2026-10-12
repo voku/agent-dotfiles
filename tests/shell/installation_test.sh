@@ -9,9 +9,9 @@ from pathlib import Path
 import shutil, sys
 source, fixture = map(Path, sys.argv[1:])
 fixture.mkdir()
-for name in ('agent_dotfiles', 'bin', 'shell', 'skills', 'profiles'):
+for name in ('agent_dotfiles', 'bin', '.redpill', 'skills', 'profiles'):
     shutil.copytree(source / name, fixture / name, ignore=shutil.ignore_patterns('__pycache__'))
-for name in ('LICENSE', '.bashrc', '.zshrc', '.shellrc', '.functions', '.exports'):
+for name in ('LICENSE', '.bashrc', '.zshrc', '.shellrc', '.functions', '.exports', '.aliases'):
     shutil.copyfile(source / name, fixture / name)
 PY
   git init -q "$INSTALL_TEST_ROOT/source"

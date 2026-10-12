@@ -14,7 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 class RepositoryOwnershipTest(unittest.TestCase):
     def test_maintainer_files_are_not_consumer_payload(self) -> None:
         for name in (
+            "MEMORY.md",
             "docs/REPOSITORY_LAYOUT.md",
+            "docs/decisions/0002-agent-shell-and-memory.md",
             "docs/STEADY_STATE_EVALUATION.md",
             "docs/decisions/0001-product-boundaries.md",
             "tools/install.py",
@@ -24,6 +26,12 @@ class RepositoryOwnershipTest(unittest.TestCase):
             with self.subTest(path=name):
                 self.assertTrue((ROOT / name).is_file(), name)
                 self.assertFalse(installation_path(name), name)
+
+    def test_project_memory_has_the_agent_loop_contract(self) -> None:
+        memory = (ROOT / "MEMORY.md").read_text(encoding="utf-8")
+        self.assertIn("## Durable repository rules", memory)
+        self.assertIn("| Subject | Durable rule | Canonical home |", memory)
+        self.assertIn("## Archived task learning", memory)
 
     def test_external_workflow_state_is_never_installed(self) -> None:
         # A maintainer may dogfood agent-loop in this very checkout.
@@ -46,8 +54,9 @@ class RepositoryOwnershipTest(unittest.TestCase):
 
     def test_runtime_inputs_remain_explicit(self) -> None:
         for name in (
-            ".bashrc", ".zshrc", ".shellrc", ".exports", ".functions",
-            "shell/modules/context.sh", "shell/modules/git.sh",
+            ".bashrc", ".zshrc", ".shellrc", ".exports", ".functions", ".aliases",
+            ".redpill/modules/context.sh", ".redpill/modules/git.sh",
+            ".redpill/core/activation.sh", ".redpill/core/deactivation.sh",
             "profiles/minimal.json",
         ):
             with self.subTest(path=name):

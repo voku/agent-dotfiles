@@ -10,6 +10,11 @@ mutation.sqlite
 mutation-results.jsonl
 mutation-summary.md
 
+# Governed sessions, Recall receipts and raw Learning observations are local
+# agent-loop state. Curated, reviewable project knowledge lives in MEMORY.md
+# and docs/decisions/ instead.
+.agent-loop/
+
 # Generated evaluations and release payloads belong in CI artifacts or pinned history.
 docs/benchmarks/
 docs/releases/

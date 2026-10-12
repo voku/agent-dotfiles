@@ -13,7 +13,7 @@ A tool appearing in dotfiles does **not** prove it is agent-safe. Test actual ex
 | `hyperfine` | Command performance evidence | Repeat runs, record machine + cache state | Optional, benchmark harness later |
 | `fzf` | Interactive terminal selection | TTY and key binding assumptions | Excluded from agent profile |
 | `ag` with pager | Human readable text search | Can invoke `less` or add color | Excluded from agent profile |
-| `.redpill` functions/aliases | Human shell shortcuts | Interactive startup, global shell changes | Excluded from agent profile |
+| `.redpill` functions | Namespaced, noninteractive agent commands | Hidden plugins, command replacement, global startup | Fixed reviewed runtime only |
 
 ## Differences that matter
 

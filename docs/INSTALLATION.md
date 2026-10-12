@@ -55,8 +55,8 @@ Replace the capitalized placeholders. The prefix must be absent or empty, outsid
 the checkout, and without symlinks or `..` components. All tracked checkout files
 must be clean; untracked and ignored files are excluded. The installer reads the
 pinned Git objects and checks the runtime files against the working copy. It copies
-only tracked Python package files, the original entry point, the five agent-owned
-shell profiles/shared files, the two fixed `shell/modules/` helper files, the two `shell/core/` lifecycle files, the four non-executable `profiles/*.json` capability declarations,
+only tracked Python package files, the original entry point, the six agent-owned
+shell entry/shared files, the fixed `.redpill/` helper and lifecycle files, the four non-executable `profiles/*.json` capability declarations,
 `skills/project-onboarding/SKILL.md`, the selected portable skill directories
 and `skills/portable-skills.json`, and the license, plus
 a small generated launcher and a versioned installation manifest. It refuses

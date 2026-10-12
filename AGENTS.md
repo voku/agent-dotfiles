@@ -38,9 +38,11 @@ maintained here; selected portable skill content originates in `voku/agent-skill
 and retains upstream ownership. Packaging a skill does not grant it control over
 project workflow, approvals, Learning, Recall or memory.
 `agent-loop` is an independently selected, separately installed workflow owner
-for planning, sessions, review, Learning, Recall and memory. Do not create a
-parallel project memory store, promote Learning findings, or modify Loop policy
-as part of an environment change. See
+for planning, sessions, review, Learning, Recall and memory. `MEMORY.md` and
+`docs/decisions/` are this project's reviewed inputs to that owner; raw
+`.agent-loop/` sessions, receipts and findings are local state and remain
+untracked. Do not create a second memory format, promote Learning findings, or
+modify Loop policy as part of an environment change. See
 [repository layout](docs/REPOSITORY_LAYOUT.md) and
 [agent-loop integration](docs/AGENT_LOOP.md).
 
