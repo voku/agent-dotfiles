@@ -3,8 +3,8 @@
 **A safe, optional shell environment for coding agents.**
 
 `agent-dotfiles` helps a coding agent inspect an unfamiliar repository without
-turning partial output into invented certainty. It provides explicit Bash/Zsh
-profiles plus a small Python CLI for bounded search, exact source ranges,
+turning partial output into invented certainty. Its reviewed `.redpill/` runtime
+provides explicit Bash/Zsh entry points plus a small Python CLI for bounded search, exact source ranges,
 file-scoped Git patches, repository state, and machine-readable capability
 reports.
 
@@ -46,6 +46,11 @@ Use `.zshrc` in Zsh. In a fresh non-interactive shell, start Bash with
 `env -u BASH_ENV bash --noprofile --norc` or Zsh with `zsh -f`, then explicitly
 source the reviewed profile. The [shell contract](docs/SHELL.md) describes the
 namespaced helpers, exit statuses, and activation guarantees.
+
+The familiar `.exports`, `.functions`, and `.aliases` entry points are adapted
+for agents: `.exports` identifies only the selected runtime; `.functions` loads
+a fixed reviewed module list; and `.aliases` contains portable named commands
+instead of fragile interactive aliases. No command overrides `git` or `rg`.
 
 ## Pick the smallest useful tool
 
@@ -130,6 +135,11 @@ consumer-installed tools from source-only examples and documentation. See
 `agent-dotfiles` provides an optional execution environment; `agent-loop`
 independently owns task workflow, Learning, Recall and memory. Neither
 is installed or configured implicitly by the other.
+
+This repository tracks short, reviewable [project memory](MEMORY.md) and
+[decisions](docs/decisions/0002-agent-shell-and-memory.md) for its own agent-loop maintenance. Raw sessions
+and run receipts remain local `.agent-loop/` state and are never installed for
+consumers.
 
 Start with the [documentation index](docs/README.md). The public project paths
 are [contributing](CONTRIBUTING.md), [code of conduct](CODE_OF_CONDUCT.md),

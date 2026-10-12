@@ -16,9 +16,14 @@ import tempfile
 
 SCHEMA = "agent-dotfiles.v1.installation"
 MANIFEST = "installation.json"
-SHELL_FILES = {".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"}
-SHELL_MODULES = {"shell/modules/context.sh", "shell/modules/git.sh"}
-SHELL_CORE = {"shell/core/activation.sh", "shell/core/deactivation.sh"}
+SHELL_ENTRYPOINTS = {".bashrc", ".zshrc", ".shellrc", ".functions", ".exports"}
+SHELL_ALIASES = {".aliases"}
+REDPILL_MODULES = {".redpill/modules/context.sh", ".redpill/modules/git.sh"}
+REDPILL_CORE = {".redpill/core/activation.sh", ".redpill/core/deactivation.sh"}
+CURRENT_SHELL_PAYLOAD = SHELL_ENTRYPOINTS | SHELL_ALIASES | REDPILL_MODULES | REDPILL_CORE
+# Retain these identifiers only to verify and remove older pinned installations.
+LEGACY_SHELL_MODULES = {"shell/modules/context.sh", "shell/modules/git.sh"}
+LEGACY_SHELL_CORE = {"shell/core/activation.sh", "shell/core/deactivation.sh"}
 PROFILE_FILES = {"profiles/minimal.json", "profiles/git.json", "profiles/php.json", "profiles/shell.json"}
 LOCAL_SKILL_FILES = {"skills/project-onboarding/SKILL.md"}
 PORTABLE_SKILLS = {
@@ -85,7 +90,8 @@ def portable_skill_path(name: str) -> bool:
 
 def installation_path(name: str) -> bool:
     return (name in {"LICENSE", "bin/agent-dotfiles", "libexec/agent-dotfiles", PORTABLE_SKILL_MANIFEST}
-            | SHELL_FILES | SHELL_MODULES | SHELL_CORE | PROFILE_FILES | LOCAL_SKILL_FILES
+            | CURRENT_SHELL_PAYLOAD | LEGACY_SHELL_MODULES | LEGACY_SHELL_CORE
+            | PROFILE_FILES | LOCAL_SKILL_FILES
             or runtime_path(name) or portable_skill_path(name))
 
 
@@ -142,7 +148,7 @@ def install(source: Path, revision: str, prefix: Path, *, preview: bool = False)
     paths = [name for name in paths if installation_path(name)]
     required = ({"LICENSE", "bin/agent-dotfiles", "agent_dotfiles/__init__.py",
                  "agent_dotfiles/cli.py", PORTABLE_SKILL_MANIFEST}
-                | SHELL_FILES | SHELL_MODULES | SHELL_CORE | LOCAL_SKILL_FILES
+                | CURRENT_SHELL_PAYLOAD | LOCAL_SKILL_FILES
                 | PROFILE_FILES | PORTABLE_SKILL_FILES)
     if not required.issubset(paths):
         raise SetupError("tracked runtime files are missing")
@@ -208,16 +214,20 @@ def verify(prefix: Path) -> dict:
                 "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"}
     if not required.issubset(files):
         raise SetupError("incomplete installation manifest")
-    if set(files) & SHELL_FILES and not SHELL_FILES.issubset(files):
+    current_shell_markers = SHELL_ALIASES | REDPILL_MODULES | REDPILL_CORE
+    if set(files) & current_shell_markers and not CURRENT_SHELL_PAYLOAD.issubset(files):
+        raise SetupError("incomplete Redpill shell payload manifest")
+    if set(files) & SHELL_ENTRYPOINTS and not SHELL_ENTRYPOINTS.issubset(files):
         raise SetupError("incomplete shell profile manifest")
     # Existing v0.4.0 manifests have no modules and remain verifiable.
-    if set(files) & SHELL_MODULES and (not SHELL_MODULES.issubset(files) or not SHELL_FILES.issubset(files)):
+    if set(files) & LEGACY_SHELL_MODULES and (not LEGACY_SHELL_MODULES.issubset(files)
+                                              or not SHELL_ENTRYPOINTS.issubset(files)):
         raise SetupError("incomplete shell module manifest")
     # Pre-core v1 modular installations remain verifiable for rollback.
     # Once a core file is present, its entire reviewed dependency set is required.
-    if set(files) & SHELL_CORE and (not SHELL_CORE.issubset(files)
-                                    or not SHELL_MODULES.issubset(files)
-                                    or not SHELL_FILES.issubset(files)):
+    if set(files) & LEGACY_SHELL_CORE and (not LEGACY_SHELL_CORE.issubset(files)
+                                           or not LEGACY_SHELL_MODULES.issubset(files)
+                                           or not SHELL_ENTRYPOINTS.issubset(files)):
         raise SetupError("incomplete shell lifecycle manifest")
     if set(files) & PROFILE_FILES and not PROFILE_FILES.issubset(files):
         raise SetupError("incomplete capability profile manifest")

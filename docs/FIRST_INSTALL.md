@@ -12,7 +12,9 @@ the network. Installation of the agent-dotfiles runtime is separately handled by
 ./firstInstall.sh plan --profile debug
 ```
 
-Profiles are fixed inventories, not shell startup scripts:
+`firstInstall.sh` uses its own small **planning selections** for package
+recommendations. They are not files, local configuration, shell startup scripts
+or the diagnostic `profiles/*.json` catalog used by `doctor`:
 
 - `minimal`: Python 3, Git, ripgrep, jq, curl.
 - `php`: minimal plus PHP and Composer (detected only: no assumed correct system PHP packages).
@@ -44,6 +46,7 @@ Do not inherit historical dotfiles global shell changes or quiet-output claims.
 ## Future gates
 
 A separate approved slice may add an **explicit** install/apply mode only after
-isolated Ubuntu/macOS dogfood and package-source/permission review. Another
-slice may add fixed `.redpill/` profiles with backwards-compatible manifests.
+isolated Ubuntu/macOS dogfood and package-source/permission review. The fixed
+`.redpill/` shell runtime is packaged separately by `install.sh`; it is not a
+planner profile and never installs tools.
 No automatic install is authorized by this document.

@@ -119,9 +119,9 @@ jobs:
         run: |
           shellcheck --severity=warning -s sh install.sh firstInstall.sh
           sh -n firstInstall.sh
-          shellcheck --severity=warning -s bash .bashrc .shellrc .functions .exports shell/modules/context.sh shell/modules/git.sh shell/core/activation.sh shell/core/deactivation.sh
-          for file in .bashrc .shellrc .functions .exports shell/modules/context.sh shell/modules/git.sh shell/core/activation.sh shell/core/deactivation.sh; do bash -n "$file"; done
-          for file in .zshrc .shellrc .functions .exports shell/modules/context.sh shell/modules/git.sh shell/core/activation.sh shell/core/deactivation.sh; do zsh -n "$file"; done
+          shellcheck --severity=warning -s bash .bashrc .shellrc .functions .exports .aliases .redpill/modules/context.sh .redpill/modules/git.sh .redpill/core/activation.sh .redpill/core/deactivation.sh
+          for file in .bashrc .shellrc .functions .exports .aliases .redpill/modules/context.sh .redpill/modules/git.sh .redpill/core/activation.sh .redpill/core/deactivation.sh; do bash -n "$file"; done
+          for file in .zshrc .shellrc .functions .exports .aliases .redpill/modules/context.sh .redpill/modules/git.sh .redpill/core/activation.sh .redpill/core/deactivation.sh; do zsh -n "$file"; done
       - name: Actual Bash and Zsh activation contracts
         env:
           REQUIRE_ZSH: "1"
@@ -170,9 +170,9 @@ jobs:
           assert plan["source_revision"] == sys.argv[3] == manifest["source_revision"]
           assert plan["entries"] == manifest["files"], "preview differs from installed payload"
           required = {
-              ".bashrc", ".zshrc", ".shellrc",
-              "shell/core/activation.sh", "shell/core/deactivation.sh",
-              "shell/modules/context.sh", "shell/modules/git.sh",
+              ".bashrc", ".zshrc", ".shellrc", ".aliases",
+              ".redpill/core/activation.sh", ".redpill/core/deactivation.sh",
+              ".redpill/modules/context.sh", ".redpill/modules/git.sh",
           }
           assert required.issubset(plan["entries"]), "required shell assets missing"
           PY

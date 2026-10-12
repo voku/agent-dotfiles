@@ -6,11 +6,13 @@
 - [Read-only developer-tool capability plan](FIRST_INSTALL.md)
 - [Pinned installation, verification, and rollback](INSTALLATION.md)
 - [Bash/Zsh activation and helper contract](SHELL.md)
+- [Runtime versus maintainer-owned paths](REPOSITORY_LAYOUT.md)
 - [Tool capability matrix](TOOL_MATRIX.md)
 
 ## Coding-agent integrations
 
 - [Optional agent-loop consumer boundary](AGENT_LOOP.md)
+- [Project memory](../MEMORY.md) and [reviewed decisions](decisions/0002-agent-shell-and-memory.md)
 - [Project onboarding skill for Codex and Claude Code](PROJECT_ONBOARDING.md)
 - [Selected portable agent-skills guidance](AGENT_SKILLS.md)
 
@@ -38,4 +40,5 @@ in the [repository README](../README.md).
 
 - [Runtime versus maintainer-owned paths](REPOSITORY_LAYOUT.md).
 - [Product boundaries (ADR 0001)](decisions/0001-product-boundaries.md).
+- [Fixed Redpill runtime and project memory (ADR 0002)](decisions/0002-agent-shell-and-memory.md).
 - [Optional agent-loop integration and owner contract](AGENT_LOOP.md).

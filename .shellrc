@@ -17,13 +17,13 @@ _agent_dotfiles_bootstrap() {
     }
     _agent_home=${_agent_home%.}
     _agent_home=${_agent_home%$'\n'}
-    if [ ! -f "$_agent_home/shell/core/activation.sh" ] || [ ! -r "$_agent_home/shell/core/activation.sh" ]; then
-        printf 'agent-dotfiles: required shell/core/activation.sh is missing or unreadable\n' >&2
+    if [ ! -f "$_agent_home/.redpill/core/activation.sh" ] || [ ! -r "$_agent_home/.redpill/core/activation.sh" ]; then
+        printf 'agent-dotfiles: required .redpill/core/activation.sh is missing or unreadable\n' >&2
         unset -f _agent_dotfiles_bootstrap
         return 2
     fi
-    # shellcheck source=shell/core/activation.sh
-    . "$_agent_home/shell/core/activation.sh"
+    # shellcheck source=.redpill/core/activation.sh
+    . "$_agent_home/.redpill/core/activation.sh"
     _agent_status=$?
     if [ "$_agent_status" -eq 0 ]; then
         _agent_dotfiles_activate "$_agent_home"

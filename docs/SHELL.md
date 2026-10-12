@@ -1,8 +1,9 @@
 # Agent-owned Bash and Zsh setup
 
 These dotfiles share the familiar layout of `voku/dotfiles`, but their contents
-are independently designed for agents. They do not source upstream/user profiles,
-load `.redpill`, create terminal sessions, configure prompts or change shell options.
+are independently designed for agents. The reviewed `.redpill/` directory is a
+fixed runtime tree: it does not source upstream/user profiles, load plugins,
+create terminal sessions, configure prompts or change shell options.
 No helper shadows `git`, `rg`, `cd` or another native command.
 
 ## Explicit activation
@@ -39,11 +40,11 @@ version. No eval-based restoration or command interception is involved.
 ## Explicit shell lifecycle and modules
 
 `.bashrc` and `.zshrc` delegate to `.shellrc`, which resolves the reviewed
-installation root and loads exactly `shell/core/activation.sh`. Core activation
+installation root and loads exactly `.redpill/core/activation.sh`. Core activation
 checks the required assets, executable, exported namespace and owned function
 names **before** exporting anything. `.functions` then loads the reviewed
-`shell/modules/context.sh`, `shell/modules/git.sh` and
-`shell/core/deactivation.sh` in fixed order. There is no plugin discovery,
+`.redpill/modules/context.sh`, `.redpill/modules/git.sh`, `.aliases` and
+`.redpill/core/deactivation.sh` in fixed order. There is no plugin discovery,
 host startup sourcing, dynamic evaluation or per-host runtime configuration.
 
 The pinned installation manifest includes and hashes both lifecycle files,
@@ -94,6 +95,8 @@ Use `--help` on a helper for the corresponding CLI contract.
 | `agent_patch` | Complete patch for one literal tracked file |
 | `agent_history` | Native Git log, with literal pathspecs and no pager/color |
 | `agent_blame` | Native Git line-porcelain blame, with literal pathspecs |
+| `agent_git` | Explicit native Git with no pager/color or credential prompt |
+| `agent_rg` | Explicit ripgrep with no host configuration or color |
 | `agent_deactivate` | Remove this namespace and installation-location export |
 
 ```bash
@@ -106,9 +109,14 @@ agent_status --root /project
 agent_patch 'src/name [v2].php' --root /project
 (cd /project && agent_history -- src/Service.php)
 (cd /project && agent_blame -- src/Service.php)
+agent_rg -n --fixed-strings 'APP_ENV' /project
+agent_git -C /project diff --no-ext-diff --no-textconv --binary --full-index
 ```
 
-Native history/blame use Git's own syntax and output, not JSON envelopes or the
+`agent_git` and `agent_rg` are opt-in functions, never command replacements.
+They scope no-pager, no-prompt and no-ripgrep-config defaults to that single
+call; they do not change `PAGER`, `GIT_PAGER`, `NO_COLOR`, `PATH`, Git config or
+the host's normal `git`/`rg` behavior. Native history/blame use Git's own syntax and output, not JSON envelopes or the
 CLI's output caps. History/blame operate in the current repository; their arguments are passed to
 `git log` and `git blame`, respectively. Use a subshell as above for another root.
 Read the complete patch or source when required; bounded discovery never proves
