@@ -20,6 +20,8 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install real search validator
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
       - name: Compile
         run: python -m compileall -q agent_dotfiles bin tests tools
       - name: Contract tests
@@ -72,6 +74,8 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.15'
+      - name: Install real macOS search validator
+        run: command -v rg >/dev/null || brew install ripgrep
       - name: Installation, Bash and Zsh source contracts on macOS
         env:
           REQUIRE_ZSH: "1"
@@ -114,7 +118,7 @@ jobs:
         with:
           python-version: '3.15'
       - name: Install independent shell validators
-        run: sudo apt-get update && sudo apt-get install -y zsh shellcheck
+        run: sudo apt-get update && sudo apt-get install -y zsh shellcheck ripgrep
       - name: ShellCheck and Bash/Zsh syntax
         run: |
           shellcheck --severity=warning -s sh install.sh firstInstall.sh
@@ -140,7 +144,7 @@ jobs:
         with:
           python-version: '3.15'
       - name: Install Zsh for a fresh consumer
-        run: sudo apt-get update && sudo apt-get install -y zsh
+        run: sudo apt-get update && sudo apt-get install -y zsh ripgrep
       - name: Verify candidate source, install, activate, verify and uninstall
         env:
           CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
