@@ -92,7 +92,7 @@ function test_git_patch_is_full_patch_not_diffstat() {
 }
 
 function test_source_checkout_has_no_automatic_publish_or_install() {
-  assert_file_exists "$PROJECT_ROOT/config/gitconfig.agent.example"
+  assert_file_exists "$PROJECT_ROOT/examples/gitconfig.agent.example"
   assert_file_not_exists "$PROJECT_ROOT/scripts/publish.sh"
   assert_file_exists "$PROJECT_ROOT/agent_dotfiles/cli.py"
 }

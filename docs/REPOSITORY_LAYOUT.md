@@ -8,7 +8,7 @@ This is an **agent environment**, not a general-purpose dotfile manager. The che
 | Optional CLI and diagnostics | `bin/agent-dotfiles`, `agent_dotfiles/`, `profiles/*.json` | Pinned private-prefix payload; profiles are read-only tool-capability declarations, **not shell configuration** |
 | Optional curated skills | `skills/project-onboarding/`, selected portable `skills/`, `skills/portable-skills.json` | Pinned payload; portable skill content is owned upstream and is never silently installed into a host |
 | Repository-only build/test tools | `tools/`, `tests/`, `.github/`, `mutation.toml`, `requirements-mutation.txt` | Used to develop and validate this repository; not consumer dotfiles |
-| Examples and maintenance documentation | `config/gitconfig.agent.example`, `docs/`, `README.md`, `AGENTS.md` | Source references only; the Git alias example is **not** installed or activated |
+| Examples and maintenance documentation | `examples/gitconfig.agent.example`, `docs/`, `README.md`, `AGENTS.md` | Source references only; the Git alias example is **not** installed or activated |
 | Reviewed project knowledge | `MEMORY.md`, `docs/decisions/`, `.agent-loop/init.json`, selected `.agent-loop/learning/` records | Versioned in this repository, not copied to a consumer's home |
 
 ## The currently confusing names
@@ -16,9 +16,9 @@ This is an **agent environment**, not a general-purpose dotfile manager. The che
 - `.exports` is a shell activation input today. It **only** exports the reviewed `AGENT_DOTFILES_HOME`. It is not an LLM configuration bundle.
 - `.functions` is a fixed loader for the namespaced, machine-readable helper functions.
 - `profiles/` describes the required/optional executable inventory for `doctor` and `firstInstall.sh plan`; selecting a profile does **not** activate, install, or tune anything.
-- `config/` currently contains just a per-invocation Git alias *example*, not an additional runtime profile or configuration layer.
+- `examples/` contains a per-invocation Git alias *example*, not another runtime profile or configuration layer.
 
-Keep `profiles/` for diagnostics only if it demonstrably solves a distinct problem. Move the misleading `config/` example under `examples/` in a small compatibility-checked change, rather than promoting both directories into competing configuration systems.
+Keep `profiles/` for diagnostics only if it demonstrably solves a distinct problem. The former `config/` entry is now an `examples/` entry. This changes the path of an **uninstalled example** only, so users invoking it by absolute path must update that path; no runtime payload or default configuration changes.
 
 ## Direction, not an unverified migration
 

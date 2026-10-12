@@ -2,15 +2,15 @@
 
 The original [`voku/dotfiles/.gitconfig`](https://github.com/voku/dotfiles/blob/master/.gitconfig)
 includes extensive interactive Git aliases. The companion
-[`config/gitconfig.agent.example`](../config/gitconfig.agent.example) keeps
+[`examples/gitconfig.agent.example`](../examples/gitconfig.agent.example) keeps
 **only read-only Git subcommands** and never overrides built-in Git commands.
 No aliases are installed by default.
 
 To use one alias for a single invocation (without changing `~/.gitconfig`):
 
 ```sh
-git -c include.path="$PWD/config/gitconfig.agent.example" agent-history -n 10
-git -c include.path="$PWD/config/gitconfig.agent.example" agent-files
+git -c include.path="$PWD/examples/gitconfig.agent.example" agent-history -n 10
+git -c include.path="$PWD/examples/gitconfig.agent.example" agent-files
 ```
 
 The NUL-delimited aliases require a NUL-aware consumer (not `grep`/`cut` on

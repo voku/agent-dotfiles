@@ -6,7 +6,7 @@
 
 ## Decision
 
-One owner per file. The only consumer payload is the allowlisted private-prefix runtime in `tools/install.py`; everything else stays in the source checkout. No implicit `$HOME` deployment, global host mutation or sourced upstream interactive configuration. Diagnostic `profiles/*.json` remain data-only; the uninstalled `config/gitconfig.agent.example` is an example and must not be mistaken for an activation layer.
+One owner per file. The only consumer payload is the allowlisted private-prefix runtime in `tools/install.py`; everything else stays in the source checkout. No implicit `$HOME` deployment, global host mutation or sourced upstream interactive configuration. Diagnostic `profiles/*.json` remain data-only; the uninstalled `examples/gitconfig.agent.example` is an example and must not be mistaken for an activation layer.
 
 Do not add generic dotfile managers, redundant tool runners or an alias framework merely to change the directory tree. Rename/move owners in independently verifiable slices, updating the fixed installer allowlist, shell activation and actual consumer tests atomically.
 

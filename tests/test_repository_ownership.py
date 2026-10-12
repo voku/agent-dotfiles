@@ -22,7 +22,7 @@ class RepositoryOwnershipTest(unittest.TestCase):
             ".agent-loop/learning/config.json",
             "tools/install.py",
             "tests/test_repository_ownership.py",
-            "config/gitconfig.agent.example",
+            "examples/gitconfig.agent.example",
         ):
             with self.subTest(path=name):
                 self.assertTrue((ROOT / name).is_file(), name)
