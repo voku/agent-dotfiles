@@ -1,8 +1,8 @@
 # First install: developer tool capability plan (S0)
 
 The current `firstInstall.sh` is **read-only**. Without an explicit profile
-it plans the universal Git, search and utility baseline, not a special
-programming environment. It detects binaries and supported platform
+it plans the universal Git, search, utilities and developer diagnostics baseline,
+not a special programming environment. It detects binaries and supported platform
 package managers and prints one JSON recommendation. It does not
 execute a package manager, install tools, change HOME or global Git, or contact
 the network. Installation of the agent-dotfiles runtime is separately handled by
@@ -22,15 +22,22 @@ views do not need selecting to use Git/search/shell capabilities.
 `doctor --profile php` and `plan --profile php` both diagnose `php` and
 `composer`, but preserve their different JSON schemas and roles:
 
-- `minimal`: Python 3, Git, ripgrep, jq, curl.
-- `php`: minimal plus PHP and Composer (detected only: no assumed correct system PHP packages).
-- `debug`: minimal plus fd/fdfind, ShellCheck, hyperfine and Linux-only strace.
+- Default (`minimal`): Python 3, Git, ripgrep, jq, curl, fd/fdfind, ShellCheck,
+  hyperfine and Linux-only strace. The last four are diagnostics, not required runtime binaries.
+- `php`: default plus PHP and Composer (detected only: no assumed correct system PHP packages).
+- `debug`: backwards-compatible alias of the default package recommendation set;
+  no additional runtime or activation is created.
 
 The wrapper requires Python 3.10 or newer and exits with status `2` and a
 clear diagnostic if Python is missing, too old or unusable. It starts only the
 Python runtime for its version check and planner; it does not invoke the
 probed developer tools. A machine without a working Python must provision that
 prerequisite independently.
+
+Debian and Ubuntu are the primary bootstrap targets; macOS with Homebrew remains
+supported by the existing read-only compatibility contracts. No other Linux
+distribution is promised a package command. This is a recommendation inventory,
+not an instruction to install every available tool.
 
 The command shows `available`, chosen executable name/path, `version: null`
 (versions are intentionally not inferred or obtained by executing code), and

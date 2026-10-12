@@ -22,8 +22,12 @@ anything:
 ./firstInstall.sh plan
 ```
 
-It recommends only missing tools from the selected profile and leaves any
-package action for explicit review. See [the first-install plan](docs/FIRST_INSTALL.md).
+The default planner also includes common debugging tools (`fd`/`fdfind`,
+ShellCheck, hyperfine and Linux-only strace), without requiring a debug profile.
+It recommends only missing tools and leaves any package action for explicit
+review. The POSIX shell entrypoint is intentionally thin; Python owns the
+structured JSON planning. Debian/Ubuntu are the primary bootstrap targets,
+with existing macOS compatibility retained. See [the first-install plan](docs/FIRST_INSTALL.md).
 
 The default `doctor` inventory already includes the universal Git and search
 baseline. No `minimal`, `git` or `shell` profile selection is needed for
