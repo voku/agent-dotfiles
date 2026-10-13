@@ -63,7 +63,7 @@ agent_context() {
 agent_root() {
     local _agent_root
     _agent_root=$(command git rev-parse --show-toplevel) || return $?
-    builtin cd -- "$_agent_root"
+    builtin cd -- "$_agent_root" || return $?
 }
 
 # Complete native Git patch output, with external diff drivers disabled.
@@ -80,5 +80,5 @@ agent_diff_check() {
 # Dotfile-style navigation helper, safe for spaces and leading dashes.
 agent_mkcd() {
     [ "$#" -eq 1 ] || { printf '%s\n' 'Usage: agent_mkcd DIRECTORY' >&2; return 2; }
-    command mkdir -p -- "$1" && builtin cd -- "$1"
+    command mkdir -p -- "$1" && builtin cd -- "$1" || return $?
 }

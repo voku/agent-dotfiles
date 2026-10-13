@@ -10,10 +10,15 @@ For a fresh Debian/Ubuntu host, prefer the single setup entry point:
 ```sh
 mkdir -p "$HOME/.local/opt"
 ./bootstrap.sh --prefix "$HOME/.local/opt/agent-dotfiles" --revision FULL_COMMIT_SHA
+./bootstrap.sh --prefix "$HOME/.local/opt/agent-dotfiles" --revision FULL_COMMIT_SHA --apply
 ```
 
-The checkout must be clean and at the exact supplied commit. For a host that
-already has its tools, install only the reviewed dotfiles and opt-in skills:
+The first command previews the package plan. Review it before running the second
+command, which explicitly applies the package changes and installs the pinned
+runtime. If Python 3.10+ is missing, the first `--apply` only installs Python 3
+and prints the complete plan; review it and run `--apply` again. The checkout
+must be clean and at the exact supplied commit. For a host that already has its
+tools, install only the reviewed dotfiles and opt-in skills:
 
 ```sh
 ./install.sh plan --prefix "$HOME/.local/opt/agent-dotfiles" --revision FULL_COMMIT_SHA

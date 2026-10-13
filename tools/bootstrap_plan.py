@@ -56,7 +56,9 @@ def package_manager(system: str, os_release: dict[str, str], has_brew: bool, has
 def plan(profile: Profile, *, system: str, os_release: dict[str, str], found: dict[str, str | None]) -> dict[str, object]:
     """Describe a fixed allowlist of capabilities without running any tool."""
     manager = package_manager(system, os_release, found.get("brew") is not None, found.get("apt-get") is not None)
-    selected = COMMON + (PHP if profile == "php" else ()) + (DEBUG if profile == "debug" else ())
+    # Diagnostics belong to the default environment; "debug" stays a read-only
+    # compatibility selection, not a separately activated runtime profile.
+    selected = COMMON + DEBUG + (PHP if profile == "php" else ())
     tools: list[dict[str, object]] = []
     packages: list[str] = []
     unmanaged: list[str] = []

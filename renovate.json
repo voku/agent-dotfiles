@@ -2,5 +2,15 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "description": "Keep the intentional unsupported-Python refusal fixture pinned",
+      "matchManagers": ["github-actions"],
+      "matchFileNames": [".github/workflows/test.yml"],
+      "matchPackageNames": ["python"],
+      "matchCurrentValue": "/^3[.]9$/",
+      "enabled": false
+    }
   ]
 }

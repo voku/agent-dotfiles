@@ -13,10 +13,14 @@ source material.
 
 - Shell profiles are explicitly sourced; they never source user/upstream
   profiles, modify startup files, alter PATH or change login shells.
-- `bootstrap.sh` is an explicit Debian/Ubuntu operation. It installs only the
-  fixed package allowlist through apt; review host and package source first.
+- `bootstrap.sh` is read-only by default. Package and private-prefix changes
+  require the explicit `--apply` switch; only the fixed Debian/Ubuntu package
+  allowlist is passed to apt. A missing Python prerequisite is installed alone,
+  and the command stops for review of the complete plan before other changes.
 - `git-env.sh` adds native Git defaults only to the current process tree. It
-  does not write system, global or repository configuration.
+  records its owned slots and refuses to deactivate if their values or the
+  appended range changed, preserving later consumer settings. It does not
+  write system, global or repository configuration.
 - The pinned installer verifies a full commit, copies an allowlisted payload,
   and records hashes before verify or uninstall. Treat the checkout and commit
   as reviewed code before installing.

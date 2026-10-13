@@ -6,6 +6,8 @@ fi
 if [ -n "${BASH_VERSION-}" ]; then
     _agent_activate_source=${BASH_SOURCE[0]}
 elif [ -n "${ZSH_VERSION-}" ]; then
+    # ShellCheck parses this shared file as Bash; this array is provided by Zsh.
+    # shellcheck disable=SC2154
     _agent_activate_source=${funcsourcetrace[1]%:*}
 else
     printf '%s\n' 'agent-dotfiles: activate.sh must be sourced by Bash or Zsh' >&2

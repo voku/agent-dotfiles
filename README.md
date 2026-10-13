@@ -12,7 +12,7 @@ non-interactive Bash/Zsh functions that keep native commands available.
 
 ## Fresh Debian or Ubuntu setup
 
-From a reviewed, clean, committed checkout, run the bootstrap with a private
+From a reviewed, clean, committed checkout, preview the setup with a private
 prefix and the exact full commit:
 
 ```sh
@@ -20,11 +20,13 @@ mkdir -p "$HOME/.local/opt"
 ./bootstrap.sh --prefix "$HOME/.local/opt/agent-dotfiles" --revision FULL_COMMIT_SHA
 ```
 
-The bootstrap installs missing packages from a small Debian/Ubuntu allowlist,
-then delegates pinned copying and verification to `install.sh`. It does not
-edit shell startup files, change login shells, or write global Git settings.
-When tools are missing, run as root or establish noninteractive `sudo` access;
-the bootstrap will not pause for a password.
+This is read-only. Review the package plan, then repeat the command with
+`--apply` to install the fixed Debian/Ubuntu package allowlist and pinned shell
+payload. On a bare Debian/Ubuntu host without Python 3.10+, the first `--apply`
+only installs Python 3 and prints the complete plan; review it, then run
+`--apply` again. Applying other package changes requires root or noninteractive
+`sudo`. The bootstrap does not edit startup files, change login shells, or
+write global Git settings.
 
 For the same task environment in Bash or Zsh, source one reviewed entry point:
 
@@ -74,7 +76,15 @@ Git defaults in `git-env.sh` are additive and session scoped: pager `cat`, color
 off, histogram diff, rename detection and ISO strict log dates. Histogram only
 changes diff presentation. Patches and error messages remain complete. The
 reviewable native config reference is [.gitconfig](.gitconfig); no file is
-copied into global Git configuration.
+copied into global Git configuration. Deactivation checks that the owned Git
+environment slots are unchanged before restoring the inherited state.
+
+The default Debian/Ubuntu package plan includes `fd`/`fdfind`, ShellCheck,
+hyperfine and Linux `strace` alongside the core tools. These remain ordinary
+optional native tools; agent-dotfiles adds no command wrappers for them.
+
+Users of the removed Python consumer CLI can follow the short
+[native-command migration note](docs/MIGRATION_FROM_PYTHON_CLI.md).
 
 ## Contents
 
