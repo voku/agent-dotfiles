@@ -7,7 +7,8 @@ ASSETS=(.bashrc .zshrc .shellrc .exports .functions .redpill/lib/activation.sh .
 
 function set_up() {
   RUN_ENV=()
-  TEST_ROOT="$(mktemp -d)"
+  # Physical path: activation resolves symlinks (macOS /var -> /private/var).
+  TEST_ROOT="$(cd -P -- "$(mktemp -d)" && pwd -P)"
   HOME_COPY="$TEST_ROOT/agent tools [雪] \$literal"
   local asset
   for asset in "${ASSETS[@]}"; do
@@ -271,7 +272,8 @@ function test_agent_extract_is_safe_and_keeps_the_archive() {
     run_shell "$shell" '. "$1" || exit 10; agent_extract "$2" "$3"' "$TEST_ROOT/src/dir/file.txt" "$TEST_ROOT/o2"
     assert_same '64' "$STATUS"
   done
-  tar -cf "$TEST_ROOT/evil.tar" -C "$src" --transform 's,^dir/,../,' dir/file.txt
+  python3 -c 'import sys, tarfile
+with tarfile.open(sys.argv[1], "w") as t: t.add(sys.argv[2], arcname="../evil.txt")' "$TEST_ROOT/evil.tar" "$src/dir/file.txt"
   for shell in $(available_shells); do
     run_shell "$shell" '. "$1" || exit 10; agent_extract "$2" "$3"' "$TEST_ROOT/evil.tar" "$TEST_ROOT/o3"
     assert_same '2' "$STATUS"
