@@ -280,3 +280,58 @@ with tarfile.open(sys.argv[1], "w") as t: t.add(sys.argv[2], arcname="../evil.tx
     assert_same 'absent' "$([ -e "$TEST_ROOT/o3" ] && echo present || echo absent)"
   done
 }
+
+function test_agent_context_reports_php_project_facts_without_running_scripts() {
+  command -v jq >/dev/null || return 0
+  local shell proj="$TEST_ROOT/php-project" bin
+  mkdir -p "$proj/vendor/bin" "$TEST_ROOT/no-php" "$TEST_ROOT/with-php"
+  git init -q "$proj"
+  printf '{"name":"example/project","require":{"php":">=8.2"},"scripts":{"test":"touch %s/ran && phpunit"}}\n' "$TEST_ROOT" > "$proj/composer.json"
+  touch "$proj/phpunit.xml.dist" "$proj/.editorconfig" "$proj/vendor/bin/phpunit"
+  chmod +x "$proj/vendor/bin/phpunit"
+  for bin in git jq; do
+    ln -s "$(command -v "$bin")" "$TEST_ROOT/no-php/$bin"
+    ln -s "$(command -v "$bin")" "$TEST_ROOT/with-php/$bin"
+  done
+  printf '#!/bin/sh\nexit 0\n' > "$TEST_ROOT/with-php/php"
+  chmod +x "$TEST_ROOT/with-php/php"
+  for shell in $(available_shells); do
+    run_shell "$shell" '. "$1" || exit 10; cd "$2" && PATH="$3" agent_context' "$proj" "$TEST_ROOT/no-php"
+    assert_same '0' "$STATUS"
+    assert_contains 'Package: example/project' "$STDOUT"
+    assert_contains 'PHP constraint: >=8.2' "$STDOUT"
+    assert_contains 'phpunit.xml.dist' "$STDOUT"
+    assert_contains 'vendor/bin/phpunit' "$STDOUT"
+    assert_contains 'Cannot run these checks: PHP is unavailable.' "$STDOUT"
+    run_shell "$shell" '. "$1" || exit 10; cd "$2" && PATH="$3" agent_context' "$proj" "$TEST_ROOT/with-php"
+    assert_same 'absent' "$(case "$STDOUT" in *'PHP is unavailable'*) echo present ;; *) echo absent ;; esac)"
+    assert_same 'absent' "$([ -e "$TEST_ROOT/ran" ] && echo present || echo absent)"
+  done
+  printf '{invalid json\n' > "$proj/composer.json"
+  run_shell bash '. "$1" || exit 10; cd "$2" && agent_context >/dev/null 2>&1; exit $?' "$proj"
+  assert_same 'nonzero' "$([ "$STATUS" -ne 0 ] && echo nonzero || echo zero)"
+}
+
+function test_agent_diff_matches_native_git_and_navigation_helpers_work() {
+  local shell repo="$TEST_ROOT/diff repo [λ]"
+  git init -q "$repo"
+  printf 'before\n' > "$repo/text.txt"
+  git -C "$repo" add text.txt
+  git -C "$repo" -c user.name=t -c user.email=t@example.test commit -qm fixture
+  printf 'after \n' > "$repo/text.txt"
+  mkdir -p "$repo/sub"
+  git -C "$repo" --no-pager -c color.ui=false diff --no-ext-diff --no-textconv > "$TEST_ROOT/native.diff"
+  for shell in $(available_shells); do
+    run_shell "$shell" '. "$1" || exit 10; cd "$2" && agent_diff' "$repo"
+    assert_same "$(cat "$TEST_ROOT/native.diff")" "$STDOUT"
+    run_shell "$shell" '. "$1" || exit 10; cd "$2" && agent_diff_check >/dev/null; exit $?' "$repo"
+    assert_same '2' "$STATUS"
+    run_shell "$shell" '. "$1" || exit 10; cd "$2/sub" && agent_root && pwd -P' "$repo"
+    assert_same "$(cd -P "$repo" && pwd -P)" "$STDOUT"
+    run_shell "$shell" '. "$1" || exit 10; agent_mkcd "$2/-new dir" && pwd -P' "$TEST_ROOT"
+    assert_same "$TEST_ROOT/-new dir" "$STDOUT"
+    rm -rf -- "$TEST_ROOT/-new dir"
+    run_shell "$shell" '. "$1" || exit 10; agent_mkcd; exit $?' x
+    assert_same '2' "$STATUS"
+  done
+}

@@ -90,6 +90,9 @@ git config --global core.excludesFile /absolute/path/to/agent-dotfiles/.redpill/
 - `agent_codepoints STRING` – one `U+XXXX<TAB>char` line per character; invisible ones (control, format, space) show their category, to find zero-width characters and lookalike spaces.
 - `agent_php_lint [DIR]` – `php -l` over `*.php`, prints failures only plus a summary that names the skipped `.git`, `vendor`, `node_modules`; exit 1 on any error.
 - `agent_extract ARCHIVE DEST` – unpack tar(.gz/.bz2/.xz) or zip into a new or empty DEST. Keeps the archive, refuses absolute or `..` entries (exit 2). Entries are listed, not otherwise vetted: review untrusted archives before use.
+- `agent_context` – orientation for a task: repo root, `status --short --branch`, staged and unstaged `--stat`, and for a Composer project the package, PHP constraint, declared scripts, config files, available `php`/`composer` and installed `vendor/bin` checks. Reads `composer.json` with `jq`; never runs a script.
+- `agent_diff [ARGS]`, `agent_diff_check` – complete native patch with external diff drivers off; `git diff --check` for staged and unstaged changes.
+- `agent_root`, `agent_mkcd DIR` – `cd` to the repository root; `mkdir -p` and `cd` (safe for spaces and leading dashes). These change the current shell's directory; they shadow nothing.
 - `agent_history`, `agent_blame` – native `git log` / `git blame --line-porcelain` with `--literal-pathspecs`.
 
 No helper shadows `git`, `rg`, `cd` or any other native command.

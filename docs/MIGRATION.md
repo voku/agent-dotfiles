@@ -74,6 +74,8 @@ ideas were rewritten rather than copied.
 
 ## Round 4: remaining files
 
+(`agent_context`, `agent_root`, `agent_diff`, `agent_diff_check`, `agent_mkcd` came from main's #61, not from `voku/dotfiles`; see ADR 0003.)
+
 | Source | Result | Where / why |
 | --- | --- | --- |
 | `.gitconfig` (aliases, color, pager, url rewrites, credential cache, rerere, rebase, hub) | Skipped | Global Git configuration is the user's, and color/pager/`diff-highlight`/`credential.helper=cache`/`rebase.autoStash`/`rerere` change behavior or hide state. Only idea worth keeping, for your own `~/.gitconfig`: `merge.conflictstyle = zdiff3` (Git 2.35+; `diff3` before) shows the common ancestor in conflict markers, which helps an agent resolve conflicts. `agent_git` stays native and sets only `color.ui=false` per command |

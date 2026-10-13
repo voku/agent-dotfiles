@@ -22,6 +22,18 @@ entry points, `.exports`, `.functions` and `.redpill/`. The Python CLI
   `agent_deactivate`. Claims about task benefit still require the controlled
   evaluation in issue #12.
 
+## Relation to #61
+
+Main's "native shell as the interface" change (#61) kept a pinned installer,
+`bootstrap.sh`, a single `activate.sh` entry point and `git-env.sh` (five
+`GIT_CONFIG_*` slots with an `eval`-based restore). This ADR keeps its helpers
+(`agent_context`, `agent_root`, `agent_diff`, `agent_diff_check`, `agent_mkcd`)
+and drops the rest: the installer and bootstrap with the Python tooling, and
+`git-env.sh`, whose pager and color settings `agent.env` and `agent_git` already
+cover. Its other defaults (`diff.algorithm=histogram`, `diff.renames`,
+`log.date=iso-strict`) change output shape and are not set; add them to your own
+`~/.gitconfig` if you want them. Both are recoverable from Git history.
+
 ## Consequences
 
 Consumers use a reviewed checkout directly. There is no pinned-prefix install,
