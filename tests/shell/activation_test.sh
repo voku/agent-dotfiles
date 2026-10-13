@@ -190,6 +190,21 @@ function test_every_helper_in_functions_is_protected_from_collisions() {
   done
 }
 
+function test_agent_head_marks_truncation_and_validates_input() {
+  local shell
+  for shell in $(available_shells); do
+    run_shell "$shell" '. "$1" || exit 10; printf "a\nb\nc\nd" | agent_head 2' x
+    assert_same "a
+b
+agent_head: TRUNCATED, showed 2 of 4 lines" "$STDOUT"
+    run_shell "$shell" '. "$1" || exit 10; printf "a\nb\n" | agent_head 2' x
+    assert_same "a
+b" "$STDOUT"
+    run_shell "$shell" '. "$1" || exit 10; printf "a\n" | agent_head nope' x
+    assert_same '64' "$STATUS"
+  done
+}
+
 function test_agent_diff_matches_native_git_despite_hostile_gitconfig() {
   local shell repo="$TEST_ROOT/diff repo [λ]"
   git init -q "$repo"

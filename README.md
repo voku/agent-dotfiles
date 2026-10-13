@@ -7,7 +7,7 @@ The source dotfiles are written by a human for a human at an interactive prompt.
 This repository is the same idea for a non-interactive agent shell: the familiar
 `.exports`, `.functions` and `.redpill/` files, but with session settings and
 three thin helpers that keep tool output plain and independent of host
-configuration. Native tools stay native.
+configuration, plus `agent_head`, which announces truncation. Native tools stay native.
 
 Nothing is installed, copied to `$HOME`, or loaded automatically. You source one
 reviewed file in a shell you control, and `agent_deactivate` removes it again.
@@ -26,7 +26,7 @@ agent_deactivate
 | --- | --- |
 | `.bashrc`, `.zshrc`, `.shellrc` | Explicit entry points; resolve the checkout root and activate |
 | `.exports` | `AGENT_DOTFILES_HOME`; applies the CLI settings in `.redpill/config/agent.env` |
-| `.functions` | `agent_git`, `agent_rg`, `agent_diff`: native commands insulated from host config ([contract](docs/SHELL.md)) |
+| `.functions` | `agent_git`, `agent_rg`, `agent_diff` (native commands insulated from host config) and `agent_head` (announced truncation) ([contract](docs/SHELL.md)) |
 | `.redpill/lib/` | Activation preflight and `agent_deactivate` |
 | `.redpill/config/` | Tool configuration files (`agent.env`, `ripgreprc`, opt-in `gitignore_global`) |
 | `tests/shell/` | Bashunit contracts run against real Bash and Zsh |

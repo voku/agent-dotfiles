@@ -15,8 +15,9 @@
   (default `--binary` or `-a`) would widen the helper to search images,
   archives and databases for every navigation query. The first #70 decision
   comment chose a default `--binary`; it was revised. `agent_rg` stays native.
-- The 0.7.0 friction log counts how often agents typed commands. It shows
-  habits, not that a wrapper improved a task outcome.
+- The 0.7.0 friction log ([EVALUATION.md](../EVALUATION.md)) counts how often
+  agents typed commands. It shows habits and failure modes, not that a wrapper
+  improved a task outcome. Its weight differs per helper; see the table below.
 
 ## Decision
 
@@ -28,31 +29,50 @@ behavior. Nothing else.
    else: the same arguments, output and exit status, with no change to what
    is searched, followed, hidden or counted. Three helpers meet this:
    `agent_git`, `agent_rg`, `agent_diff`.
-2. **Environment defaults** (`agent.env`, `ripgreprc`) may remove progress
+2. **One narrow exception: `agent_head`, an evidence-preservation primitive.**
+   It does not replace or alter a native tool's behavior. It is the visible
+   form of an operation the agent already performs (cutting a stream to N
+   lines), and its only effect is that the cut is announced with the true line
+   count. It is justified by an observed failure mode, not by convenience:
+   `| head` appeared in 6,148 of 12,121 observed shell calls, 2,097 of them
+   after `rg`, each dropping the remainder without a word. That is evidence
+   that the failure mode is common, **not** proof of better task outcomes
+   (#69 showed none either way), so the exception stays small: no other
+   output-bounding, paging or summarizing helper rides on it. It still reads a
+   text stream, prints its banner on stdout and consumes all input. Whether it
+   changes outcomes is hypothesis H3 in #12.
+3. **Environment defaults** (`agent.env`, `ripgreprc`) may remove progress
    bars, color, pagers, prompts and update nags. They must not change task
    semantics or hide evidence. `PYTHONIOENCODING` changed codec behavior and
    is removed.
-3. **Task strategy is not a shell helper.** Choosing `rg` or `git grep`,
-   proving a search complete, cross-checking results, bounding output,
-   deciding when to search binary files, linting a tree, orienting in a
-   repository, unpacking archives: this is guidance for `voku/agent-skills`
-   and workflow for agent-loop. This repository makes no completeness or
-   correctness claim for it.
-4. **A generic helper must justify itself with outcome evidence**, such as a
-   controlled run (#12) where it changed a correctness or evidence result,
-   not with plausibility, call frequency or a passing corpus check.
+4. **Task strategy is not a shell helper.** Choosing `rg` or `git grep`,
+   proving a search complete, cross-checking results, deciding when to search
+   binary files, linting a tree, orienting in a repository, archive policy:
+   this is guidance for `voku/agent-skills` and workflow for agent-loop. This
+   repository makes no completeness or correctness claim for it. A capability
+   that stays useful may still belong to another owner.
+5. **A new helper must name a failure mode and task evidence.** "Useful" or
+   "called often" is not enough; neither is a passing corpus check. Reintroducing
+   a removed helper needs that helper's own failure mode and a task where
+   its absence changed a result, argued per helper.
 
 ## Helpers removed (recoverable from tag v0.7.0)
 
-| Helper | Why it is not environment normalization |
-| --- | --- |
-| `agent_head` | Output-bounding policy; its banner is mixed into the data stream. Guidance ("never cut evidence with a bare `\| head`") belongs in a skill. Frequency of `\| head` in the friction log is a habit count, not an outcome result. |
-| `agent_php_lint` | Task strategy: which directories to skip, parallelism and a coverage accounting claim. Owned by a PHP skill. |
-| `agent_context` | Repository orientation is the onboarding skill's job. |
-| `agent_extract` | Archive-safety policy, 12 uses in 12,121 calls. |
-| `agent_require` | ADR 0003 already says `command -v` covers capability checks. |
-| `agent_curl` | `--location` follows redirects, which hides them. |
-| `agent_history`, `agent_blame`, `agent_diff_check`, `agent_root`, `agent_mkcd`, `agent_usage`, `agent_codepoints` | Thin or convenience wrappers with no outcome evidence; `agent_root` and `agent_mkcd` change the shell's directory. |
+Judged individually. "Friction log" is the 12,121-call count in EVALUATION.md;
+"none" means that log has no row for the habit.
+
+| Helper | Friction-log evidence | Why it is not an exception | Owner of the capability |
+| --- | --- | --- | --- |
+| `agent_php_lint` | 478 `php -l` calls, 3 used `find`/`xargs` | Task strategy: which directories to skip, parallelism, a coverage claim. The corpus check proved only that it matched `find`; it needed bug fixes for interleaving and miscounts, i.e. maintenance cost for a task policy. | agent-skills (`php-static-analysis`) |
+| `agent_context` | 427 `git diff --stat` calls | Repository orientation; reads `composer.json` and picks what to report. | agent-skills (`project-onboarding`) |
+| `agent_extract` | 12 `tar`/`unzip` calls | Archive policy (traversal refusal, empty destination). The hazard is real, but it is a policy decision, not normalization, and the sample is tiny. | agent-skills guidance |
+| `agent_require` | 227 `command -v`/`which` calls | Native `command -v` already answers it (ADR 0003); the version compare is extra policy. No observed failure mode. | none needed |
+| `agent_curl` | none | `--location` follows redirects, hiding them, which contradicts the evidence rule. | none needed |
+| `agent_history`, `agent_blame` | 86 `git log -p/-S/-G`/`blame` calls | `--literal-pathspecs` and `--line-porcelain` change pathspec semantics and output format; no observed failure of native Git. | none needed |
+| `agent_diff_check` | none | Two native commands in sequence. | none needed |
+| `agent_root`, `agent_mkcd` | none | Change the shell's directory; navigation, not normalization. | none needed |
+| `agent_usage` | 43 `du` calls | `du -h -d 1`; no failure mode. | none needed |
+| `agent_codepoints` | none | Niche diagnostic with no observed use. | skill, if a task needs it |
 
 ## Contract kept narrow
 
@@ -65,6 +85,5 @@ chooses and verifies the method; that is task strategy.
 
 ## Consequences
 
-Fewer things to maintain and a smaller surface to be wrong. Hypotheses that
-would justify adding anything back are tracked as small questions in #12, not
-as features here.
+A smaller surface to be wrong, with one deliberate evidence-preservation
+exception. Open questions are tracked per helper in #12, not as features here.
