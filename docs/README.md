@@ -1,6 +1,7 @@
 # Documentation
 
 - [Shell environment and CLI settings](SHELL.md)
+- [Evaluation and friction log](EVALUATION.md) (issue #12)
 - [Repository layout](REPOSITORY_LAYOUT.md)
 - [Migration from voku/dotfiles](MIGRATION.md)
 - [agent-loop boundary](AGENT_LOOP.md)

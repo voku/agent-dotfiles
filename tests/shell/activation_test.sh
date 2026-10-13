@@ -195,42 +195,6 @@ function test_agent_require_reports_missing_old_and_satisfied_tools() {
   done
 }
 
-function test_agent_os_reports_key_value_facts() {
-  local shell
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; agent_os' x
-    assert_same '0' "$STATUS"
-    assert_contains 'kernel=' "$STDOUT"
-    assert_contains 'arch=' "$STDOUT"
-  done
-}
-
-function test_agent_free_port_skips_a_listening_port() {
-  command -v ss >/dev/null || command -v netstat >/dev/null || return 0
-  local shell port
-  python3 -c 'import socket,time
-s=socket.socket(); s.bind(("127.0.0.1",0)); s.listen()
-print(s.getsockname()[1], flush=True); time.sleep(20)' > "$TEST_ROOT/port" &
-  local listener=$!
-  while [ ! -s "$TEST_ROOT/port" ]; do sleep 0.05; done
-  port="$(cat "$TEST_ROOT/port")"
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; agent_ports | grep -qx "$2" || exit 11; free=$(agent_free_port "$2") || exit 12; [ "$free" != "$2" ] && [ "$free" -gt "$2" ]' "$port"
-    assert_same '0' "$STATUS"
-  done
-  kill "$listener" 2>/dev/null
-}
-
-function test_agent_json_formats_and_rejects_invalid_input() {
-  local shell
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; printf "{\"a\":[1,2]}" | agent_json | tr -d " \n"' x
-    assert_same '{"a":[1,2]}' "$STDOUT"
-    run_shell "$shell" '. "$1" || exit 10; printf "{nope" | agent_json >/dev/null 2>&1; exit $?' x
-    assert_same 'nonzero' "$([ "$STATUS" -ne 0 ] && echo nonzero || echo zero)"
-  done
-}
-
 function test_agent_codepoints_exposes_invisible_characters() {
   command -v perl >/dev/null || return 0
   local shell
@@ -421,5 +385,26 @@ EOS
     run_shell "$shell" '. "$1" || exit 10; PATH="$2:$PATH" agent_php_lint "$3"' "$stub" "$proj"
     assert_same '1' "$STATUS"
     assert_contains '1 ok, 0 with errors, 1 unchecked' "$STDOUT"
+  done
+}
+
+function test_agent_php_lint_parallel_jobs_do_not_interleave_reports() {
+  local shell proj="$TEST_ROOT/many-src" stub="$TEST_ROOT/chatty-bin" i
+  mkdir -p "$proj" "$stub"
+  for i in $(seq 1 80); do touch "$proj/f$i.php"; done
+  cat > "$stub/php" <<'EOS'
+#!/bin/sh
+for f; do :; done
+printf 'No syntax '
+sleep 0.01
+printf 'errors detected in '
+sleep 0.01
+printf '%s\n' "$f"
+EOS
+  chmod +x "$stub/php"
+  for shell in $(available_shells); do
+    run_shell "$shell" '. "$1" || exit 10; AGENT_PHP_LINT_JOBS=16 PATH="$2:$PATH" agent_php_lint "$3"' "$stub" "$proj"
+    assert_same '0' "$STATUS"
+    assert_contains '80 ok, 0 with errors, 0 unchecked' "$STDOUT"
   done
 }

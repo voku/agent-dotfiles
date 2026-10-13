@@ -95,6 +95,17 @@ WGETRC=/absolute/path/to/agent-dotfiles/.redpill/config/wgetrc wget URL
 - **`rg` output order changes between identical runs** (parallel walk). Compare
   results as sets, or add `--sort path` when a stable order matters.
 
+## Never cut output silently
+
+Half of the shell calls in the friction log end in `| head`, which drops the
+rest without a word. Use the announcing form, and prefer a count when the
+question is "how many":
+
+```sh
+agent_rg -n 'pattern' src | agent_head 50     # prints "TRUNCATED, showed 50 of 812 lines"
+agent_rg -c 'pattern' src                     # per-file counts, nothing cut
+```
+
 ## Helpers
 
 - `agent_git` – `git --no-pager -c color.ui=false` with prompts off; full output and exit status.

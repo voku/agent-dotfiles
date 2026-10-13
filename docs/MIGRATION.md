@@ -55,9 +55,9 @@ ideas were rewritten rather than copied.
 
 | Source | Result | Where / why |
 | --- | --- | --- |
-| `os-info()`, `bin/os-detect.sh`, `cpuinfo()` | Adapted | `agent_os`: `key=value`, reads `/etc/os-release`, adds WSL; no `lsb_release`, no bash-4 `declare -A` |
-| `netstat_used_local_ports`, `netstat_free_local_port` | Adapted | `agent_ports`, `agent_free_port` (`ss`, else `netstat`) |
-| `json()` | Adapted | `agent_json`: no `pygmentize` color; uses `jq` or `json.tool` |
+| `os-info()`, `bin/os-detect.sh`, `cpuinfo()` | Adapted in 0.6.0, dropped in 0.7.0 | `agent_os`: 3 uses of `uname`/`lsb_release` in 12,121 agent shell calls; `uname -a` is enough. Recover from Git history (tag v0.6.0) |
+| `netstat_used_local_ports`, `netstat_free_local_port` | Adapted in 0.6.0, dropped in 0.7.0 | `agent_ports`, `agent_free_port`: 8 uses of `ss`/`lsof`/`netstat` in 12,121 calls; use `ss -ltn` directly. Recover from tag v0.6.0 |
+| `json()` | Adapted in 0.6.0, dropped in 0.7.0 | `agent_json`: 4 uses of `json.tool` in 12,121 calls; `jq .` is enough. Recover from tag v0.6.0 |
 | `escape`, `unidecode`, `codepoint` | Adapted | `agent_codepoints`: reveals invisible characters instead of converting escapes |
 | `php-parse-error-check()` | Adapted | `agent_php_lint`: reports counts and the skipped directories instead of grepping for one message |
 | `extract()` | Adapted | `agent_extract` with an explicit destination (see round 2) |
