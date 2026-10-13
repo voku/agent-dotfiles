@@ -10,7 +10,7 @@ runs unless you source it.
 | `.bashrc` / `.zshrc` | Explicit entry points; refuse the wrong shell; never read user startup files |
 | `.shellrc` | Resolves the checkout root, then calls `.redpill/lib/activation.sh` |
 | `.exports` | `AGENT_DOTFILES_HOME`; applies `agent.env` and `RIPGREP_CONFIG_PATH` |
-| `.functions` | the `agent_*` helpers below |
+| `.functions` | the three `agent_*` helpers below |
 | `.redpill/lib/` | Activation preflight and `agent_deactivate` |
 | `.redpill/config/` | `agent.env` (CLI settings), `ripgreprc`, opt-in `gitignore_global` and `wgetrc` |
 
@@ -43,8 +43,9 @@ written to disk, Git config or user startup files. Detail per tool comes from
 [awesome-ai-friendly-cli](https://github.com/alies-dev/awesome-ai-friendly-cli).
 
 What is deliberately **not** set: `CI=true` (changes tool behavior, e.g. test
-watch modes), `--quiet`-style switches, audit/vulnerability switches and
-telemetry opt-outs. Settings remove noise; they never hide results, errors,
+watch modes), `--quiet`-style switches, audit/vulnerability switches,
+telemetry opt-outs and `PYTHONIOENCODING` (changes codec behavior, not
+presentation). Settings remove noise; they never hide results, errors,
 warnings or exit statuses.
 
 To add a setting, add a `NAME=value` line to `agent.env` and a test if its
@@ -94,56 +95,41 @@ WGETRC="/absolute/path/to/agent-dotfiles/.redpill/config/wgetrc" wget URL
   sees `PAGER=cat` but has no `agent_git`; source the profile there too.
 - **`rg` output order changes between identical runs** (parallel walk). Compare
   results as sets, or add `--sort path` when a stable order matters.
+- **`rg` skips NUL-containing files in recursive search**, silently (see above).
 
-## Never cut output silently
+## Contract of the helpers
 
-Half of the shell calls in the friction log end in `| head`, which drops the
-rest without a word. Use the announcing form, and prefer a count when the
-question is "how many":
+Product boundary: [ADR 0004](decisions/0004-environment-vs-task-strategy.md).
+A helper is the native command with host-config bleed or interactivity
+removed, and nothing else (plus `agent_head`, below). Same arguments, output and exit status as the
+native tool under a clean configuration. Native tools stay native.
 
-```sh
-agent_rg -n 'pattern' src | agent_head 50     # prints "TRUNCATED, showed 50 of 812 lines"
-agent_rg -c 'pattern' src                     # per-file counts, nothing cut
-```
-
-## Complete file inventories
-
-`agent_rg` behaves like native `rg` and is **not** a completeness guarantee. In a
-recursive search ripgrep treats a file containing a NUL byte as binary and skips
-it without a message, even when the file is source code that matches (found in
-the #69 pilot: one PHP file hidden from `rg -l`, exit status 0). The helper adds
-no binary flag on purpose: ordinary source navigation should not search images,
-archives and databases.
-
-When the question is "every file containing X", say the scope and pick the mode:
-
-```sh
-git grep -l -z -F 'assertType(' -- '*.php'            # tracked files; stable, no binary skipping
-agent_rg --binary -l -F 'assertType(' --glob '*.php'  # scoped working-tree search; binary matches are reported, not printed
-```
-
-`--binary` lists a NUL-containing match and prints `binary file matches` instead
-of raw bytes. `-a`/`--text` prints everything, including binary data; use it
-only for a named file you mean to read as text. Cross-check an inventory with a
-second, independent count when it is used as evidence.
-
-## Helpers
-
-- `agent_git` – `git --no-pager -c color.ui=false` with prompts off; full output and exit status.
-- `agent_rg` – `rg --no-config --color=never`, immune to host ripgrep config. Exit 1 means no match; 2 is an error. Native binary handling: see [Complete file inventories](#complete-file-inventories).
-- `agent_curl` – `curl --silent --show-error --location`: no progress meter, errors and redirects handled.
-- `agent_require TOOL [MIN]` – capability check: prints `tool<TAB>version<TAB>path`. Exit 1 missing, 2 too old, 3 version unreadable, 64 usage. Runs `TOOL --version`.
-- `agent_head [N]` – first N lines (default 100) of stdin, then `agent_head: TRUNCATED, showed N of M lines` on stdout. Use it instead of a bare `head`, which truncates silently.
-- `agent_usage [DIR]` – `du -h -d 1`.
-- `agent_codepoints STRING` – one `U+XXXX<TAB>char` line per character; invisible ones (control, format, space) show their category, to find zero-width characters and lookalike spaces.
-- `agent_php_lint [DIR]` – parallel `php -l` over `*.php`, skipping `.git`, `vendor` and `node_modules`. Reports files with errors plus ok/error/unchecked counts; any error or unchecked file makes the command fail.
-- `agent_extract ARCHIVE DEST` – unpack tar(.gz/.bz2/.xz) or zip into a new or empty DEST. Keeps the archive, refuses absolute or `..` entries (exit 2). Entries are listed, not otherwise vetted: review untrusted archives before use.
-- `agent_context` – orientation for a task: repo root, `status --short --branch`, staged and unstaged `--stat`, and for a Composer project the package, PHP constraint, declared scripts, config files, available `php`/`composer` and installed `vendor/bin` checks. Reads `composer.json` with `jq`; never runs a script.
-- `agent_diff [ARGS]`, `agent_diff_check` – complete native patch with external diff drivers off; `git diff --check` for staged and unstaged changes.
-- `agent_root`, `agent_mkcd DIR` – `cd` to the repository root; `mkdir -p` and `cd` (safe for spaces and leading dashes). These change the current shell's directory; they shadow nothing.
-- `agent_history`, `agent_blame` – native `git log` / `git blame --line-porcelain` with `--literal-pathspecs`.
+- `agent_git` – `git --no-pager -c color.ui=false` with prompts off.
+- `agent_rg` – `rg --no-config --color=never`, immune to host ripgrep config. Exit 1 means no match; 2 is an error.
+- `agent_head [N]` – **the one exception** (ADR 0004, evidence preservation): first N lines (default 100) of stdin, then `agent_head: TRUNCATED, showed N of M lines` on stdout. Use it instead of a bare `| head`, which cuts silently:
+  `agent_rg -n 'pattern' src | agent_head 50`. It handles text lines, prints the banner on stdout, and reads all input to count it. It does not make a search complete.
 
 No helper shadows `git`, `rg`, `cd` or any other native command.
+
+## What the helpers do not do
+
+Task strategy is out of scope and no helper here claims to solve it: which
+tool to search with, whether a result is complete, cross-checking, binary-file
+policy, linting, orientation or archive handling. That belongs in
+[agent-skills](https://github.com/voku/agent-skills) guidance.
+
+One consequence is documented because it was observed (#69, #70): `agent_rg`
+is native ripgrep, so a recursive search silently skips a file containing a NUL
+byte even when it is source code that matches (exit 0, no message). `agent_rg`
+is therefore **not** an "every file" tool and adds no `--binary`. Whoever needs
+a complete inventory chooses the method, for example `git grep -l -z -F` for
+tracked files or `rg --binary`, and verifies it independently. The regression
+test keeps the limitation as evidence.
+
+Removed helpers (`agent_php_lint`, `agent_context`, `agent_extract`,
+`agent_require`, `agent_curl`, `agent_history`, `agent_blame`, `agent_diff`, `agent_diff_check`,
+`agent_root`, `agent_mkcd`, `agent_usage`, `agent_codepoints`) are recoverable
+from tag `v0.7.0`; the ADR gives the evidence and reason for each, and the owner where the capability stays useful.
 
 ## Test
 

@@ -8,7 +8,7 @@ productivity.
 
 | Layer | Question | Status (0.7.0) |
 | --- | --- | --- |
-| A. Corpus check | Does each helper give the same evidence as clean native commands on real code, in Bash and Zsh? | Run, repeatable: `tests/eval/corpus_check.sh` |
+| A. Corpus check | Does each remaining helper give the same evidence as clean native commands on real code, in Bash and Zsh? | Run, repeatable: `tests/eval/corpus_check.sh` |
 | B. Friction log | Which shell habits do agents really have, and so which helpers earn a place? | Done once, 12,121 calls (below) |
 | C. Agent trial | Do agents with the environment finish real tasks at least as correctly, with at least as complete evidence? | **Protocol only, not run** |
 
@@ -21,9 +21,6 @@ profile in a fresh shell and, per repository, checks:
 | --- | --- |
 | `rg-insulated`, `rg-exit-status` | `agent_rg` under a hostile `RIPGREP_CONFIG_PATH` (column limit, glob, max-count, color) returns the same lines and exit status as clean `rg --no-config` |
 | `rg-plain-no-hidden-matches` | plain `rg` with the activated config returns the same lines as clean native `rg` |
-| `diff-insulated` | `agent_diff HEAD~1 HEAD` under a hostile global gitconfig (forced color, broken external driver, pager) is byte-identical to a clean native diff |
-| `php-lint-coverage` | `agent_php_lint` accounts for exactly the files an independent `find` sees |
-| `context-package` | `agent_context` reports the package name in `composer.json` |
 | `head-announces` | `agent_head 25` shows 25 lines and announces the true total |
 
 Output order of `rg` differs between identical runs (parallel walk), so `rg`
@@ -44,6 +41,13 @@ What it found and fixed before release:
   fails the run. Both are covered by regression tests.
 - `rg` ordering is nondeterministic; documented, not changed.
 
+After [ADR 0004](decisions/0004-environment-vs-task-strategy.md) the corpus
+check covers `agent_rg`, activated plain `rg` and `agent_head`
+(`head-announces`: `agent_head 25` shows 25 lines and announces the true
+total). Checks for the removed helpers (`php-lint-coverage`,
+`context-package`, `diff-insulated`) were deleted with them. The 2026-10-13 result above was recorded at 0.7.0 with
+those checks.
+
 ## B. Friction log
 
 Counts from 70 local Claude Code transcripts (12,121 Bash calls, one
@@ -51,15 +55,15 @@ developer, PHP-heavy work). Commands were counted, never stored or quoted.
 
 | Habit | Calls | Consequence |
 | --- | ---: | --- |
-| `… \| head` (any) | 6,148 | Silent truncation is the dominant habit: use `agent_head` |
-| `rg … \| head` | 2,097 | Search results cut with no notice: `agent_rg … \| agent_head 50` |
-| `rg` | 5,111 | Plain `rg` presentation defaults matter |
-| `git diff --stat` | 427 | Covered by `agent_context` / `agent_diff` |
-| `php -l` | 478 | `agent_php_lint`; only 3 of these used `find`/`xargs` |
-| `command -v` / `which` | 227 | `agent_require` |
-| `git log -p/-S/-G`, `blame` | 86 | `agent_history`, `agent_blame` |
-| `du` | 43 | `agent_usage` |
-| `tar` / `unzip` | 12 | `agent_extract` (kept for its traversal refusal) |
+| `… \| head` (any) | 6,148 | Silent truncation is the dominant habit; the basis for the `agent_head` exception (ADR 0004). Habit frequency, not an outcome result |
+| `rg … \| head` | 2,097 | Search results cut with no notice; `agent_rg … \| agent_head 50` announces the cut |
+| `rg` | 5,111 | Plain `rg` presentation defaults (`ripgreprc`); `agent_rg` for host-config insulation |
+| `git diff --stat` | 427 | Native `git diff --stat`. Orientation is skill territory (`agent_context` removed) |
+| `php -l` | 478 | Native; only 3 used `find`/`xargs`. Linting strategy belongs in a skill (`agent_php_lint` removed) |
+| `command -v` / `which` | 227 | Native `command -v` is enough (`agent_require` removed) |
+| `git log -p/-S/-G`, `blame` | 86 | Native Git (`agent_history`, `agent_blame` removed) |
+| `du` | 43 | Native `du` (`agent_usage` removed) |
+| `tar` / `unzip` | 12 | Archive policy is skill territory (`agent_extract` removed) |
 | `ss`/`lsof`/`netstat` | 8 | Dropped `agent_ports`, `agent_free_port` |
 | `json.tool` | 4 | Dropped `agent_json` |
 | `uname`/`lsb_release` | 3 | Dropped `agent_os` |
@@ -67,8 +71,33 @@ developer, PHP-heavy work). Commands were counted, never stored or quoted.
 A helper only helps if the agent calls it. The habit data says the guidance
 ("never a bare `| head`") matters more than another wrapper; that guidance is
 in [SHELL.md](SHELL.md) and belongs in the `agent-skills` onboarding skill.
-Limits: one developer, one stack, and counts show use, not whether the output
-was complete.
+Limits: one developer, one stack, and counts show use and failure modes, not
+whether the output was complete or a task went better. Do not call a helper
+this table marks as removed; it no longer exists (recover from `v0.7.0`).
+
+### Pilot #69 (one triplet, closed)
+
+Final answers were identical and correct in all arms; the guided arm used more
+calls and time; treatment isolation and activation were not proven, so there
+is no valid comparative effect. It exposed the `agent_rg` NUL limitation (#70).
+Raw transcripts are local and not part of this repository.
+
+Open hypotheses, each small and testable under a new protocol with isolation
+and an activation proof, none a feature request:
+
+- H1: with the profile active and no guidance, agents truncate or miss
+  evidence no more often than native (regression check only).
+- H2: guidance about cross-checking inventories (agent-skills) reduces
+  incomplete answers more than any shell helper does.
+- H3: `agent_head` (the one evidence-preservation exception): when the
+  profile is active, agents whose output was cut by it state the cut in their
+  answer more often than agents using a bare `| head`, and no answer is less
+  correct. Outcome benefit is unproven; if the data show no difference, remove
+  it.
+- H4: removing `PYTHONIOENCODING` matters for no scored task.
+
+No hypothesis covers "the removed helpers" as a group. Reintroducing one needs
+its own helper name, failure mode and task evidence (ADR 0004, rule 5).
 
 ## C. Agent trial protocol (not yet run)
 

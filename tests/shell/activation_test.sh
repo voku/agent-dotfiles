@@ -100,8 +100,7 @@ function test_host_chosen_settings_survive_activation_and_deactivation() {
 function test_owned_name_collision_refuses_without_partial_state() {
   local shell definition
   for shell in $(available_shells); do
-    for definition in 'agent_git() { :; }' 'agent_rg() { :; }' 'agent_history() { :; }' \
-        'agent_blame() { :; }'  'agent_deactivate() { :; }' 'alias agent_git=true' 'AGENT_DOTFILES_HOME=existing'; do
+    for definition in 'agent_git() { :; }' 'agent_rg() { :; }' 'agent_deactivate() { :; }' 'alias agent_git=true' 'AGENT_DOTFILES_HOME=existing'; do
       run_shell "$shell" "$definition; . \"\$1\"" x
       assert_same '2' "$STATUS"
       assert_contains 'agent-dotfiles:' "$STDERR"
@@ -146,14 +145,14 @@ function test_agent_rg_ignores_host_configuration_and_reports_no_match() {
   done
 }
 
-function test_agent_rg_keeps_native_binary_handling_and_binary_flag_is_not_silent() {
+function test_agent_rg_is_native_ripgrep_and_inherits_its_binary_file_limitation() {
   local shell
   mkdir -p -- "$TEST_ROOT/tree"
   printf 'needle\n\0tail\n' > "$TEST_ROOT/tree/nul.php"
   printf 'xx\0needle\0yy\n' > "$TEST_ROOT/tree/real.bin"
   printf 'needle\n' > "$TEST_ROOT/tree/plain.php"
   for shell in $(available_shells); do
-    # Default: native ripgrep silently skips NUL-containing files in a recursive walk.
+    # Evidence for #70, not a guarantee: native ripgrep silently skips NUL-containing files in a recursive walk.
     run_shell "$shell" '. "$1" || exit 10; shift; agent_rg -l -F -- needle "$1"/tree' "$TEST_ROOT"
     assert_same '0' "$STATUS"
     assert_contains 'plain.php' "$STDOUT"
@@ -202,130 +201,6 @@ agent_head: TRUNCATED, showed 2 of 4 lines" "$STDOUT"
 b" "$STDOUT"
     run_shell "$shell" '. "$1" || exit 10; printf "a\n" | agent_head nope' x
     assert_same '64' "$STATUS"
-  done
-}
-
-function test_agent_require_reports_missing_old_and_satisfied_tools() {
-  local shell
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; agent_require definitely-not-installed-tool; exit $?' x
-    assert_same '1' "$STATUS"
-    run_shell "$shell" '. "$1" || exit 10; agent_require git 999.0; exit $?' x
-    assert_same '2' "$STATUS"
-    run_shell "$shell" '. "$1" || exit 10; agent_require git 1.0 | cut -f1' x
-    assert_same 'git' "$STDOUT"
-    run_shell "$shell" '. "$1" || exit 10; agent_require; exit $?' x
-    assert_same '64' "$STATUS"
-  done
-}
-
-function test_agent_codepoints_exposes_invisible_characters() {
-  command -v perl >/dev/null || return 0
-  local shell
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; agent_codepoints "$(printf "a\342\200\213\303\251")"' x
-    assert_same "$(printf 'U+0061\ta\nU+200B\tCf\nU+00E9\té')" "$STDOUT"
-  done
-}
-
-function test_agent_php_lint_reports_failures_and_skips_vendor() {
-  command -v php >/dev/null || return 0
-  local shell tree="$TEST_ROOT/php tree"
-  mkdir -p "$tree/src" "$tree/vendor"
-  printf '<?php echo 1;\n' > "$tree/src/ok.php"
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; agent_php_lint "$2"' "$tree"
-    assert_same '0' "$STATUS"
-    assert_contains '1 ok, 0 with errors' "$STDOUT"
-  done
-  printf '<?php echo ;\n' > "$tree/src/bad.php"
-  printf '<?php echo ;\n' > "$tree/vendor/skipped.php"
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; agent_php_lint "$2"' "$tree"
-    assert_same '1' "$STATUS"
-    assert_contains 'bad.php' "$STDOUT"
-    assert_contains '1 ok, 1 with errors' "$STDOUT"
-    assert_same 'absent' "$(contains_word 'skipped.php' "$STDOUT")"
-  done
-}
-
-function test_agent_extract_is_safe_and_keeps_the_archive() {
-  local shell src="$TEST_ROOT/src" archive="$TEST_ROOT/pack.tar.gz"
-  mkdir -p "$src/dir"
-  printf 'content\n' > "$src/dir/file.txt"
-  tar -czf "$archive" -C "$src" dir
-  for shell in $(available_shells); do
-    rm -rf -- "$TEST_ROOT/out"
-    run_shell "$shell" '. "$1" || exit 10; agent_extract "$2" "$3"' "$archive" "$TEST_ROOT/out"
-    assert_same '0' "$STATUS"
-    assert_same 'content' "$(cat "$TEST_ROOT/out/dir/file.txt")"
-    assert_same 'present' "$([ -f "$archive" ] && echo present || echo absent)"
-    run_shell "$shell" '. "$1" || exit 10; agent_extract "$2" "$3"' "$archive" "$TEST_ROOT/out"
-    assert_same '1' "$STATUS"
-    run_shell "$shell" '. "$1" || exit 10; agent_extract "$2" "$3"' "$TEST_ROOT/src/dir/file.txt" "$TEST_ROOT/o2"
-    assert_same '64' "$STATUS"
-  done
-  python3 -c 'import sys, tarfile
-with tarfile.open(sys.argv[1], "w") as t: t.add(sys.argv[2], arcname="../evil.txt")' "$TEST_ROOT/evil.tar" "$src/dir/file.txt"
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; agent_extract "$2" "$3"' "$TEST_ROOT/evil.tar" "$TEST_ROOT/o3"
-    assert_same '2' "$STATUS"
-    assert_same 'absent' "$([ -e "$TEST_ROOT/o3" ] && echo present || echo absent)"
-  done
-}
-
-function test_agent_context_reports_php_project_facts_without_running_scripts() {
-  command -v jq >/dev/null || return 0
-  local shell proj="$TEST_ROOT/php-project" bin
-  mkdir -p "$proj/vendor/bin" "$TEST_ROOT/no-php" "$TEST_ROOT/with-php"
-  git init -q "$proj"
-  printf '{"name":"example/project","require":{"php":">=8.2"},"scripts":{"test":"touch %s/ran && phpunit"}}\n' "$TEST_ROOT" > "$proj/composer.json"
-  touch "$proj/phpunit.xml.dist" "$proj/.editorconfig" "$proj/vendor/bin/phpunit"
-  chmod +x "$proj/vendor/bin/phpunit"
-  for bin in git jq; do
-    ln -s "$(command -v "$bin")" "$TEST_ROOT/no-php/$bin"
-    ln -s "$(command -v "$bin")" "$TEST_ROOT/with-php/$bin"
-  done
-  printf '#!/bin/sh\nexit 0\n' > "$TEST_ROOT/with-php/php"
-  chmod +x "$TEST_ROOT/with-php/php"
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; cd "$2" && PATH="$3" agent_context' "$proj" "$TEST_ROOT/no-php"
-    assert_same '0' "$STATUS"
-    assert_contains 'Package: example/project' "$STDOUT"
-    assert_contains 'PHP constraint: >=8.2' "$STDOUT"
-    assert_contains 'phpunit.xml.dist' "$STDOUT"
-    assert_contains 'vendor/bin/phpunit' "$STDOUT"
-    assert_contains 'Cannot run these checks: PHP is unavailable.' "$STDOUT"
-    run_shell "$shell" '. "$1" || exit 10; cd "$2" && PATH="$3" agent_context' "$proj" "$TEST_ROOT/with-php"
-    assert_same 'absent' "$(contains_word 'PHP is unavailable' "$STDOUT")"
-    assert_same 'absent' "$([ -e "$TEST_ROOT/ran" ] && echo present || echo absent)"
-  done
-  printf '{invalid json\n' > "$proj/composer.json"
-  run_shell bash '. "$1" || exit 10; cd "$2" && agent_context >/dev/null 2>&1; exit $?' "$proj"
-  assert_same 'nonzero' "$([ "$STATUS" -ne 0 ] && echo nonzero || echo zero)"
-}
-
-function test_agent_diff_matches_native_git_and_navigation_helpers_work() {
-  local shell repo="$TEST_ROOT/diff repo [λ]"
-  git init -q "$repo"
-  printf 'before\n' > "$repo/text.txt"
-  git -C "$repo" add text.txt
-  git -C "$repo" -c user.name=t -c user.email=t@example.test commit -qm fixture
-  printf 'after \n' > "$repo/text.txt"
-  mkdir -p "$repo/sub"
-  git -C "$repo" --no-pager -c color.ui=false diff --no-ext-diff --no-textconv > "$TEST_ROOT/native.diff"
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; cd "$2" && agent_diff' "$repo"
-    assert_same "$(cat "$TEST_ROOT/native.diff")" "$STDOUT"
-    run_shell "$shell" '. "$1" || exit 10; cd "$2" && agent_diff_check >/dev/null; exit $?' "$repo"
-    assert_same '2' "$STATUS"
-    run_shell "$shell" '. "$1" || exit 10; cd "$2/sub" && agent_root && pwd -P' "$repo"
-    assert_same "$(cd -P "$repo" && pwd -P)" "$STDOUT"
-    run_shell "$shell" '. "$1" || exit 10; agent_mkcd "$2/-new dir" && pwd -P' "$TEST_ROOT"
-    assert_same "$TEST_ROOT/-new dir" "$STDOUT"
-    rm -rf -- "$TEST_ROOT/-new dir"
-    run_shell "$shell" '. "$1" || exit 10; agent_mkcd; exit $?' x
-    assert_same '2' "$STATUS"
   done
 }
 
@@ -395,41 +270,3 @@ function test_bashrc_refuses_a_posix_shell_without_defining_anything() {
   assert_contains '.bashrc requires Bash' "$STDERR"
 }
 
-function test_agent_php_lint_fails_when_a_file_is_never_reported_on() {
-  local shell proj="$TEST_ROOT/lint-src" stub="$TEST_ROOT/stub-bin"
-  mkdir -p "$proj" "$stub"
-  touch "$proj/a.php" "$proj/silent.php"
-  cat > "$stub/php" <<'EOS'
-#!/bin/sh
-for f; do :; done
-case "$f" in *silent.php) exit 0 ;; esac
-printf 'No syntax errors detected in %s\n' "$f"
-EOS
-  chmod +x "$stub/php"
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; PATH="$2:$PATH" agent_php_lint "$3"' "$stub" "$proj"
-    assert_same '1' "$STATUS"
-    assert_contains '1 ok, 0 with errors, 1 unchecked' "$STDOUT"
-  done
-}
-
-function test_agent_php_lint_parallel_jobs_do_not_interleave_reports() {
-  local shell proj="$TEST_ROOT/many-src" stub="$TEST_ROOT/chatty-bin" i
-  mkdir -p "$proj" "$stub"
-  for i in $(seq 1 80); do touch "$proj/f$i.php"; done
-  cat > "$stub/php" <<'EOS'
-#!/bin/sh
-for f; do :; done
-printf 'No syntax '
-sleep 0.01
-printf 'errors detected in '
-sleep 0.01
-printf '%s\n' "$f"
-EOS
-  chmod +x "$stub/php"
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; AGENT_PHP_LINT_JOBS=16 PATH="$2:$PATH" agent_php_lint "$3"' "$stub" "$proj"
-    assert_same '0' "$STATUS"
-    assert_contains '80 ok, 0 with errors, 0 unchecked' "$STDOUT"
-  done
-}
