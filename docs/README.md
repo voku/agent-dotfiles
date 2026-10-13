@@ -1,8 +1,10 @@
 # Documentation
 
-- [Project overview and native workflow](../README.md)
-- [Debian/Ubuntu first install](FIRST_INSTALL.md)
-- [Pinned install, verify and uninstall](INSTALLATION.md)
-- [Repository ownership and layout](REPOSITORY_LAYOUT.md)
-- [Optional agent-loop boundary](AGENT_LOOP.md)
-- [Security reporting](SECURITY.md)
+- [Shell environment and CLI settings](SHELL.md)
+- [Repository layout](REPOSITORY_LAYOUT.md)
+- [Migration from voku/dotfiles](MIGRATION.md)
+- [agent-loop boundary](AGENT_LOOP.md)
+- Decisions: [0001 boundaries](decisions/0001-product-boundaries.md),
+  [0002 Redpill runtime and memory](decisions/0002-agent-shell-and-memory.md),
+  [0003 shell-only](decisions/0003-shell-only.md)
+- [Project memory](../MEMORY.md)

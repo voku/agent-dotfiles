@@ -1,28 +1,22 @@
 # Changelog
 
-## Unreleased
+## 0.6.0
 
-- Remove the Python consumer CLI, diagnostic profiles, command wrappers and
-  wrapper-specific tests. Coding agents now use native Git, rg, shell and project
-  tools directly.
-- Make Debian/Ubuntu bootstrap read-only by default; require `--apply` for
-  package and private-prefix changes, and stage a missing Python prerequisite
-  separately so the complete package plan is reviewed first.
-- Include fd, ShellCheck, hyperfine and Linux strace in the default Debian tool
-  plan without turning debugging tools into a profile or command vocabulary.
-- Add one idempotent Bash/Zsh activation entry point with reversible Git session
-  settings, so different coding-agent hosts can use the same setup instruction.
-- Restore only the exact Git config slots owned by an activation, and refuse
-  deactivation if those slots or a later consumer's appended range changed.
-- Adapt the practical repo/navigation ideas from voku/dotfiles into optional
-  `agent_context`, `agent_root`, complete `agent_diff`, `agent_diff_check` and
-  `agent_mkcd` shell functions without overriding native commands.
-- Keep Python only for internal pinned installation and maintainer utilities.
-- Keep historical evaluations and inconclusive experiments under
-  `docs/archive/`; add a migration note for removed Python consumer commands.
-- Restore exact-head Bash/Zsh, installer, legacy-manifest and Debian/Ubuntu
-  bootstrap checks. Independent CLI-agent and paired-task evidence remains a
-  separate product-validation target.
+- Become shell-only: remove the Python CLI, `tools/`, installer, first-install
+  planner, capability profiles and vendored skills ([ADR 0003](docs/decisions/0003-shell-only.md)).
+- Move `agent_git`/`agent_rg` from `.aliases` into `.functions`; drop `.aliases`.
+- Add `.redpill/config/agent.env`: per-tool variables that remove progress bars,
+  color, pagers, update nags and prompts (Git, Composer, npm, pip, Cargo, ...),
+  applied only when unset and removed exactly by `agent_deactivate`.
+- Add helpers `agent_curl`, `agent_require` (capability check), `agent_head`
+  (truncation that is always announced), `agent_usage`, `agent_os`, `agent_ports`,
+  `agent_free_port`, `agent_json`, `agent_codepoints`, `agent_php_lint` and `agent_extract`.
+- Keep #61's `agent_context`, `agent_root`, `agent_diff`, `agent_diff_check` and
+  `agent_mkcd`, now in `.functions` with tests; drop its installer, `activate.sh`
+  and `git-env.sh` (see ADR 0003).
+- Derive the owned function namespace from `.functions` instead of two hand-kept lists.
+- Replace `.redpill/core` and `.redpill/modules` with `.redpill/lib` and `.redpill/config`.
+- Move `project-onboarding` to `voku/agent-skills`.
 
 ## 0.5.0
 

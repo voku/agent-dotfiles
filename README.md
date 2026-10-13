@@ -1,112 +1,58 @@
 # agent-dotfiles
 
-**A comfortable, native-first workspace for coding agents.**
+**Shell dotfiles for coding agents (LLMs), in the layout of
+[voku/dotfiles](https://github.com/voku/dotfiles).**
 
-Agents already know `git`, `rg`, `sed`, `find`, shells and project test tools.
-This repository prepares those tools and the environment around them. It does
-not teach agents a second command language.
+The source dotfiles are written by a human for a human at an interactive prompt.
+This repository is the same idea for a non-interactive agent shell: the familiar
+`.exports`, `.functions` and `.redpill/` files, but with session settings and
+helpers that keep tool output plain, bounded by the tool and complete.
 
-These dotfiles are shaped by real agent use. When actual Codex or Claude Code
-behavior differs from our assumptions, we adapt the environment rather than
-forcing the agent through an invented workflow. Features should earn their
-place through repeated real-world use. Unused helpers and abstractions should
-be simplified or removed.
-
-The layout takes inspiration from [voku/dotfiles](https://github.com/voku/dotfiles).
-Its practical navigation and repository shortcuts are adapted here as a few
-non-interactive Bash/Zsh functions that keep native commands available.
-
-## Fresh Debian or Ubuntu setup
-
-From a reviewed, clean, committed checkout, preview the setup with a private
-prefix and the exact full commit:
+Nothing is installed, copied to `$HOME`, or loaded automatically. You source one
+reviewed file in a shell you control, and `agent_deactivate` removes it again.
 
 ```sh
-mkdir -p "$HOME/.local/opt"
-./bootstrap.sh --prefix "$HOME/.local/opt/agent-dotfiles" --revision FULL_COMMIT_SHA
+env -u BASH_ENV bash --noprofile --norc      # or: zsh -f
+source /absolute/path/to/agent-dotfiles/.bashrc   # .zshrc in Zsh
+agent_git -C /project status --short
+agent_rg -n -F -- 'function save(' /project
+agent_deactivate
 ```
 
-This is read-only. Review the package plan, then repeat the command with
-`--apply` to install the fixed Debian/Ubuntu package allowlist and pinned shell
-payload. On a bare Debian/Ubuntu host without Python 3.10+, the first `--apply`
-only installs Python 3 and prints the complete plan; review it, then run
-`--apply` again. Applying other package changes requires root or noninteractive
-`sudo`. The bootstrap does not edit startup files, change login shells, or
-write global Git settings.
+## Layout
 
-For the same task environment in Bash or Zsh, source one reviewed entry point:
+| Path | Role |
+| --- | --- |
+| `.bashrc`, `.zshrc`, `.shellrc` | Explicit entry points; resolve the checkout root and activate |
+| `.exports` | `AGENT_DOTFILES_HOME`; applies the CLI settings in `.redpill/config/agent.env` |
+| `.functions` | `agent_*` helpers: `agent_context`, `agent_diff`, Git/rg wrappers, `agent_require`, `agent_head`, `agent_os`, `agent_php_lint`, `agent_extract`, ... ([list](docs/SHELL.md)) |
+| `.redpill/lib/` | Activation preflight and `agent_deactivate` |
+| `.redpill/config/` | Tool configuration files (`agent.env`, `ripgreprc`, opt-in `gitignore_global`) |
+| `tests/shell/` | Bashunit contracts run against real Bash and Zsh |
+| `docs/` | [Shell contract](docs/SHELL.md), [layout](docs/REPOSITORY_LAYOUT.md), [agent-loop boundary](docs/AGENT_LOOP.md), [decisions](docs/decisions/) |
+
+No progress bars, color, pagers, update nags or prompts: `agent.env` sets the
+per-tool variables (Git, Composer, npm, pip, Cargo, ...) only where the host has
+not, and deactivation removes exactly those. See [docs/SHELL.md](docs/SHELL.md) for the full
+list and how to add one.
+
+## Skills
+
+Skills live in [voku/agent-skills](https://github.com/voku/agent-skills), including
+`coding-simplicity`, `testing-best-practices`, `php-static-analysis`,
+`language-onboarding-authoring` and `project-onboarding`. This repository ships none.
+
+## Boundaries
+
+No startup-file edits, package installs, login-shell changes, global Git
+configuration, daemons, or command shadowing. Task workflow, approvals,
+Learning, Recall and memory belong to [agent-loop](docs/AGENT_LOOP.md).
+
+## Validate
 
 ```sh
-. "$HOME/.local/opt/agent-dotfiles/activate.sh"
+bashunit test tests/shell --strict
 ```
 
-It loads the correct explicit profile, applies session-only Git defaults and
-provides `agent_deactivate` to restore the prior Git environment and remove the
-shell namespace. It is safe to source twice. In fresh per-command Bash sessions,
-use `env -u BASH_ENV bash --noprofile --norc`; in Zsh, use `zsh -f`. The setup
-never writes these into startup files.
-
-## Native workflow
-
-```sh
-git status --short --branch
-rg -n --hidden --glob '!vendor/**' 'target symbol' src tests
-sed -n '40,100p' src/path/to/file.php
-git diff -- src/path/to/file.php
-./vendor/bin/phpunit --filter RelevantTest
-```
-
-Use native output as-is. Search and inspect the relevant source before editing;
-run the project's own focused checks; inspect the full diff and visible errors.
-The shell environment does not cap output, rewrite commands, or claim shorter
-output as a quality improvement.
-
-The explicitly activated shell also provides a few small Bash/Zsh comforts:
-
-- `agent_context` prints the repository root, full short status, and staged and
-  unstaged diff summaries. In Composer projects it also reports declared PHP
-  requirements, script commands, common project config files, and available
-  PHP/Composer/check executables. It only reads this information; it does not
-  run scripts or install dependencies. Read source and full patches before
-  making decisions.
-- `agent_root` moves to the repository root.
-- `agent_diff [PATH...]` shows the complete native patch with external diff
-  drivers and text conversion disabled.
-- `agent_diff_check` checks staged and unstaged whitespace errors.
-- `agent_mkcd DIRECTORY` creates a directory and enters it.
-
-These functions are optional conveniences loaded by `activate.sh`. Direct
-`git`, `rg`, shell and project commands remain fully available.
-
-Git defaults in `git-env.sh` are additive and session scoped: pager `cat`, color
-off, histogram diff, rename detection and ISO strict log dates. Histogram only
-changes diff presentation. Patches and error messages remain complete. The
-reviewable native config reference is [.gitconfig](.gitconfig); no file is
-copied into global Git configuration. Deactivation checks that the owned Git
-environment slots are unchanged before restoring the inherited state.
-
-The default Debian/Ubuntu package plan includes `fd`/`fdfind`, ShellCheck,
-hyperfine and Linux `strace` alongside the core tools. These remain ordinary
-optional native tools; agent-dotfiles adds no command wrappers for them.
-
-Users of the removed Python consumer CLI can follow the short
-[native-command migration note](docs/MIGRATION_FROM_PYTHON_CLI.md).
-
-## Contents
-
-- `activate.sh`, `.bashrc`, `.zshrc` and `.redpill/`: one explicit Bash/Zsh
-  activation path with no
-  prompt framework, plugin discovery or user profile loading.
-- `bootstrap.sh`, `firstInstall.sh` and `install.sh`: host setup, capability
-  planning and pinned private-prefix installation.
-- `git-env.sh`: session-only Git defaults.
-- `skills/`: reviewed, opt-in agent guidance.
-- `tools/`: maintainer-side installer, provenance and release utilities.
-
-The secure manifest installer and maintainer automation still use Python
-internally. Python is no longer a coding-agent runtime or consumer command.
-
-See [setup details](docs/FIRST_INSTALL.md), [installation](docs/INSTALLATION.md),
-[repository layout](docs/REPOSITORY_LAYOUT.md), and [agent-loop boundary](docs/AGENT_LOOP.md).
-This project provides an environment; agent-loop remains the independently
-installed task workflow.
+MIT licensed; see [CONTRIBUTING](CONTRIBUTING.md), [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md)
+and [SUPPORT](SUPPORT.md). Origin: [UPSTREAM.md](UPSTREAM.md).

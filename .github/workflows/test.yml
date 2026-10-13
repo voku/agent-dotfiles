@@ -2,178 +2,38 @@ name: tests
 
 on:
   push:
-    branches: [main]
   pull_request:
-  workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: agent-dotfiles-tests-${{ github.event.pull_request.head.sha || github.sha }}
-  cancel-in-progress: true
-
 jobs:
-  shell-and-maintainer-contracts:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          persist-credentials: false
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.12'
-      - name: Install CI-only shell checkers
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends shellcheck zsh jq
-      - name: Confirm exact checked-out head
-        env:
-          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
-      - name: Check shell syntax and lint
-        run: |
-          for file in .aliases .bashrc .zshrc .shellrc activate.sh bootstrap.sh firstInstall.sh install.sh git-env.sh .redpill/core/*.sh .redpill/modules/*.sh tests/shell/*.sh; do bash -n "$file"; done
-          for file in .zshrc .shellrc activate.sh .redpill/core/*.sh .redpill/modules/*.sh; do zsh -n "$file"; done
-          shellcheck --severity=warning -s bash .aliases .bashrc activate.sh tests/shell/*.sh
-          shellcheck --severity=warning -s sh bootstrap.sh firstInstall.sh install.sh
-      - name: Run focused shell contracts
-        run: |
-          bash tests/shell/project_context_test.sh
-          bash tests/shell/environment_test.sh
-          bash tests/shell/bootstrap_test.sh
-      - name: Run retained Python maintainer-tool contracts
-        run: python -m unittest discover -s tests -p 'test_*.py'
-
-  unsupported-python-refusal:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          persist-credentials: false
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.9'
-      - name: Preserve the documented Python minimum
-        run: |
-          if ./firstInstall.sh plan >plan.json 2>plan.err; then
-            echo 'Python 3.9 must be refused.' >&2
-            exit 1
-          fi
-          test ! -s plan.json
-          grep -F 'Python 3.10+ is required' plan.err
-
-  cold-install-and-legacy-verify:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          persist-credentials: false
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.12'
-      - name: Install Zsh for activation lifecycle check
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends zsh
-      - name: Install, verify, activate and uninstall the exact candidate
-        env:
-          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: |
-          set -eu
-          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
-          tmp="$(mktemp -d)"
-          trap 'rm -rf "$tmp"' EXIT
-          mkdir -p "$tmp/opt"
-          ./install.sh plan --prefix "$tmp/opt/candidate" --revision "$EXPECTED_HEAD" > "$tmp/plan.json"
-          ./install.sh --prefix "$tmp/opt/candidate" --revision "$EXPECTED_HEAD"
-          ./install.sh verify --prefix "$tmp/opt/candidate" --revision "$EXPECTED_HEAD"
-          env -u BASH_ENV bash --noprofile --norc -c '. "$1/activate.sh"; test "$(git config --get core.pager)" = cat; agent_deactivate; test -z "${AGENT_DOTFILES_SESSION_ACTIVE-}"' _ "$tmp/opt/candidate"
-          zsh -f -c '. "$1/activate.sh"; test "$(git config --get core.pager)" = cat; agent_deactivate; test -z "${AGENT_DOTFILES_SESSION_ACTIVE-}"' _ "$tmp/opt/candidate"
-          ./install.sh uninstall --prefix "$tmp/opt/candidate" --revision "$EXPECTED_HEAD"
-          test ! -e "$tmp/opt/candidate"
-      - name: Verify a released v0.5.0 installation with current code
-        env:
-          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
-        run: |
-          set -eu
-          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
-          tmp="$(mktemp -d)"
-          trap 'rm -rf "$tmp"' EXIT
-          mkdir -p "$tmp/opt"
-          git fetch --depth=1 origin refs/tags/v0.5.0:refs/tags/v0.5.0
-          legacy_revision=36a5363f3b45db106b0cff83d02945434fb0c586
-          git worktree add --detach "$tmp/v0.5.0" "$legacy_revision"
-          "$tmp/v0.5.0/install.sh" --prefix "$tmp/opt/legacy" --revision "$legacy_revision"
-          ./install.sh verify --prefix "$tmp/opt/legacy" --revision "$legacy_revision"
-          ./install.sh uninstall --prefix "$tmp/opt/legacy" --revision "$legacy_revision"
-          test ! -e "$tmp/opt/legacy"
-          git worktree remove --force "$tmp/v0.5.0"
-
-  debian-ubuntu-bootstrap:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 35
+  shell:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - image: debian:12-slim
-            distribution: debian
-          - image: ubuntu:24.04
-            distribution: ubuntu
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          persist-credentials: false
-      - name: Run the complete bootstrap in a fresh distro container
-        env:
-          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install Zsh, ripgrep and ShellCheck (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y zsh shellcheck ripgrep
+      - name: Install ripgrep (macOS)
+        if: runner.os == 'macOS'
+        run: command -v rg >/dev/null || brew install ripgrep
+      - name: ShellCheck
+        if: runner.os == 'Linux'
+        run: shellcheck --severity=warning -s bash .bashrc .shellrc .functions .exports .redpill/lib/*.sh
+      - name: Bash and Zsh syntax
         run: |
-          set -eu
-          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
-          evidence="$RUNNER_TEMP/agent-dotfiles-${{ matrix.distribution }}"
-          mkdir -p "$evidence/opt"
-          container_status=0
-          docker run --rm \
-            --env "EXPECTED_HEAD=$EXPECTED_HEAD" \
-            --env GIT_CONFIG_COUNT=1 \
-            --env GIT_CONFIG_KEY_0=safe.directory \
-            --env GIT_CONFIG_VALUE_0=/repo \
-            --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/repo,readonly" \
-            --mount "type=bind,src=$evidence,dst=/evidence" \
-            "${{ matrix.image }}" sh -ec '
-              set -eu
-              prefix=/evidence/opt/agent-dotfiles
-              /repo/bootstrap.sh --prefix "$prefix" --revision "$EXPECTED_HEAD" > /evidence/preview.log 2>&1
-              /repo/bootstrap.sh --prefix "$prefix" --revision "$EXPECTED_HEAD" --apply > /evidence/python-bootstrap.log 2>&1
-              test -x /usr/bin/python3
-              /repo/bootstrap.sh --prefix "$prefix" --revision "$EXPECTED_HEAD" --apply > /evidence/bootstrap.log 2>&1
-              test "$(git -C /repo rev-parse HEAD)" = "$EXPECTED_HEAD"
-              bash -n "$prefix/activate.sh" "$prefix/git-env.sh"
-              for tool in git rg jq curl shellcheck hyperfine strace; do command -v "$tool" >/dev/null; done
-              command -v fd >/dev/null 2>&1 || command -v fdfind >/dev/null
-              env -u BASH_ENV bash --noprofile --norc -c ". \"$prefix/activate.sh\"; test \"\$(git config --get core.pager)\" = cat; agent_deactivate"
-              /repo/install.sh uninstall --prefix "$prefix" --revision "$EXPECTED_HEAD"
-              test ! -e "$prefix"
-            ' > "$evidence/container.log" 2>&1 || container_status=$?
-          docker image inspect --format '{{json .RepoDigests}}' '${{ matrix.image }}' > "$evidence/image-digests.json" || true
-          docker image inspect --format '{{json .Id}}' '${{ matrix.image }}' > "$evidence/image-id.json" || true
-          printf '%s\n' "$EXPECTED_HEAD" > "$evidence/checked-head.txt"
-          printf '%s\n' "$container_status" > "$evidence/exit-status.txt"
-          cat "$evidence/container.log"
-          test "$container_status" -eq 0
-      - name: Retain exact-head setup receipts
-        if: always()
-        uses: actions/upload-artifact@v7
+          for file in .bashrc .shellrc .functions .exports .redpill/lib/*.sh; do bash -n "$file"; done
+          for file in .zshrc .shellrc .functions .exports .redpill/lib/*.sh; do zsh -n "$file"; done
+      # Commit and release verified against the official annotated 0.50.1 tag.
+      - uses: TypedDevs/bashunit@8d4f357f52df7596f92ece2d6c049d91d45517a2 # 0.52.0
         with:
-          name: setup-${{ matrix.distribution }}-${{ github.run_id }}
-          path: ${{ runner.temp }}/agent-dotfiles-${{ matrix.distribution }}
-          if-no-files-found: warn
-          retention-days: 14
+          version: '0.50.1'
+          verify-checksum: 'true'
+      - name: Bash and Zsh activation contracts
+        run: bashunit test tests/shell --strict
