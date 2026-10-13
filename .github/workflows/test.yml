@@ -37,3 +37,16 @@ jobs:
           verify-checksum: 'true'
       - name: Bash and Zsh activation contracts
         run: bashunit test tests/shell --strict
+      - name: Container runner contract
+        if: runner.os == 'Linux'
+        run: tests/container/run.sh tests/shell --strict
+      - name: Corpus missing-shell guard
+        if: runner.os == 'Linux'
+        run: |
+          missing=agent-dotfiles-shell-that-does-not-exist
+          if tests/eval/corpus_check.sh -n 1 -s "$missing" . >missing-shell.log 2>&1; then
+            cat missing-shell.log
+            echo "corpus_check unexpectedly succeeded with a missing requested shell" >&2
+            exit 1
+          fi
+          grep -F "requested shell $missing is not installed" missing-shell.log
