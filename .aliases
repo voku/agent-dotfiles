@@ -56,6 +56,9 @@ agent_context() {
             fi
         done
         [ "$_agent_found" -eq 1 ] || printf '  (none installed)\n'
+        if [ "$_agent_found" -eq 1 ] && ! command -v php >/dev/null 2>&1; then
+            printf '%s\n' '  Cannot run these checks: PHP is unavailable.'
+        fi
     fi
 }
 

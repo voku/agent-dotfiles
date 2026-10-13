@@ -23,13 +23,32 @@ touch "$tmp/php-project/vendor/bin/phpunit"
 chmod +x "$tmp/php-project/vendor/bin/phpunit"
 export AGENT_CONTEXT_MARKER="$tmp/script-ran"
 
-output=$(cd "$tmp/php-project" && agent_context)
+git_bin=$(command -v git)
+jq_bin=$(command -v jq)
+mkdir "$tmp/no-php-bin" "$tmp/with-php-bin"
+ln -s "$git_bin" "$tmp/no-php-bin/git"
+ln -s "$jq_bin" "$tmp/no-php-bin/jq"
+ln -s "$git_bin" "$tmp/with-php-bin/git"
+ln -s "$jq_bin" "$tmp/with-php-bin/jq"
+cat >"$tmp/with-php-bin/php" <<'PHP'
+#!/usr/bin/env bash
+exit 0
+PHP
+chmod +x "$tmp/with-php-bin/php"
+
+output=$(cd "$tmp/php-project" && PATH="$tmp/no-php-bin" agent_context)
 [[ "$output" == *'PHP / Composer project:'* ]]
 [[ "$output" == *'Package: example/project'* ]]
 [[ "$output" == *'PHP constraint: >=8.2'* ]]
 [[ "$output" == *'test: touch $AGENT_CONTEXT_MARKER && phpunit'* ]]
 [[ "$output" == *'phpunit.xml.dist'* && "$output" == *'.editorconfig'* ]]
 [[ "$output" == *'vendor/bin/phpunit'* ]]
+[[ "$output" == *'Cannot run these checks: PHP is unavailable.'* ]]
+[[ ! -e "$AGENT_CONTEXT_MARKER" ]]
+
+output=$(cd "$tmp/php-project" && PATH="$tmp/with-php-bin" agent_context)
+[[ "$output" == *'vendor/bin/phpunit'* ]]
+[[ "$output" != *'Cannot run these checks: PHP is unavailable.'* ]]
 [[ ! -e "$AGENT_CONTEXT_MARKER" ]]
 
 mkdir "$tmp/plain-project"
