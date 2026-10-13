@@ -143,12 +143,12 @@ jobs:
             --mount "type=bind,src=$evidence,dst=/evidence" \
             "${{ matrix.image }}" sh -ec '
               set -eu
-              test "$(git -C /repo rev-parse HEAD)" = "$EXPECTED_HEAD"
               prefix=/evidence/opt/agent-dotfiles
               /repo/bootstrap.sh --prefix "$prefix" --revision "$EXPECTED_HEAD" > /evidence/preview.log 2>&1
               /repo/bootstrap.sh --prefix "$prefix" --revision "$EXPECTED_HEAD" --apply > /evidence/python-bootstrap.log 2>&1
               test -x /usr/bin/python3
               /repo/bootstrap.sh --prefix "$prefix" --revision "$EXPECTED_HEAD" --apply > /evidence/bootstrap.log 2>&1
+              test "$(git -C /repo rev-parse HEAD)" = "$EXPECTED_HEAD"
               bash -n "$prefix/activate.sh" "$prefix/git-env.sh"
               for tool in git rg jq curl shellcheck hyperfine strace; do command -v "$tool" >/dev/null; done
               command -v fd >/dev/null 2>&1 || command -v fdfind >/dev/null
