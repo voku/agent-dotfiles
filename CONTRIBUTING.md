@@ -1,8 +1,8 @@
 # Contributing
 
-Thanks for improving `agent-dotfiles`. The project is an optional, read-only
-environment for coding agents, so a small behavior change can affect evidence,
-automation, and consumer trust.
+Thanks for improving `agent-dotfiles`. The project is an optional, explicitly
+activated environment for coding agents, so a small behavior change can affect
+evidence, automation, and consumer trust.
 
 ## Before you change code
 
