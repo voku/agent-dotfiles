@@ -6,7 +6,7 @@
 The source dotfiles are written by a human for a human at an interactive prompt.
 This repository is the same idea for a non-interactive agent shell: the familiar
 `.exports`, `.functions` and `.redpill/` files, but with session settings and
-three thin helpers that keep tool output plain and independent of host
+two thin helpers that keep tool output plain and independent of host
 configuration, plus `agent_head`, which announces truncation. Native tools stay native.
 
 Nothing is installed, copied to `$HOME`, or loaded automatically. You source one
