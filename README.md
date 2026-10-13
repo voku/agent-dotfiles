@@ -6,6 +6,12 @@ Agents already know `git`, `rg`, `sed`, `find`, shells and project test tools.
 This repository prepares those tools and the environment around them. It does
 not teach agents a second command language.
 
+These dotfiles are shaped by real agent use. When actual Codex or Claude Code
+behavior differs from our assumptions, we adapt the environment rather than
+forcing the agent through an invented workflow. Features should earn their
+place through repeated real-world use. Unused helpers and abstractions should
+be simplified or removed.
+
 The layout takes inspiration from [voku/dotfiles](https://github.com/voku/dotfiles).
 Its practical navigation and repository shortcuts are adapted here as a few
 non-interactive Bash/Zsh functions that keep native commands available.
