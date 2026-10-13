@@ -1,8 +1,8 @@
 # Migration from voku/dotfiles
 
 > **Historical.** [ADR 0004](decisions/0004-environment-vs-task-strategy.md)
-> removed most helpers named below (all but `agent_git`, `agent_rg`,
-> `agent_diff` and `agent_head`). The tables record what was ported and why at the time; they
+> removed most helpers named below (all but `agent_git`, `agent_rg`
+> and `agent_head`). The tables record what was ported and why at the time; they
 > are not the current helper list. Recover removed code from tag `v0.7.0`.
 
 Files are migrated one at a time, small and generic first. A file is **adapted**

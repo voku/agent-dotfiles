@@ -10,7 +10,7 @@ runs unless you source it.
 | `.bashrc` / `.zshrc` | Explicit entry points; refuse the wrong shell; never read user startup files |
 | `.shellrc` | Resolves the checkout root, then calls `.redpill/lib/activation.sh` |
 | `.exports` | `AGENT_DOTFILES_HOME`; applies `agent.env` and `RIPGREP_CONFIG_PATH` |
-| `.functions` | the four `agent_*` helpers below |
+| `.functions` | the three `agent_*` helpers below |
 | `.redpill/lib/` | Activation preflight and `agent_deactivate` |
 | `.redpill/config/` | `agent.env` (CLI settings), `ripgreprc`, opt-in `gitignore_global` and `wgetrc` |
 
@@ -106,7 +106,6 @@ native tool under a clean configuration. Native tools stay native.
 
 - `agent_git` – `git --no-pager -c color.ui=false` with prompts off.
 - `agent_rg` – `rg --no-config --color=never`, immune to host ripgrep config. Exit 1 means no match; 2 is an error.
-- `agent_diff [ARGS]` – `git diff --no-ext-diff --no-textconv`, no pager, no color: the raw patch even under a host Git config that sets an external driver.
 - `agent_head [N]` – **the one exception** (ADR 0004, evidence preservation): first N lines (default 100) of stdin, then `agent_head: TRUNCATED, showed N of M lines` on stdout. Use it instead of a bare `| head`, which cuts silently:
   `agent_rg -n 'pattern' src | agent_head 50`. It handles text lines, prints the banner on stdout, and reads all input to count it. It does not make a search complete.
 
@@ -128,7 +127,7 @@ tracked files or `rg --binary`, and verifies it independently. The regression
 test keeps the limitation as evidence.
 
 Removed helpers (`agent_php_lint`, `agent_context`, `agent_extract`,
-`agent_require`, `agent_curl`, `agent_history`, `agent_blame`, `agent_diff_check`,
+`agent_require`, `agent_curl`, `agent_history`, `agent_blame`, `agent_diff`, `agent_diff_check`,
 `agent_root`, `agent_mkcd`, `agent_usage`, `agent_codepoints`) are recoverable
 from tag `v0.7.0`; the ADR gives the evidence and reason for each, and the owner where the capability stays useful.
 

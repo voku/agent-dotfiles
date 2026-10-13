@@ -37,10 +37,5 @@ agent_head() {
     fi
 }
 
-# Complete native Git patch output, with external diff drivers and textconv off.
-agent_diff() {
-    command git --no-pager -c color.ui=false diff --no-ext-diff --no-textconv "$@"
-}
-
 # shellcheck source=.redpill/lib/deactivation.sh
 . "$AGENT_DOTFILES_HOME/.redpill/lib/deactivation.sh"

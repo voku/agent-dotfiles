@@ -23,17 +23,7 @@ command rg -n 'function ' . > "$EVAL_TMP/rg.plain.active" 2>&1
 sort -o "$EVAL_TMP/rg.plain.native" "$EVAL_TMP/rg.plain.native"; sort -o "$EVAL_TMP/rg.plain.active" "$EVAL_TMP/rg.plain.active"
 same rg-plain-no-hidden-matches "$EVAL_TMP/rg.plain.native" "$EVAL_TMP/rg.plain.active" "activated rg == native rg"
 
-# 3. agent_diff equals clean native Git over the last commit, despite a hostile gitconfig.
-if git rev-parse -q --verify HEAD~1 >/dev/null 2>&1; then
-    printf '[color]\n\tui = always\n[diff]\n\texternal = /nonexistent/driver\n[core]\n\tpager = false\n' > "$EVAL_TMP/hostile-gitconfig"
-    GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null command git --no-pager -c color.ui=false diff --no-ext-diff --no-textconv HEAD~1 HEAD > "$EVAL_TMP/diff.native" 2>&1
-    GIT_CONFIG_GLOBAL="$EVAL_TMP/hostile-gitconfig" GIT_CONFIG_SYSTEM=/dev/null agent_diff HEAD~1 HEAD > "$EVAL_TMP/diff.agent" 2>&1
-    same diff-insulated "$EVAL_TMP/diff.native" "$EVAL_TMP/diff.agent" "$(wc -c < "$EVAL_TMP/diff.native" | tr -d ' ') bytes"
-else
-    say PASS diff-insulated "single-commit repo, skipped"
-fi
-
-# 4. agent_head never truncates silently: shown + announced == total.
+# 3. agent_head never truncates silently: shown + announced == total.
 total=$(command rg --no-config -c --no-filename 'function ' . 2>/dev/null | awk '{s+=$1} END {print s+0}')
 if [ "$total" -gt 25 ]; then
     command rg --no-config -n --no-heading 'function ' . 2>/dev/null | agent_head 25 > "$EVAL_TMP/head.out"

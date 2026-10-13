@@ -100,8 +100,7 @@ function test_host_chosen_settings_survive_activation_and_deactivation() {
 function test_owned_name_collision_refuses_without_partial_state() {
   local shell definition
   for shell in $(available_shells); do
-    for definition in 'agent_git() { :; }' 'agent_rg() { :; }' 'agent_diff() { :; }' \
-        'agent_deactivate() { :; }' 'alias agent_git=true' 'AGENT_DOTFILES_HOME=existing'; do
+    for definition in 'agent_git() { :; }' 'agent_rg() { :; }' 'agent_deactivate() { :; }' 'alias agent_git=true' 'AGENT_DOTFILES_HOME=existing'; do
       run_shell "$shell" "$definition; . \"\$1\"" x
       assert_same '2' "$STATUS"
       assert_contains 'agent-dotfiles:' "$STDERR"
@@ -202,25 +201,6 @@ agent_head: TRUNCATED, showed 2 of 4 lines" "$STDOUT"
 b" "$STDOUT"
     run_shell "$shell" '. "$1" || exit 10; printf "a\n" | agent_head nope' x
     assert_same '64' "$STATUS"
-  done
-}
-
-function test_agent_diff_matches_native_git_despite_hostile_gitconfig() {
-  local shell repo="$TEST_ROOT/diff repo [λ]"
-  git init -q "$repo"
-  printf 'before\n' > "$repo/text.txt"
-  git -C "$repo" add text.txt
-  git -C "$repo" -c user.name=t -c user.email=t@example.test commit -qm fixture
-  printf 'after \n' > "$repo/text.txt"
-  GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null \
-    git -C "$repo" --no-pager -c color.ui=false diff --no-ext-diff --no-textconv > "$TEST_ROOT/native.diff"
-  printf '[color]\n\tui = always\n[diff]\n\texternal = /nonexistent/driver\n' > "$TEST_ROOT/hostile-gitconfig"
-  for shell in $(available_shells); do
-    RUN_ENV=(GIT_CONFIG_GLOBAL="$TEST_ROOT/hostile-gitconfig" GIT_CONFIG_SYSTEM=/dev/null)
-    run_shell "$shell" '. "$1" || exit 10; cd "$2" && agent_diff' "$repo"
-    RUN_ENV=()
-    assert_same '0' "$STATUS"
-    assert_same "$(cat "$TEST_ROOT/native.diff")" "$STDOUT"
   done
 }
 

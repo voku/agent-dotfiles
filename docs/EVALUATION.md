@@ -21,7 +21,6 @@ profile in a fresh shell and, per repository, checks:
 | --- | --- |
 | `rg-insulated`, `rg-exit-status` | `agent_rg` under a hostile `RIPGREP_CONFIG_PATH` (column limit, glob, max-count, color) returns the same lines and exit status as clean `rg --no-config` |
 | `rg-plain-no-hidden-matches` | plain `rg` with the activated config returns the same lines as clean native `rg` |
-| `diff-insulated` | `agent_diff HEAD~1 HEAD` under a hostile global gitconfig (forced color, broken external driver, pager) is byte-identical to a clean native diff |
 | `head-announces` | `agent_head 25` shows 25 lines and announces the true total |
 
 Output order of `rg` differs between identical runs (parallel walk), so `rg`
@@ -43,10 +42,10 @@ What it found and fixed before release:
 - `rg` ordering is nondeterministic; documented, not changed.
 
 After [ADR 0004](decisions/0004-environment-vs-task-strategy.md) the corpus
-check covers `agent_rg`, `agent_diff`, activated plain `rg` and `agent_head`
+check covers `agent_rg`, activated plain `rg` and `agent_head`
 (`head-announces`: `agent_head 25` shows 25 lines and announces the true
 total). Checks for the removed helpers (`php-lint-coverage`,
-`context-package`) were deleted with them. The 2026-10-13 result above was recorded at 0.7.0 with
+`context-package`, `diff-insulated`) were deleted with them. The 2026-10-13 result above was recorded at 0.7.0 with
 those checks.
 
 ## B. Friction log
@@ -59,7 +58,7 @@ developer, PHP-heavy work). Commands were counted, never stored or quoted.
 | `… \| head` (any) | 6,148 | Silent truncation is the dominant habit; the basis for the `agent_head` exception (ADR 0004). Habit frequency, not an outcome result |
 | `rg … \| head` | 2,097 | Search results cut with no notice; `agent_rg … \| agent_head 50` announces the cut |
 | `rg` | 5,111 | Plain `rg` presentation defaults (`ripgreprc`); `agent_rg` for host-config insulation |
-| `git diff --stat` | 427 | Native; `agent_diff` only normalizes. Orientation is skill territory (`agent_context` removed) |
+| `git diff --stat` | 427 | Native `git diff --stat`. Orientation is skill territory (`agent_context` removed) |
 | `php -l` | 478 | Native; only 3 used `find`/`xargs`. Linting strategy belongs in a skill (`agent_php_lint` removed) |
 | `command -v` / `which` | 227 | Native `command -v` is enough (`agent_require` removed) |
 | `git log -p/-S/-G`, `blame` | 86 | Native Git (`agent_history`, `agent_blame` removed) |

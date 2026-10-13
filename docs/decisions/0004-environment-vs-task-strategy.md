@@ -27,19 +27,20 @@ behavior. Nothing else.
 1. **Native tools stay native.** A helper is allowed only if it is the native
    command with host-configuration bleed or interactivity removed and nothing
    else: the same arguments, output and exit status, with no change to what
-   is searched, followed, hidden or counted. Three helpers meet this:
-   `agent_git`, `agent_rg`, `agent_diff`.
+   is searched, followed, hidden or counted. Two helpers meet this:
+   `agent_git` and `agent_rg`. (`agent_diff` did not: see the table below.)
 2. **One narrow exception: `agent_head`, an evidence-preservation primitive.**
    It does not replace or alter a native tool's behavior. It is the visible
    form of an operation the agent already performs (cutting a stream to N
-   lines), and its only effect is that the cut is announced with the true line
-   count. It is justified by an observed failure mode, not by convenience:
+   lines); what it adds is that the cut is announced with the true line count.
+   Unlike `head` it also consumes all of stdin to count, so the producer is not
+   cut off by SIGPIPE. It is justified by an observed failure mode, not by convenience:
    `| head` appeared in 6,148 of 12,121 observed shell calls, 2,097 of them
    after `rg`, each dropping the remainder without a word. That is evidence
    that the failure mode is common, **not** proof of better task outcomes
    (#69 showed none either way), so the exception stays small: no other
-   output-bounding, paging or summarizing helper rides on it. It still reads a
-   text stream, prints its banner on stdout and consumes all input. Whether it
+   output-bounding, paging or summarizing helper rides on it. It reads a
+   text stream and prints its banner on stdout. Whether it
    changes outcomes is hypothesis H3 in #12.
 3. **Environment defaults** (`agent.env`, `ripgreprc`) may remove progress
    bars, color, pagers, prompts and update nags. They must not change task
@@ -69,6 +70,7 @@ Judged individually. "Friction log" is the 12,121-call count in EVALUATION.md;
 | `agent_require` | 227 `command -v`/`which` calls | Native `command -v` already answers it (ADR 0003); the version compare is extra policy. No observed failure mode. | none needed |
 | `agent_curl` | none | `--location` follows redirects, hiding them, which contradicts the evidence rule. | none needed |
 | `agent_history`, `agent_blame` | 86 `git log -p/-S/-G`/`blame` calls | `--literal-pathspecs` and `--line-porcelain` change pathspec semantics and output format; no observed failure of native Git. | none needed |
+| `agent_diff` | 427 `git diff --stat` calls (not specific to it) | `--no-ext-diff --no-textconv` is not host noise: external diff drivers and textconv filters may be repository-defined, so the output can differ from native `git diff` evidence. Choosing a raw, apply-able patch is task strategy; explicit guidance, not a second exception without independent task evidence (owner review of #72). | agent-skills guidance |
 | `agent_diff_check` | none | Two native commands in sequence. | none needed |
 | `agent_root`, `agent_mkcd` | none | Change the shell's directory; navigation, not normalization. | none needed |
 | `agent_usage` | 43 `du` calls | `du -h -d 1`; no failure mode. | none needed |

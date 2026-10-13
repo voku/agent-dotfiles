@@ -26,7 +26,7 @@ agent_deactivate
 | --- | --- |
 | `.bashrc`, `.zshrc`, `.shellrc` | Explicit entry points; resolve the checkout root and activate |
 | `.exports` | `AGENT_DOTFILES_HOME`; applies the CLI settings in `.redpill/config/agent.env` |
-| `.functions` | `agent_git`, `agent_rg`, `agent_diff` (native commands insulated from host config) and `agent_head` (announced truncation) ([contract](docs/SHELL.md)) |
+| `.functions` | `agent_git`, `agent_rg` (native commands insulated from host config) and `agent_head` (announced truncation) ([contract](docs/SHELL.md)) |
 | `.redpill/lib/` | Activation preflight and `agent_deactivate` |
 | `.redpill/config/` | Tool configuration files (`agent.env`, `ripgreprc`, opt-in `gitignore_global`) |
 | `tests/shell/` | Bashunit contracts run against real Bash and Zsh |

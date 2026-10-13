@@ -8,7 +8,7 @@ Boundary cleanup ([ADR 0004](docs/decisions/0004-environment-vs-task-strategy.md
   `agent_curl`, `agent_history`, `agent_blame`, `agent_diff_check`,
   `agent_root`, `agent_mkcd`, `agent_usage`, `agent_codepoints`: task strategy
   or convenience, judged individually in the ADR. Recoverable from v0.7.0.
-  Kept: `agent_git`, `agent_rg`, `agent_diff`, and `agent_head` as the one
+  Kept: `agent_git`, `agent_rg`, and `agent_head` as the one
   evidence-preservation exception (silent `| head` truncation, 6,148 of
   12,121 observed calls; outcome benefit unproven).
 - Remove `PYTHONIOENCODING` from `agent.env` (changes codec behavior).
