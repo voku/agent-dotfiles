@@ -106,10 +106,31 @@ agent_rg -n 'pattern' src | agent_head 50     # prints "TRUNCATED, showed 50 of 
 agent_rg -c 'pattern' src                     # per-file counts, nothing cut
 ```
 
+## Complete file inventories
+
+`agent_rg` behaves like native `rg` and is **not** a completeness guarantee. In a
+recursive search ripgrep treats a file containing a NUL byte as binary and skips
+it without a message, even when the file is source code that matches (found in
+the #69 pilot: one PHP file hidden from `rg -l`, exit status 0). The helper adds
+no binary flag on purpose: ordinary source navigation should not search images,
+archives and databases.
+
+When the question is "every file containing X", say the scope and pick the mode:
+
+```sh
+git grep -l -z -F 'assertType(' -- '*.php'            # tracked files; stable, no binary skipping
+agent_rg --binary -l -F 'assertType(' --glob '*.php'  # scoped working-tree search; binary matches are reported, not printed
+```
+
+`--binary` lists a NUL-containing match and prints `binary file matches` instead
+of raw bytes. `-a`/`--text` prints everything, including binary data; use it
+only for a named file you mean to read as text. Cross-check an inventory with a
+second, independent count when it is used as evidence.
+
 ## Helpers
 
 - `agent_git` – `git --no-pager -c color.ui=false` with prompts off; full output and exit status.
-- `agent_rg` – `rg --no-config --color=never`, immune to host ripgrep config. Exit 1 means no match; 2 is an error.
+- `agent_rg` – `rg --no-config --color=never`, immune to host ripgrep config. Exit 1 means no match; 2 is an error. Native binary handling: see [Complete file inventories](#complete-file-inventories).
 - `agent_curl` – `curl --silent --show-error --location`: no progress meter, errors and redirects handled.
 - `agent_require TOOL [MIN]` – capability check: prints `tool<TAB>version<TAB>path`. Exit 1 missing, 2 too old, 3 version unreadable, 64 usage. Runs `TOOL --version`.
 - `agent_head [N]` – first N lines (default 100) of stdin, then `agent_head: TRUNCATED, showed N of M lines` on stdout. Use it instead of a bare `head`, which truncates silently.

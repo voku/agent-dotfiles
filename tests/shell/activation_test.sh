@@ -146,6 +146,30 @@ function test_agent_rg_ignores_host_configuration_and_reports_no_match() {
   done
 }
 
+function test_agent_rg_keeps_native_binary_handling_and_binary_flag_is_not_silent() {
+  local shell
+  mkdir -p -- "$TEST_ROOT/tree"
+  printf 'needle\n\0tail\n' > "$TEST_ROOT/tree/nul.php"
+  printf 'xx\0needle\0yy\n' > "$TEST_ROOT/tree/real.bin"
+  printf 'needle\n' > "$TEST_ROOT/tree/plain.php"
+  for shell in $(available_shells); do
+    # Default: native ripgrep silently skips NUL-containing files in a recursive walk.
+    run_shell "$shell" '. "$1" || exit 10; shift; agent_rg -l -F -- needle "$1"/tree' "$TEST_ROOT"
+    assert_same '0' "$STATUS"
+    assert_contains 'plain.php' "$STDOUT"
+    assert_not_contains 'nul.php' "$STDOUT"
+    # Caller opt-in: lists the NUL-containing source file and the binary match.
+    run_shell "$shell" '. "$1" || exit 10; shift; agent_rg --binary -l -F -- needle "$1"/tree' "$TEST_ROOT"
+    assert_contains 'nul.php' "$STDOUT"
+    assert_contains 'real.bin' "$STDOUT"
+    # ...without emitting raw NUL bytes, and with a visible notice.
+    run_shell "$shell" '. "$1" || exit 10; shift; agent_rg --binary -n -F -- needle "$1"/tree | { tr -cd "\\0" | wc -c; }' "$TEST_ROOT"
+    assert_same '0' "$(printf '%s' "$STDOUT" | tr -d ' ')"
+    run_shell "$shell" '. "$1" || exit 10; shift; agent_rg --binary -n -F -- needle "$1"/tree' "$TEST_ROOT"
+    assert_contains 'binary file matches' "$STDOUT"
+  done
+}
+
 function test_agent_env_values_with_equals_and_spaces_survive_intact() {
   local shell
   printf 'ODD_VALUE=a=b c\n# comment\n\nSECOND=2\n' >> "$HOME_COPY/.redpill/config/agent.env"
