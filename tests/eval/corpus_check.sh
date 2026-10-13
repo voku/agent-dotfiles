@@ -32,7 +32,11 @@ repos=("${repos[@]:0:$max}")
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 pass=0; fail=0
 for sh in ${shells//,/ }; do
-  command -v "$sh" >/dev/null || { echo "corpus_check: $sh not installed, skipped"; continue; }
+  command -v "$sh" >/dev/null 2>&1 || {
+    echo "corpus_check: requested shell $sh is not installed" >&2
+    fail=$((fail + 1))
+    continue
+  }
   profile=.bashrc; flags="--noprofile --norc"
   [ "$sh" = zsh ] && { profile=.zshrc; flags="-f"; }
   for repo in "${repos[@]}"; do
