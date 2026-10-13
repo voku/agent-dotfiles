@@ -123,21 +123,29 @@ agent_codepoints() {
 }
 
 # `php -l` over every *.php below DIR (default .), skipping .git, vendor and
-# node_modules. Prints only failures plus a summary naming the exclusions.
+# node_modules, in parallel (AGENT_PHP_LINT_JOBS, default: CPU count). Prints
+# only failures plus a summary naming the exclusions. A file php never reported
+# on counts as "unchecked" and fails the run, so nothing is skipped silently.
 agent_php_lint() {
-    local _dir="${1:-.}" _out _ok _bad
+    local _dir="${1:-.}" _out _ok _bad _total _jobs _unchecked
     if [ ! -d "$_dir" ]; then
         printf 'usage: agent_php_lint [DIR]\n' >&2
         return 64
     fi
     command -v php >/dev/null 2>&1 || { printf 'agent_php_lint: php not found\n' >&2; return 1; }
-    _out=$(find "$_dir" \( -name .git -o -name vendor -o -name node_modules \) -prune -o \
-        -type f -name '*.php' -exec php -d display_errors=1 -d log_errors=0 -l {} \; 2>&1)
+    _jobs="${AGENT_PHP_LINT_JOBS:-$(command getconf _NPROCESSORS_ONLN 2>/dev/null)}"
+    case "$_jobs" in '' | *[!0-9]* | 0) _jobs=4 ;; esac
+    _total=$(command find "$_dir" \( -name .git -o -name vendor -o -name node_modules \) -prune -o \
+        -type f -name '*.php' -print0 | command tr -cd '\0' | command wc -c | command tr -d ' ')
+    _out=$(command find "$_dir" \( -name .git -o -name vendor -o -name node_modules \) -prune -o \
+        -type f -name '*.php' -print0 |
+        command xargs -0 -n 1 -P "$_jobs" php -d display_errors=1 -d log_errors=0 -l 2>&1)
     _ok=$(printf '%s\n' "$_out" | grep -c '^No syntax errors detected in ')
     _bad=$(printf '%s\n' "$_out" | grep -c '^Errors parsing ')
+    _unchecked=$((_total - _ok - _bad))
     printf '%s\n' "$_out" | grep -v '^No syntax errors detected in ' | grep -v '^$'
-    printf 'agent_php_lint: %s ok, %s with errors (skipped: .git vendor node_modules)\n' "$_ok" "$_bad"
-    [ "$_bad" -eq 0 ]
+    printf 'agent_php_lint: %s ok, %s with errors, %s unchecked (skipped: .git vendor node_modules)\n' "$_ok" "$_bad" "$_unchecked"
+    [ "$_bad" -eq 0 ] && [ "$_unchecked" -eq 0 ]
 }
 
 # Unpack tar(.gz/.bz2/.xz) or zip into a new or empty DEST. Never deletes the

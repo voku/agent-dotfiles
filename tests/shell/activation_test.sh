@@ -340,3 +340,86 @@ function test_agent_diff_matches_native_git_and_navigation_helpers_work() {
     assert_same '2' "$STATUS"
   done
 }
+
+function test_second_activation_refuses_and_a_deactivated_shell_can_reactivate() {
+  local shell
+  for shell in $(available_shells); do
+    run_shell "$shell" '
+. "$1" || exit 10
+home=$AGENT_DOTFILES_HOME
+. "$1"; [ "$?" = 2 ] || exit 11
+[ "$AGENT_DOTFILES_HOME" = "$home" ] && type agent_git >/dev/null 2>&1 || exit 12
+agent_deactivate
+. "$1" || exit 13
+agent_git --version >/dev/null || exit 14' "$HOME_COPY/$([ "$shell" = zsh ] && echo .zshrc || echo .bashrc)"
+    assert_same '0' "$STATUS"
+    assert_contains 'AGENT_DOTFILES_HOME already exists' "$STDERR"
+  done
+}
+
+function test_child_shells_inherit_variables_but_not_functions() {
+  local shell
+  for shell in $(available_shells); do
+    run_shell "$shell" '
+. "$1" || exit 10
+[ "$("$2" -c "printf %s \"\$PAGER\"")" = cat ] || exit 11
+"$2" -c "command -v agent_git >/dev/null 2>&1" && exit 12
+exit 0' "$shell"
+    assert_same '0' "$STATUS"
+  done
+}
+
+function test_activation_works_from_a_relative_path_with_newline_and_leading_dash() {
+  local shell odd="$TEST_ROOT/-odd
+dir" asset
+  for asset in "${ASSETS[@]}"; do
+    mkdir -p -- "$odd/$(dirname -- "$asset")"
+    cp -- "$PROJECT_ROOT/$asset" "$odd/$asset"
+  done
+  for shell in $(available_shells); do
+    local -a flags=(--noprofile --norc); local profile=.bashrc
+    [ "$shell" = zsh ] && { flags=(-f); profile=.zshrc; }
+    STATUS=0
+    STDOUT="$(cd -- "$odd" && env -i PATH="$PATH" HOME="$TEST_ROOT/user" "$shell" "${flags[@]}" -c \
+      '. "./$1" || exit 10; [ "$AGENT_DOTFILES_HOME" = "$PWD" ] || exit 11; agent_deactivate' x "$profile" 2>&1)" || STATUS=$?
+    assert_same '0' "$STATUS"
+    assert_same '' "$STDOUT"
+  done
+}
+
+function test_symlinked_profile_is_refused_cleanly() {
+  local shell
+  for shell in $(available_shells); do
+    local profile=.bashrc; [ "$shell" = zsh ] && profile=.zshrc
+    ln -sfn "$HOME_COPY/$profile" "$TEST_ROOT/link$profile"
+    run_shell "$shell" '. "$2"; rc=$?; [ "$rc" = 2 ] || exit 10; [ "${AGENT_DOTFILES_HOME+x}" = x ] && exit 11; exit 0' "$TEST_ROOT/link$profile"
+    assert_same '0' "$STATUS"
+    assert_contains '.shellrc is missing or unreadable' "$STDERR"
+  done
+}
+
+function test_bashrc_refuses_a_posix_shell_without_defining_anything() {
+  command -v dash >/dev/null || [ "$(readlink "$(command -v sh)" 2>/dev/null)" = dash ] || return 0
+  STATUS=0
+  STDERR="$(env -i PATH="$PATH" HOME="$TEST_ROOT/user" sh -c '. "$1"; rc=$?; command -v agent_git >/dev/null && exit 11; exit "$rc"' x "$HOME_COPY/.bashrc" 2>&1 >/dev/null)" || STATUS=$?
+  assert_same '2' "$STATUS"
+  assert_contains '.bashrc requires Bash' "$STDERR"
+}
+
+function test_agent_php_lint_fails_when_a_file_is_never_reported_on() {
+  local shell proj="$TEST_ROOT/lint-src" stub="$TEST_ROOT/stub-bin"
+  mkdir -p "$proj" "$stub"
+  touch "$proj/a.php" "$proj/silent.php"
+  cat > "$stub/php" <<'EOS'
+#!/bin/sh
+for f; do :; done
+case "$f" in *silent.php) exit 0 ;; esac
+printf 'No syntax errors detected in %s\n' "$f"
+EOS
+  chmod +x "$stub/php"
+  for shell in $(available_shells); do
+    run_shell "$shell" '. "$1" || exit 10; PATH="$2:$PATH" agent_php_lint "$3"' "$stub" "$proj"
+    assert_same '1' "$STATUS"
+    assert_contains '1 ok, 0 with errors, 1 unchecked' "$STDOUT"
+  done
+}
