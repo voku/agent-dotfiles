@@ -34,7 +34,7 @@ or productivity.
 ### Result, 2026-10-13
 
 Linux container (Debian bookworm, PHP 8.2), both shells, nine real PHP
-repositories from 6 to about 12,700 files : **126 passed, 0 failed** (9 repositories × 2 shells; the largest, IT-Portal and phpstan-src, took 169–300 s per shell, almost all of it linting).
+repositories from 6 to about 12,700 files: **126 passed, 0 failed** (9 repositories × 2 shells; the largest, IT-Portal and phpstan-src, took 169–300 s per shell, almost all of it linting).
 
 What it found and fixed before release:
 
