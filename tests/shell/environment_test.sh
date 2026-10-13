@@ -78,6 +78,15 @@ agent_deactivate
 ! typeset -f agent_context >/dev/null 2>&1
 . "$root/activate.sh"
 [[ "$GIT_CONFIG_COUNT" == 7 ]]
+GIT_CONFIG_VALUE_2=overridden
+export GIT_CONFIG_VALUE_2
+if agent_deactivate 2>/dev/null; then
+    printf "%s\n" "deactivation should refuse a changed owned Git slot" >&2
+    exit 1
+fi
+[[ "$GIT_CONFIG_COUNT" == 7 && "$GIT_CONFIG_VALUE_2" == overridden ]]
+GIT_CONFIG_VALUE_2=cat
+export GIT_CONFIG_VALUE_2
 agent_deactivate
 [[ "$GIT_CONFIG_COUNT" == 2 ]]
 ' bash-test "$repo_root" "$tmp/diff-repo"
