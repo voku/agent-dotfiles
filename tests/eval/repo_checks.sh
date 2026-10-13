@@ -35,7 +35,7 @@ fi
 
 # 4. agent_php_lint covers exactly the PHP files an independent find sees.
 if command -v php >/dev/null 2>&1; then
-    expected=$(find . \( -name .git -o -name vendor -o -name node_modules \) -prune -o -type f -name '*.php' -print | wc -l | tr -d ' ')
+    expected=$(find . \( -name .git -o -name vendor -o -name node_modules \) -prune -o -type f -name '*.php' -print0 | tr -cd '\0' | wc -c | tr -d ' ')
     out=$(agent_php_lint . 2>&1); rc=$?
     covered=$(printf '%s\n' "$out" | sed -n 's/^agent_php_lint: \([0-9]*\) ok, \([0-9]*\) with errors.*/\1 \2/p' | awk '{print $1+$2}')
     if [ "$expected" = "${covered:-x}" ]; then say PASS php-lint-coverage "$expected files, rc=$rc"; else say FAIL php-lint-coverage "find=$expected lint=${covered:-none}"; fi
