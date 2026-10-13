@@ -12,7 +12,7 @@ runs unless you source it.
 | `.exports` | `AGENT_DOTFILES_HOME`; applies `agent.env` and `RIPGREP_CONFIG_PATH` |
 | `.functions` | the `agent_*` helpers below |
 | `.redpill/lib/` | Activation preflight and `agent_deactivate` |
-| `.redpill/config/` | `agent.env` (CLI settings), `ripgreprc`, opt-in `gitignore_global` |
+| `.redpill/config/` | `agent.env` (CLI settings), `ripgreprc`, opt-in `gitignore_global` and `wgetrc` |
 
 There is no `.aliases`: aliases do not expand in non-interactive shells, so
 every helper is a function and behaves the same in Bash and Zsh.
@@ -74,6 +74,36 @@ once, yourself:
 
 ```sh
 git config --global core.excludesFile /absolute/path/to/agent-dotfiles/.redpill/config/gitignore_global
+```
+
+## Optional wget settings
+
+`.redpill/config/wgetrc` bounds waits (`timeout`, `tries`, `retry_connrefused`)
+and prints server responses. Wget only reads it through `WGETRC`, which would
+replace the user's own `~/.wgetrc`, so it is never exported for you:
+
+```sh
+WGETRC=/absolute/path/to/agent-dotfiles/.redpill/config/wgetrc wget URL
+```
+
+## Known behavior
+
+- **Symlinked profiles are refused** (exit 2, `.shellrc is missing or unreadable`):
+  the root is the physical directory of the sourced file. Source the real path.
+- **Child shells inherit variables, not functions.** A `bash -c` started by a tool
+  sees `PAGER=cat` but has no `agent_git`; source the profile there too.
+- **`rg` output order changes between identical runs** (parallel walk). Compare
+  results as sets, or add `--sort path` when a stable order matters.
+
+## Never cut output silently
+
+Half of the shell calls in the friction log end in `| head`, which drops the
+rest without a word. Use the announcing form, and prefer a count when the
+question is "how many":
+
+```sh
+agent_rg -n 'pattern' src | agent_head 50     # prints "TRUNCATED, showed 50 of 812 lines"
+agent_rg -c 'pattern' src                     # per-file counts, nothing cut
 ```
 
 ## Helpers

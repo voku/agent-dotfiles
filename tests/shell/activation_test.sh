@@ -195,42 +195,6 @@ function test_agent_require_reports_missing_old_and_satisfied_tools() {
   done
 }
 
-function test_agent_os_reports_key_value_facts() {
-  local shell
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; agent_os' x
-    assert_same '0' "$STATUS"
-    assert_contains 'kernel=' "$STDOUT"
-    assert_contains 'arch=' "$STDOUT"
-  done
-}
-
-function test_agent_free_port_skips_a_listening_port() {
-  command -v ss >/dev/null || command -v netstat >/dev/null || return 0
-  local shell port
-  python3 -c 'import socket,time
-s=socket.socket(); s.bind(("127.0.0.1",0)); s.listen()
-print(s.getsockname()[1], flush=True); time.sleep(20)' > "$TEST_ROOT/port" &
-  local listener=$!
-  while [ ! -s "$TEST_ROOT/port" ]; do sleep 0.05; done
-  port="$(cat "$TEST_ROOT/port")"
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; agent_ports | grep -qx "$2" || exit 11; free=$(agent_free_port "$2") || exit 12; [ "$free" != "$2" ] && [ "$free" -gt "$2" ]' "$port"
-    assert_same '0' "$STATUS"
-  done
-  kill "$listener" 2>/dev/null
-}
-
-function test_agent_json_formats_and_rejects_invalid_input() {
-  local shell
-  for shell in $(available_shells); do
-    run_shell "$shell" '. "$1" || exit 10; printf "{\"a\":[1,2]}" | agent_json | tr -d " \n"' x
-    assert_same '{"a":[1,2]}' "$STDOUT"
-    run_shell "$shell" '. "$1" || exit 10; printf "{nope" | agent_json >/dev/null 2>&1; exit $?' x
-    assert_same 'nonzero' "$([ "$STATUS" -ne 0 ] && echo nonzero || echo zero)"
-  done
-}
-
 function test_agent_codepoints_exposes_invisible_characters() {
   command -v perl >/dev/null || return 0
   local shell
@@ -338,5 +302,110 @@ function test_agent_diff_matches_native_git_and_navigation_helpers_work() {
     rm -rf -- "$TEST_ROOT/-new dir"
     run_shell "$shell" '. "$1" || exit 10; agent_mkcd; exit $?' x
     assert_same '2' "$STATUS"
+  done
+}
+
+function test_second_activation_refuses_and_a_deactivated_shell_can_reactivate() {
+  local shell
+  for shell in $(available_shells); do
+    run_shell "$shell" '
+. "$1" || exit 10
+home=$AGENT_DOTFILES_HOME
+. "$1"; [ "$?" = 2 ] || exit 11
+[ "$AGENT_DOTFILES_HOME" = "$home" ] && type agent_git >/dev/null 2>&1 || exit 12
+agent_deactivate
+. "$1" || exit 13
+agent_git --version >/dev/null || exit 14' "$HOME_COPY/$([ "$shell" = zsh ] && echo .zshrc || echo .bashrc)"
+    assert_same '0' "$STATUS"
+    assert_contains 'AGENT_DOTFILES_HOME already exists' "$STDERR"
+  done
+}
+
+function test_child_shells_inherit_variables_but_not_functions() {
+  local shell
+  for shell in $(available_shells); do
+    run_shell "$shell" '
+. "$1" || exit 10
+[ "$("$2" -c "printf %s \"\$PAGER\"")" = cat ] || exit 11
+"$2" -c "command -v agent_git >/dev/null 2>&1" && exit 12
+exit 0' "$shell"
+    assert_same '0' "$STATUS"
+  done
+}
+
+function test_activation_works_from_a_relative_path_with_newline_and_leading_dash() {
+  local shell odd="$TEST_ROOT/-odd
+dir" asset
+  for asset in "${ASSETS[@]}"; do
+    mkdir -p -- "$odd/$(dirname -- "$asset")"
+    cp -- "$PROJECT_ROOT/$asset" "$odd/$asset"
+  done
+  for shell in $(available_shells); do
+    local -a flags=(--noprofile --norc); local profile=.bashrc
+    [ "$shell" = zsh ] && { flags=(-f); profile=.zshrc; }
+    STATUS=0
+    STDOUT="$(cd -- "$odd" && env -i PATH="$PATH" HOME="$TEST_ROOT/user" "$shell" "${flags[@]}" -c \
+      '. "./$1" || exit 10; [ "$AGENT_DOTFILES_HOME" = "$PWD" ] || exit 11; agent_deactivate' x "$profile" 2>&1)" || STATUS=$?
+    assert_same '0' "$STATUS"
+    assert_same '' "$STDOUT"
+  done
+}
+
+function test_symlinked_profile_is_refused_cleanly() {
+  local shell
+  for shell in $(available_shells); do
+    local profile=.bashrc; [ "$shell" = zsh ] && profile=.zshrc
+    ln -sfn "$HOME_COPY/$profile" "$TEST_ROOT/link$profile"
+    run_shell "$shell" '. "$2"; rc=$?; [ "$rc" = 2 ] || exit 10; [ "${AGENT_DOTFILES_HOME+x}" = x ] && exit 11; exit 0' "$TEST_ROOT/link$profile"
+    assert_same '0' "$STATUS"
+    assert_contains '.shellrc is missing or unreadable' "$STDERR"
+  done
+}
+
+function test_bashrc_refuses_a_posix_shell_without_defining_anything() {
+  # macOS /bin/sh is Bash in POSIX mode and legitimately activates; only test a real non-Bash sh.
+  [ -z "$(env -i PATH="$PATH" sh -c 'printf %s "${BASH_VERSION-}"')" ] || return 0
+  STATUS=0
+  STDERR="$(env -i PATH="$PATH" HOME="$TEST_ROOT/user" sh -c '. "$1"; rc=$?; command -v agent_git >/dev/null && exit 11; exit "$rc"' x "$HOME_COPY/.bashrc" 2>&1 >/dev/null)" || STATUS=$?
+  assert_same '2' "$STATUS"
+  assert_contains '.bashrc requires Bash' "$STDERR"
+}
+
+function test_agent_php_lint_fails_when_a_file_is_never_reported_on() {
+  local shell proj="$TEST_ROOT/lint-src" stub="$TEST_ROOT/stub-bin"
+  mkdir -p "$proj" "$stub"
+  touch "$proj/a.php" "$proj/silent.php"
+  cat > "$stub/php" <<'EOS'
+#!/bin/sh
+for f; do :; done
+case "$f" in *silent.php) exit 0 ;; esac
+printf 'No syntax errors detected in %s\n' "$f"
+EOS
+  chmod +x "$stub/php"
+  for shell in $(available_shells); do
+    run_shell "$shell" '. "$1" || exit 10; PATH="$2:$PATH" agent_php_lint "$3"' "$stub" "$proj"
+    assert_same '1' "$STATUS"
+    assert_contains '1 ok, 0 with errors, 1 unchecked' "$STDOUT"
+  done
+}
+
+function test_agent_php_lint_parallel_jobs_do_not_interleave_reports() {
+  local shell proj="$TEST_ROOT/many-src" stub="$TEST_ROOT/chatty-bin" i
+  mkdir -p "$proj" "$stub"
+  for i in $(seq 1 80); do touch "$proj/f$i.php"; done
+  cat > "$stub/php" <<'EOS'
+#!/bin/sh
+for f; do :; done
+printf 'No syntax '
+sleep 0.01
+printf 'errors detected in '
+sleep 0.01
+printf '%s\n' "$f"
+EOS
+  chmod +x "$stub/php"
+  for shell in $(available_shells); do
+    run_shell "$shell" '. "$1" || exit 10; AGENT_PHP_LINT_JOBS=16 PATH="$2:$PATH" agent_php_lint "$3"' "$stub" "$proj"
+    assert_same '0' "$STATUS"
+    assert_contains '80 ok, 0 with errors, 0 unchecked' "$STDOUT"
   done
 }

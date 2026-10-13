@@ -17,7 +17,7 @@ skipped by design: it is for a human at a terminal.
 | `.gitmessage` | Skipped | Commit templates only show in an editor; agents use `-m` and must follow the target repo's convention. Jira/time-tracking hints are personal |
 | `.git-templates/hooks/post-checkout` | Skipped | Writes `~/.git-clone-init` and local Git identity: host mutation |
 | `.gitattributes` | Skipped | Only commented-out content |
-| `.wgetrc` | Deferred (single tool) | Skipped in round 1. Later: keep `timeout`, `tries`, `retry_connrefused`, `no_parent`, `server_response`; drop the IE user-agent, `robots = off`, `follow_ftp`. Applying it needs `WGETRC`, which would hide a user's own `~/.wgetrc`, so it stays opt-in |
+| `.wgetrc` | Adapted, opt-in (`.redpill/config/wgetrc`) | Skipped in round 1. Later: keep `timeout`, `tries`, `retry_connrefused`, `no_parent`, `server_response`; drop the IE user-agent, `robots = off`, `follow_ftp`. Applying it needs `WGETRC`, which would hide a user's own `~/.wgetrc`, so it stays opt-in |
 | `.ackrc`, `.colordiffrc`, `.gemrc`, `.irbrc`, `.gdbinit`, `.screenrc`, `.tmux.conf`, `.minttyrc`, `.gvimrc`, `.xbindkeysrc`, `.hgignore` (Mercurial duplicate of the global ignore) | Skipped | One tool each; not needed by an agent shell |
 | `.hushlogin`, `.inputrc`, `.bash_logout`, `.bash_complete`, `.colors`, `.dircolors`, `.icons`, `.fonts/`, `.vim*` | Skipped | Login, readline, completion, color and editor concerns for humans |
 | `.zprofile`, `.bash_profile`, `.zshrc`, `.bashrc`, `.shellrc` (source) | Skipped / replaced | Login/interactive startup that loads `~/.extra`, prompt, plugins and themes. This repo has its own explicit entry points |
@@ -55,9 +55,9 @@ ideas were rewritten rather than copied.
 
 | Source | Result | Where / why |
 | --- | --- | --- |
-| `os-info()`, `bin/os-detect.sh`, `cpuinfo()` | Adapted | `agent_os`: `key=value`, reads `/etc/os-release`, adds WSL; no `lsb_release`, no bash-4 `declare -A` |
-| `netstat_used_local_ports`, `netstat_free_local_port` | Adapted | `agent_ports`, `agent_free_port` (`ss`, else `netstat`) |
-| `json()` | Adapted | `agent_json`: no `pygmentize` color; uses `jq` or `json.tool` |
+| `os-info()`, `bin/os-detect.sh`, `cpuinfo()` | Adapted in 0.6.0, dropped in 0.7.0 | `agent_os`: 3 uses of `uname`/`lsb_release` in 12,121 agent shell calls; `uname -a` is enough. Recover from Git history (tag v0.6.0) |
+| `netstat_used_local_ports`, `netstat_free_local_port` | Adapted in 0.6.0, dropped in 0.7.0 | `agent_ports`, `agent_free_port`: 8 uses of `ss`/`lsof`/`netstat` in 12,121 calls; use `ss -ltn` directly. Recover from tag v0.6.0 |
+| `json()` | Adapted in 0.6.0, dropped in 0.7.0 | `agent_json`: 4 uses of `json.tool` in 12,121 calls; `jq .` is enough. Recover from tag v0.6.0 |
 | `escape`, `unidecode`, `codepoint` | Adapted | `agent_codepoints`: reveals invisible characters instead of converting escapes |
 | `php-parse-error-check()` | Adapted | `agent_php_lint`: reports counts and the skipped directories instead of grepping for one message |
 | `extract()` | Adapted | `agent_extract` with an explicit destination (see round 2) |
@@ -82,7 +82,7 @@ ideas were rewritten rather than copied.
 | `.config/fontconfig`, `.macos`, `.osx`, `examples/` (Android SDK installer, Sublime settings, vim cheatsheet, screenshot) | Skipped | Desktop, macOS defaults and installers |
 | `docs/` (CONFIGURATION, PLUGINS, RECIPES, TECHNICAL_DOCUMENTATION) | Skipped | Documentation of the human framework |
 | `.redpill/tests/functions-tests.sh` | Superseded | Tested `lc`/`uc` with shunit2; replaced by `tests/shell/activation_test.sh` (Bashunit) |
-| `.wgetrc` | Deferred | See round 1; opt-in only because wget has no non-intrusive way to load it |
+| `.wgetrc` | Adapted, opt-in file `.redpill/config/wgetrc` (needs `WGETRC`) | See round 1; opt-in only because wget has no non-intrusive way to load it |
 
 Everything in the source repository has now been reviewed once. New candidates
 come from real agent tasks that needed something and lacked it, not from

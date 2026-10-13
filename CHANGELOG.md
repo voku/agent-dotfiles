@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.7.0
+
+Hardening and evidence release. It does **not** recommend default activation:
+the agent trial in [docs/EVALUATION.md](docs/EVALUATION.md) (layer C, issue #12)
+is specified but has not been run.
+
+- Add `tests/container/run.sh`: Linux CI job (Bash, Zsh, ShellCheck, jq, ss) in
+  a throwaway Debian container; CI installs `jq`/`iproute2` so no test skips.
+- Add `tests/eval/corpus_check.sh`: compares helper output with clean native
+  output on real repositories in Bash and Zsh.
+- Add activation tests: second activation, reactivation, child shells, newline
+  and leading-dash paths, symlinked profile (refused), sourcing from a POSIX shell.
+- `agent_php_lint` runs in parallel (`AGENT_PHP_LINT_JOBS`), writes each report
+  atomically and fails on files php never reported on ("unchecked").
+- Drop `agent_os`, `agent_ports`, `agent_free_port`, `agent_json`: 3-8 uses in
+  12,121 observed agent shell calls (recoverable from v0.6.0).
+- `GCM_INTERACTIVE=false` (the current documented value; `never` is legacy).
+- Add opt-in `.redpill/config/wgetrc` (needs `WGETRC`; never exported).
+- Document known behavior (symlinks, child shells, `rg` ordering) and the
+  `| agent_head` idiom in place of a bare `| head`.
+
 ## 0.6.0
 
 - Become shell-only: remove the Python CLI, `tools/`, installer, first-install
