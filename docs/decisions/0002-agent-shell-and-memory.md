@@ -1,30 +1,24 @@
-# ADR 0002: Fixed Redpill runtime and project memory
+# ADR 0002: Native tools are the agent interface
 
 - Status: Accepted
 - Date: 2026-10-12
-- Context: [Redpill-inspired environment RFC #40](https://github.com/voku/agent-dotfiles/issues/40)
+- Context: Coding agents already use Git, rg, shell and project-native tools.
 
 ## Decision
 
-The familiar dotfile entry points remain at the repository root, but their
-implementation lives in one fixed `.redpill/` tree. `.functions` loads the
-reviewed modules in a declared order. `.aliases` is retained as a recognizable
-entry point but exposes named functions, because ordinary aliases are not a
-reliable interface for non-interactive coding-agent shells.
+Remove the Python consumer CLI and its command wrappers. Prepare an explicitly
+activated Bash/Zsh environment, session-scoped native Git defaults and opt-in
+skills. Do not make agents learn `agent-dotfiles search`, `read`, `workspace` or
+similar commands.
 
-`agent_git` and `agent_rg` are optional command-scoped defaults. They preserve
-full stdout, stderr and exit status while disabling only the pager, credential
-prompt, color and inherited ripgrep configuration relevant to the invocation.
-They never shadow native commands or alter global environment settings.
-
-`MEMORY.md` and this decision directory are versioned input for agent-loop when
-maintaining this repository. They are not a second workflow implementation and
-are excluded from every installed consumer prefix. Raw `.agent-loop/` state
-remains local and ignored.
+Keep Python only inside pinned installation and maintainer tooling where it
+provides path safety, immutable commit reads and manifest verification. This
+internal use is not exposed as an agent runtime.
 
 ## Consequences
 
-New pinned installations contain the complete root entrypoint set and the
-complete `.redpill/` tree. Existing legacy manifests remain verifiable and
-removable. Profiles retain one purpose: diagnostics. Any claimed task-quality
-benefit still needs the controlled evaluation in issue #12.
+Agents work with native output and complete errors and patches. The project
+accepts losing structured JSON envelopes and wrapper-specific bounds. Setup
+correctness and comfort must be judged in real coding sessions before adding
+new abstractions. No global Git configuration or automatic shell activation is
+introduced.

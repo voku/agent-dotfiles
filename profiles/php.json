@@ -1,8 +1,0 @@
-{
-  "schema": "agent-dotfiles.v1.profile",
-  "name": "php",
-  "description": "PHP investigation with native project checks selected only after discovery.",
-  "required_tools": ["rg", "git", "php"],
-  "optional_tools": ["jq", "curl", "composer", "ctags"],
-  "platform_limits": {}
-}

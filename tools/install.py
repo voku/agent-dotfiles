@@ -21,10 +21,10 @@ SHELL_ALIASES = {".aliases"}
 REDPILL_MODULES = {".redpill/modules/context.sh", ".redpill/modules/git.sh"}
 REDPILL_CORE = {".redpill/core/activation.sh", ".redpill/core/deactivation.sh"}
 CURRENT_SHELL_PAYLOAD = SHELL_ENTRYPOINTS | SHELL_ALIASES | REDPILL_MODULES | REDPILL_CORE
+BOOTSTRAP_ASSETS = {"activate.sh", "git-env.sh"}
 # Retain these identifiers only to verify and remove older pinned installations.
 LEGACY_SHELL_MODULES = {"shell/modules/context.sh", "shell/modules/git.sh"}
 LEGACY_SHELL_CORE = {"shell/core/activation.sh", "shell/core/deactivation.sh"}
-PROFILE_FILES = {"profiles/minimal.json", "profiles/git.json", "profiles/php.json", "profiles/shell.json"}
 LOCAL_SKILL_FILES = {"skills/project-onboarding/SKILL.md"}
 PORTABLE_SKILLS = {
     "coding-simplicity",
@@ -34,7 +34,9 @@ PORTABLE_SKILLS = {
 }
 PORTABLE_SKILL_MANIFEST = "skills/portable-skills.json"
 PORTABLE_SKILL_FILES = {f"skills/{skill}/SKILL.md" for skill in PORTABLE_SKILLS}
-LAUNCHER = b'''#!/usr/bin/env python3
+LEGACY_CLI_FILES = {"bin/agent-dotfiles", "libexec/agent-dotfiles"}
+LEGACY_PROFILE_FILES = {"profiles/minimal.json", "profiles/git.json", "profiles/php.json", "profiles/shell.json"}
+LEGACY_LAUNCHER = b'''#!/usr/bin/env python3
 """Explicitly activated isolated agent-dotfiles; do not create bytecode."""
 import sys
 from pathlib import Path
@@ -73,14 +75,6 @@ def git(source: Path, *arguments: str) -> bytes:
     return result.stdout
 
 
-def runtime_path(name: str) -> bool:
-    path = PurePosixPath(name)
-    return (len(path.parts) >= 2 and path.parts[0] == "agent_dotfiles"
-            and path.suffix == ".py" and ".." not in path.parts
-            and all(re.fullmatch(r"[A-Za-z_][A-Za-z_0-9]*", part)
-                    for part in (*path.parts[1:-1], path.stem)))
-
-
 def portable_skill_path(name: str) -> bool:
     path = PurePosixPath(name)
     return (len(path.parts) >= 3 and path.parts[0] == "skills"
@@ -89,10 +83,15 @@ def portable_skill_path(name: str) -> bool:
 
 
 def installation_path(name: str) -> bool:
-    return (name in {"LICENSE", "bin/agent-dotfiles", "libexec/agent-dotfiles", PORTABLE_SKILL_MANIFEST}
-            | CURRENT_SHELL_PAYLOAD | LEGACY_SHELL_MODULES | LEGACY_SHELL_CORE
-            | PROFILE_FILES | LOCAL_SKILL_FILES
-            or runtime_path(name) or portable_skill_path(name))
+    legacy_parts = PurePosixPath(name).parts
+    legacy_runtime = (len(legacy_parts) >= 2 and legacy_parts[0] == "agent_dotfiles"
+                      and PurePosixPath(name).suffix == ".py" and ".." not in legacy_parts
+                      and all(re.fullmatch(r"[A-Za-z_][A-Za-z_0-9]*", part)
+                              for part in (*legacy_parts[1:-1], PurePosixPath(name).stem)))
+    return (name in ({"LICENSE", PORTABLE_SKILL_MANIFEST} | BOOTSTRAP_ASSETS
+                     | CURRENT_SHELL_PAYLOAD | LEGACY_SHELL_MODULES | LEGACY_SHELL_CORE
+                     | LOCAL_SKILL_FILES | LEGACY_CLI_FILES | LEGACY_PROFILE_FILES)
+            or legacy_runtime or portable_skill_path(name))
 
 
 def portable_skill_digests(data: bytes) -> dict[str, str]:
@@ -146,10 +145,9 @@ def install(source: Path, revision: str, prefix: Path, *, preview: bool = False)
     tracked = git(source, "ls-files", "-z").split(b"\0")
     paths = [os.fsdecode(name) for name in tracked if name]
     paths = [name for name in paths if installation_path(name)]
-    required = ({"LICENSE", "bin/agent-dotfiles", "agent_dotfiles/__init__.py",
-                 "agent_dotfiles/cli.py", PORTABLE_SKILL_MANIFEST}
+    required = ({"LICENSE", "activate.sh", "git-env.sh", PORTABLE_SKILL_MANIFEST}
                 | CURRENT_SHELL_PAYLOAD | LOCAL_SKILL_FILES
-                | PROFILE_FILES | PORTABLE_SKILL_FILES)
+                | PORTABLE_SKILL_FILES)
     if not required.issubset(paths):
         raise SetupError("tracked runtime files are missing")
     contents = {}
@@ -162,14 +160,12 @@ def install(source: Path, revision: str, prefix: Path, *, preview: bool = False)
         data = git(source, "show", f"{revision}:{name}")
         if original.read_bytes() != data:
             raise SetupError("runtime source differs from pinned commit")
-        installed = "libexec/agent-dotfiles" if name == "bin/agent-dotfiles" else name
-        contents[installed] = (data, 0o644)
+        contents[name] = (data, 0o644)
     expected_portable = portable_skill_digests(contents[PORTABLE_SKILL_MANIFEST][0])
     actual_portable = {name: digest(data) for name, (data, _mode) in contents.items()
                        if portable_skill_path(name)}
     if actual_portable != expected_portable:
         raise SetupError("portable skill files do not match their provenance manifest")
-    contents["bin/agent-dotfiles"] = (LAUNCHER, 0o755)
     manifest = {"schema": SCHEMA, "source_revision": revision,
                 "files": {name: {"sha256": digest(data), "mode": mode}
                           for name, (data, mode) in sorted(contents.items())}}
@@ -210,8 +206,11 @@ def verify(prefix: Path) -> dict:
             or not isinstance(manifest["files"], dict)):
         raise SetupError("unknown or invalid installation manifest")
     files = manifest["files"]
-    required = {"LICENSE", "libexec/agent-dotfiles", "bin/agent-dotfiles",
-                "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"}
+    legacy_cli = bool(set(files) & LEGACY_CLI_FILES) or any(
+        name.startswith("agent_dotfiles/") for name in files)
+    required = ({"LICENSE", "bin/agent-dotfiles", "libexec/agent-dotfiles",
+                 "agent_dotfiles/__init__.py", "agent_dotfiles/cli.py"}
+                if legacy_cli else {"LICENSE", "activate.sh", "git-env.sh"})
     if not required.issubset(files):
         raise SetupError("incomplete installation manifest")
     current_shell_markers = SHELL_ALIASES | REDPILL_MODULES | REDPILL_CORE
@@ -229,8 +228,6 @@ def verify(prefix: Path) -> dict:
                                            or not LEGACY_SHELL_MODULES.issubset(files)
                                            or not SHELL_ENTRYPOINTS.issubset(files)):
         raise SetupError("incomplete shell lifecycle manifest")
-    if set(files) & PROFILE_FILES and not PROFILE_FILES.issubset(files):
-        raise SetupError("incomplete capability profile manifest")
     portable_entries = {name for name in files
                         if name == PORTABLE_SKILL_MANIFEST or portable_skill_path(name)}
     if portable_entries and not (LOCAL_SKILL_FILES | {PORTABLE_SKILL_MANIFEST}
@@ -250,8 +247,8 @@ def verify(prefix: Path) -> dict:
                 or stat.S_IMODE(target.stat().st_mode) != entry["mode"]):
             raise SetupError(f"installed file changed or missing: {name}")
         directories.update(str(parent) for parent in PurePosixPath(name).parents if str(parent) != ".")
-    if files["bin/agent-dotfiles"]["sha256"] != digest(LAUNCHER):
-        raise SetupError("unknown installation launcher")
+    if legacy_cli and files["bin/agent-dotfiles"]["sha256"] != digest(LEGACY_LAUNCHER):
+        raise SetupError("unknown legacy installation launcher")
     if portable_entries:
         expected_portable = portable_skill_digests((prefix / PORTABLE_SKILL_MANIFEST).read_bytes())
         actual_portable = {name: digest((prefix / name).read_bytes()) for name in files

@@ -1,15 +1,38 @@
-# Coding-agent convenience commands.
-#
-# Traditional aliases do not expand in the non-interactive shells used by most
-# coding agents. Keep this familiar dotfile entry point, but expose reviewed
-# functions instead of aliases so Bash and Zsh behave identically.
+# Small Bash/Zsh functions inspired by the practical navigation and repo
+# shortcuts in voku/dotfiles. They preserve native tool behavior and errors.
 
-# Read-only native Git with stable, non-paged output and no credential prompt.
-agent_git() {
-    GIT_PAGER=cat GIT_TERMINAL_PROMPT=0 command git --no-pager -c color.ui=false "$@"
+# Print compact orientation only; inspect source and full diffs before decisions.
+agent_context() {
+    local _agent_root
+    _agent_root=$(command git rev-parse --show-toplevel) || return $?
+    printf 'Repository: %s\n\nGit status:\n' "$_agent_root"
+    command git -C "$_agent_root" --no-pager -c color.ui=false status --short --branch || return $?
+    printf '\nUnstaged summary:\n'
+    command git -C "$_agent_root" --no-pager -c color.ui=false diff --stat --no-ext-diff --no-textconv || return $?
+    printf '\nStaged summary:\n'
+    command git -C "$_agent_root" --no-pager -c color.ui=false diff --cached --stat --no-ext-diff --no-textconv
 }
 
-# Literal ripgrep invocation insulated from host ripgrep configuration.
-agent_rg() {
-    RIPGREP_CONFIG_PATH=/dev/null command rg --no-config --color=never "$@"
+# Move to the current repository root without changing the shell's other state.
+agent_root() {
+    local _agent_root
+    _agent_root=$(command git rev-parse --show-toplevel) || return $?
+    builtin cd -- "$_agent_root"
+}
+
+# Complete native Git patch output, with external diff drivers disabled.
+agent_diff() {
+    command git --no-pager -c color.ui=false diff --no-ext-diff --no-textconv "$@"
+}
+
+# Check whitespace/errors in both staged and unstaged patches.
+agent_diff_check() {
+    command git diff --check "$@" || return $?
+    command git diff --cached --check "$@"
+}
+
+# Dotfile-style navigation helper, safe for spaces and leading dashes.
+agent_mkcd() {
+    [ "$#" -eq 1 ] || { printf '%s\n' 'Usage: agent_mkcd DIRECTORY' >&2; return 2; }
+    command mkdir -p -- "$1" && builtin cd -- "$1"
 }

@@ -1,8 +1,0 @@
-{
-  "schema": "agent-dotfiles.v1.profile",
-  "name": "minimal",
-  "description": "Portable read-only source and Git evidence.",
-  "required_tools": ["rg", "git"],
-  "optional_tools": ["jq", "curl"],
-  "platform_limits": {}
-}

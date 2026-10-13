@@ -18,11 +18,11 @@ configuration, or run a project's test/static-analysis commands automatically.
 2. Capture the current worktree with `git status --porcelain=v1 -z --untracked-files=all`.
    Preserve path boundaries and distinguish a clean
    checkout from unavailable or truncated information.
-3. If an explicitly supplied, pinned `agent-dotfiles` executable is available,
-   run its `doctor` first. Use `workspace --root . --limit 100` only when the
-   doctor result is usable. Record its exit status and `truncated` field. If it
-   is absent or unusable, continue with native Git; do not search for, install,
-   source, or configure the optional tool.
+3. Use native Git to confirm the current branch and working tree. Use native
+   `rg` or `find` only when additional file discovery is needed; do not install
+   or configure a second command interface.
+   If the approved dotfiles session is already active, `agent_context` can give
+   a compact starting summary; verify details with native Git and source reads.
 
 ## Discover PHP verification facts without guessing
 
@@ -51,9 +51,7 @@ configuration, or run a project's test/static-analysis commands automatically.
   `agent-loop map` / `agent-map` evidence when that owner is available. Verify
   the reported source range in the current file before relying on it.
 - For literal configuration, template, error text, or filename questions, use
-  native `rg` or a bounded `agent-dotfiles search` only when its structured
-  coordinates or completeness signal matters. A status of 3 or
-  `truncated: true` is incomplete evidence.
+  native `rg` with a scope appropriate to the repository.
 - Read selected source ranges exactly. Preserve the original path, range,
   revision/digest, command exit status, and any incomplete-result flag.
 

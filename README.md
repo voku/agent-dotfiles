@@ -1,167 +1,93 @@
 # agent-dotfiles
 
-**A safe, optional shell environment for coding agents.**
+**A comfortable, native-first workspace for coding agents.**
 
-`agent-dotfiles` helps a coding agent inspect an unfamiliar repository without
-turning partial output into invented certainty. Its reviewed `.redpill/` runtime
-provides explicit Bash/Zsh entry points plus a small Python CLI for bounded search, exact source ranges,
-file-scoped Git patches, repository state, and machine-readable capability
-reports.
+Agents already know `git`, `rg`, `sed`, `find`, shells and project test tools.
+This repository prepares those tools and the environment around them. It does
+not teach agents a second command language.
 
-It takes inspiration from [voku/dotfiles](https://github.com/voku/dotfiles),
-but is designed for non-interactive agents: no prompt hooks, startup-file edits,
-package installation, global Git changes, or automatic activation.
+The layout takes inspiration from [voku/dotfiles](https://github.com/voku/dotfiles).
+Its practical navigation and repository shortcuts are adapted here as a few
+non-interactive Bash/Zsh functions that keep native commands available.
 
-## Start safely
+## Fresh Debian or Ubuntu setup
 
-Use a reviewed checkout directly. First inspect the small, fixed host-tool
-baseline; this is read-only and prints a JSON plan rather than installing
-anything:
+From a reviewed, clean, committed checkout, run the bootstrap with a private
+prefix and the exact full commit:
 
 ```sh
-./firstInstall.sh plan
+mkdir -p "$HOME/.local/opt"
+./bootstrap.sh --prefix "$HOME/.local/opt/agent-dotfiles" --revision FULL_COMMIT_SHA
 ```
 
-It recommends only missing tools from the selected profile and leaves any
-package action for explicit review. See [the first-install plan](docs/FIRST_INSTALL.md).
+The bootstrap installs missing packages from a small Debian/Ubuntu allowlist,
+then delegates pinned copying and verification to `install.sh`. It does not
+edit shell startup files, change login shells, or write global Git settings.
+When tools are missing, run as root or establish noninteractive `sudo` access;
+the bootstrap will not pause for a password.
 
-The default `doctor` inventory already includes the universal Git and search
-baseline. No `minimal`, `git` or `shell` profile selection is needed for
-coding or administration work. Their existing `--profile` names remain
-available as backwards-compatible diagnostic views, not activation modes.
+For the same task environment in Bash or Zsh, source one reviewed entry point:
 
 ```sh
-./bin/agent-dotfiles doctor
-./bin/agent-dotfiles doctor --profile php
+. "$HOME/.local/opt/agent-dotfiles/activate.sh"
 ```
 
-The optional PHP diagnostic checks whether `php` is available (required for
-PHP work) and whether `composer` is available (useful but not mandatory for
-every PHP project). A diagnostic never runs these discovered executables.
+It loads the correct explicit profile, applies session-only Git defaults and
+provides `agent_deactivate` to restore the prior Git environment and remove the
+shell namespace. It is safe to source twice. In fresh per-command Bash sessions,
+use `env -u BASH_ENV bash --noprofile --norc`; in Zsh, use `zsh -f`. The setup
+never writes these into startup files.
 
-For an explicit, temporary Bash session, source the profile and remove it when
-the task ends:
+## Native workflow
 
 ```sh
-source /absolute/path/to/agent-dotfiles/.bashrc
-agent_workspace --root /absolute/path/to/project
-agent_search 'function save(' --root /absolute/path/to/project --glob '*.php'
-agent_deactivate
+git status --short --branch
+rg -n --hidden --glob '!vendor/**' 'target symbol' src tests
+sed -n '40,100p' src/path/to/file.php
+git diff -- src/path/to/file.php
+./vendor/bin/phpunit --filter RelevantTest
 ```
 
-Use `.zshrc` in Zsh. In a fresh non-interactive shell, start Bash with
-`env -u BASH_ENV bash --noprofile --norc` or Zsh with `zsh -f`, then explicitly
-source the reviewed profile. The [shell contract](docs/SHELL.md) describes the
-namespaced helpers, exit statuses, and activation guarantees.
+Use native output as-is. Search and inspect the relevant source before editing;
+run the project's own focused checks; inspect the full diff and visible errors.
+The shell environment does not cap output, rewrite commands, or claim shorter
+output as a quality improvement.
 
-The familiar `.exports`, `.functions`, and `.aliases` entry points are adapted
-for agents: `.exports` identifies only the selected runtime; `.functions` loads
-a fixed reviewed module list; and `.aliases` contains portable named commands
-instead of fragile interactive aliases. No command overrides `git` or `rg`.
+The explicitly activated shell also provides a few small Bash/Zsh comforts:
 
-## Pick the smallest useful tool
+- `agent_context` prints the repository root, full short status, and staged and
+  unstaged diff summaries for orientation. It is not a substitute for reading
+  source or inspecting the full patch.
+- `agent_root` moves to the repository root.
+- `agent_diff [PATH...]` shows the complete native patch with external diff
+  drivers and text conversion disabled.
+- `agent_diff_check` checks staged and unstaged whitespace errors.
+- `agent_mkcd DIRECTORY` creates a directory and enters it.
 
-| Question | Recommended path |
-| --- | --- |
-| You know the file and only need a quick answer | Native `rg`, `git`, or a source read |
-| You need match coordinates and explicit completeness | `agent-dotfiles search` or `agent_search` |
-| You need exact lines tied to a file identity | `agent-dotfiles read` or `agent_read` |
-| You need the complete patch for one literal file | `agent-dotfiles git-patch` or `agent_patch` |
-| You need a bounded checkout identity and current worktree state | `agent-dotfiles workspace` or `agent_workspace` |
-| You need PHP symbols or callers | [agent-map](https://github.com/voku/agent-map) through the current agent-loop workflow |
-| You need a capability/readiness report | `agent-dotfiles doctor` (add `--profile php` for PHP-specific readiness) |
+These functions are optional conveniences loaded by `activate.sh`. Direct
+`git`, `rg`, shell and project commands remain fully available.
 
-The profile is optional. Do not rerun a successful native command just to use a
-helper. Search output can be incomplete: exit code `3` and `truncated: true`
-mean that you must narrow the scope or retrieve more evidence before reaching a
-conclusion.
+Git defaults in `git-env.sh` are additive and session scoped: pager `cat`, color
+off, histogram diff, rename detection and ISO strict log dates. Histogram only
+changes diff presentation. Patches and error messages remain complete. The
+reviewable native config reference is [.gitconfig](.gitconfig); no file is
+copied into global Git configuration.
 
-## Install a pinned consumer copy
+## Contents
 
-Installation is optional. It copies an independently reviewed full Git commit to
-a private prefix and verifies every installed payload file. First preview the
-exact plan, then install and verify the same approved commit:
+- `activate.sh`, `.bashrc`, `.zshrc` and `.redpill/`: one explicit Bash/Zsh
+  activation path with no
+  prompt framework, plugin discovery or user profile loading.
+- `bootstrap.sh`, `firstInstall.sh` and `install.sh`: host setup, capability
+  planning and pinned private-prefix installation.
+- `git-env.sh`: session-only Git defaults.
+- `skills/`: reviewed, opt-in agent guidance.
+- `tools/`: maintainer-side installer, provenance and release utilities.
 
-```sh
-./install.sh plan --prefix /existing/private/agent-tools --revision APPROVED_FULL_COMMIT_SHA
-./install.sh --prefix /existing/private/agent-tools --revision APPROVED_FULL_COMMIT_SHA
-./install.sh verify --prefix /existing/private/agent-tools --revision APPROVED_FULL_COMMIT_SHA
-```
+The secure manifest installer and maintainer automation still use Python
+internally. Python is no longer a coding-agent runtime or consumer command.
 
-The installer neither downloads packages nor edits user shell files. It has an
-explicit rollback path. Read [installation and rollback](docs/INSTALLATION.md)
-before using it in a consumer environment.
-
-## What is included
-
-- Bounded literal search and file discovery with explicit hidden/ignored scope.
-- Exact UTF-8 source ranges with a whole-file SHA-256 digest.
-- Filename-safe Git status, tracked inventory, workspace identity, and complete
-  literal-file patches.
-- Stable JSON envelopes, meaningful exit statuses, and visible truncation.
-- Read-only capability discovery for native and optional tools, including
-  `fd`/`fdfind`, `jq`, `curl`, `ShellCheck`, `strace`, and `hyperfine`.
-- A common baseline plus opt-in PHP diagnostics; legacy `minimal`, `git`, and
-  `shell` views remain available. None is an installer, plugin loader, alias,
-  or automatic routing mechanism.
-- A project-onboarding skill for PHP work plus a selected, pinned set of
-  portable skills from [agent-skills](https://github.com/voku/agent-skills).
-
-The CLI uses Python 3.10+ and the standard library. `rg` is required for search;
-Git is recommended for repository evidence. Linux, macOS, and WSL are supported
-within the documented contracts; Windows installation is not supported.
-
-## Agent integrations
-
-[Project onboarding](docs/PROJECT_ONBOARDING.md) explains the shared Codex and
-Claude Code skill for a PHP failure or unfamiliar project. It gathers verified
-Git, Composer, configuration, and source context without automatically running
-project checks.
-
-[Selected portable skills](docs/AGENT_SKILLS.md) explains the consumer projection
-and the maintainer-only, locally pinned synchronization process. The canonical
-portable guidance remains owned by
-[voku/agent-skills](https://github.com/voku/agent-skills); this repository does
-not become a second skill catalog.
-
-[agent-loop integration](docs/AGENT_LOOP.md) documents the optional consumer
-boundary. Agent-loop can start and govern work when this repository is absent.
-
-## Evidence before claims
-
-The project aims to improve context quality, not to make output shorter at the
-expense of relevant evidence. Its small controlled evaluations so far establish
-correctness for their tested tasks, but do **not** prove a general productivity,
-time, or model-token benefit. See the [evaluation record](docs/EVALUATION_2026-10-11.md)
-and [full-cycle evidence](docs/FULL_CYCLE.md) for methods and limits.
-
-## Documentation and community
-
-The [repository layout and ownership guide](docs/REPOSITORY_LAYOUT.md) separates
-consumer-installed tools from source-only examples and documentation. See
-[the product boundary](docs/decisions/0001-product-boundaries.md):
-`agent-dotfiles` provides an optional execution environment; `agent-loop`
-independently owns task workflow, Learning, Recall and memory. Neither
-is installed or configured implicitly by the other.
-
-This repository tracks short, reviewable [project memory](MEMORY.md) and
-[decisions](docs/decisions/0002-agent-shell-and-memory.md) for its own agent-loop maintenance. Raw sessions
-and run receipts remain local `.agent-loop/` state and are never installed for
-consumers.
-
-Start with the [documentation index](docs/README.md). The public project paths
-are [contributing](CONTRIBUTING.md), [code of conduct](CODE_OF_CONDUCT.md),
-[security reporting](docs/SECURITY.md), and [support](SUPPORT.md). The project
-is available under the [MIT License](LICENSE).
-
-## Validate a checkout
-
-```sh
-python3 -m unittest discover -s tests -v
-python3 -m compileall -q agent_dotfiles bin tests tools
-/path/to/bashunit/bashunit test tests/shell --strict
-```
-
-The Python suite checks CLI contracts and documentation links. The Bashunit
-suite exercises observable shell and Git behavior in real fixtures. GitHub
-Actions runs the supported Python and shell matrix independently.
+See [setup details](docs/FIRST_INSTALL.md), [installation](docs/INSTALLATION.md),
+[repository layout](docs/REPOSITORY_LAYOUT.md), and [agent-loop boundary](docs/AGENT_LOOP.md).
+This project provides an environment; agent-loop remains the independently
+installed task workflow.

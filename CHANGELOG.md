@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+- Remove the Python consumer CLI, diagnostic profiles, command wrappers and
+  wrapper-specific tests. Coding agents now use native Git, rg, shell and project
+  tools directly.
+- Add an explicit Debian/Ubuntu bootstrap that applies the fixed package list,
+  installs the pinned shell/skill payload, verifies its manifest and checks the
+  session-scoped Git defaults through Git itself.
+- Add one idempotent Bash/Zsh activation entry point with reversible Git session
+  settings, so different coding-agent hosts can use the same setup instruction.
+- Adapt the practical repo/navigation ideas from voku/dotfiles into optional
+  `agent_context`, `agent_root`, complete `agent_diff`, `agent_diff_check` and
+  `agent_mkcd` shell functions without overriding native commands.
+- Keep Python only for internal pinned installation and maintainer utilities.
+- Remove stale CLI evaluation, mutation and integration docs whose commands no
+  longer exist. The next product check is real coding-session dogfooding.
+
 ## 0.5.0
 
 - Establish one reviewed `.redpill/` Bash/Zsh runtime with explicit, reversible
