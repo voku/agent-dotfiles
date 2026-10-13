@@ -26,6 +26,7 @@ EOT
     # shellcheck source=../../.exports
     . "$_agent_home/.exports" "$_agent_home"
     # Recorded so agent_deactivate removes exactly these functions.
+    # shellcheck disable=SC2034
     AGENT_DOTFILES_FUNCTIONS="$_agent_names"
     # shellcheck source=../../.functions
     . "$_agent_home/.functions"

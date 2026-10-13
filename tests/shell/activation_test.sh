@@ -33,7 +33,7 @@ function run_shell() {
   local -a flags=(--noprofile --norc)
   [ "$shell" = zsh ] && flags=(-f)
   STATUS=0
-  STDOUT="$(env -i PATH="$PATH" HOME="$TEST_ROOT/user" "${RUN_ENV[@]}" \
+  STDOUT="$(env -i PATH="$PATH" HOME="$TEST_ROOT/user" ${RUN_ENV[@]+"${RUN_ENV[@]}"} \
       "$shell" "${flags[@]}" -c "$script" consumer "$HOME_COPY/$profile" "$@" 2>"$TEST_ROOT/stderr")" || STATUS=$?
   STDERR="$(cat -- "$TEST_ROOT/stderr")"
 }
