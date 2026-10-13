@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.8.0
 
-Boundary cleanup ([ADR 0004](docs/decisions/0004-environment-vs-task-strategy.md)), from the #69 pilot and #70. No new behavior.
+Boundary cleanup ([ADR 0004](docs/decisions/0004-environment-vs-task-strategy.md)), from the #69 pilot and #70. No new behavior. **Breaking:** the removed helpers and `PYTHONIOENCODING` are no longer provided; use native commands or restore from `v0.7.0`. It does **not** recommend default activation (#12).
 
 - Remove `agent_php_lint`, `agent_context`, `agent_extract`, `agent_require`,
   `agent_curl`, `agent_history`, `agent_blame`, `agent_diff`,
