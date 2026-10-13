@@ -130,6 +130,7 @@ def verify_previous_snapshot(destination: Path) -> set[str]:
     if (manifest.get("schema") != SCHEMA or not isinstance(source, dict)
             or not isinstance(skills, dict)
             or source.get("repository") != "voku/agent-skills"
+            or not isinstance(source.get("revision"), str)
             or not re.fullmatch(r"[0-9a-f]{40}", source.get("revision", ""))
             or set(skills) != set(SKILLS)):
         raise SyncError("portable skill replacement requires a complete provenance manifest")
@@ -142,7 +143,8 @@ def verify_previous_snapshot(destination: Path) -> set[str]:
         for relative, expected_digest in entries.items():
             pure = PurePosixPath(relative)
             if (not isinstance(relative, str) or pure.is_absolute() or not pure.parts
-                    or ".." in pure.parts or not re.fullmatch(r"[0-9a-f]{64}", expected_digest)):
+                    or ".." in pure.parts or not isinstance(expected_digest, str)
+                    or not re.fullmatch(r"[0-9a-f]{64}", expected_digest)):
                 raise SyncError("portable skill replacement has unsafe provenance files")
             path = f"skills/{skill}/{relative}"
             target = destination_path(destination, path)
@@ -167,8 +169,8 @@ def sync(source: Path, revision: str, destination: Path, *, preview: bool = Fals
          replace: bool = False) -> dict[str, object]:
     source = regular_directory(source, "source")
     destination = regular_directory(destination, "destination")
-    if source == destination:
-        raise SyncError("source and destination must be separate checkouts")
+    if source == destination or source in destination.parents or destination in source.parents:
+        raise SyncError("source and destination must be separate, non-overlapping checkouts")
     files = source_files(source, revision)
     manifest = {
         "schema": SCHEMA,

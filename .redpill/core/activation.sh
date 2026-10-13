@@ -7,15 +7,11 @@ _agent_dotfiles_activate() {
             return 2
         fi
     done
-    if [ ! -f "$_agent_home/bin/agent-dotfiles" ] || [ ! -x "$_agent_home/bin/agent-dotfiles" ]; then
-        printf 'agent-dotfiles: required bin/agent-dotfiles is missing or not executable\n' >&2
-        return 2
-    fi
     if [ "${AGENT_DOTFILES_HOME+x}" = x ]; then
         printf 'agent-dotfiles: AGENT_DOTFILES_HOME already exists; deactivate first\n' >&2
         return 2
     fi
-    for _agent_name in agent_dotfiles agent_doctor agent_workspace agent_files agent_search agent_read agent_tracked agent_status agent_patch agent_history agent_blame agent_git agent_rg agent_deactivate; do
+    for _agent_name in agent_deactivate agent_git_deactivate agent_context agent_root agent_diff agent_diff_check agent_mkcd; do
         if typeset -f "$_agent_name" >/dev/null 2>&1 || alias "$_agent_name" >/dev/null 2>&1; then
             printf 'agent-dotfiles: owned namespace collision: %s\n' "$_agent_name" >&2
             return 2

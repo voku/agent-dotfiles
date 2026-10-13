@@ -1,5 +1,29 @@
 # Changelog
 
+## Unreleased
+
+- Remove the Python consumer CLI, diagnostic profiles, command wrappers and
+  wrapper-specific tests. Coding agents now use native Git, rg, shell and project
+  tools directly.
+- Make Debian/Ubuntu bootstrap read-only by default; require `--apply` for
+  package and private-prefix changes, and stage a missing Python prerequisite
+  separately so the complete package plan is reviewed first.
+- Include fd, ShellCheck, hyperfine and Linux strace in the default Debian tool
+  plan without turning debugging tools into a profile or command vocabulary.
+- Add one idempotent Bash/Zsh activation entry point with reversible Git session
+  settings, so different coding-agent hosts can use the same setup instruction.
+- Restore only the exact Git config slots owned by an activation, and refuse
+  deactivation if those slots or a later consumer's appended range changed.
+- Adapt the practical repo/navigation ideas from voku/dotfiles into optional
+  `agent_context`, `agent_root`, complete `agent_diff`, `agent_diff_check` and
+  `agent_mkcd` shell functions without overriding native commands.
+- Keep Python only for internal pinned installation and maintainer utilities.
+- Keep historical evaluations and inconclusive experiments under
+  `docs/archive/`; add a migration note for removed Python consumer commands.
+- Restore exact-head Bash/Zsh, installer, legacy-manifest and Debian/Ubuntu
+  bootstrap checks. Independent CLI-agent and paired-task evidence remains a
+  separate product-validation target.
+
 ## 0.5.0
 
 - Establish one reviewed `.redpill/` Bash/Zsh runtime with explicit, reversible

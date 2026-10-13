@@ -18,20 +18,47 @@ class BootstrapPlanTest(unittest.TestCase):
         found = {"python3": "/usr/bin/python3", "git": "/usr/bin/git", "apt-get": "/usr/bin/apt-get"}
         result = plan("minimal", system="Linux", os_release={"ID": "debian"}, found=found)
         self.assertEqual(result["manager"], "apt")
-        self.assertEqual(result["package_command_argv"], ["apt-get", "install", "--", "ripgrep", "jq", "curl"])
+        self.assertEqual(result["package_command_argv"], [
+            "apt-get", "install", "--", "ripgrep", "jq", "curl",
+            "fd-find", "shellcheck", "hyperfine", "strace",
+        ])
         self.assertTrue(result["package_command_requires_privileges"])
         self.assertFalse(next(x for x in result["tools"] if x["name"] == "rg")["available"])
 
     def test_no_command_when_everything_is_present(self) -> None:
-        found = {"apt-get": "/usr/bin/apt-get", "python3": "/python3", "git": "/git", "rg": "/rg", "jq": "/jq", "curl": "/curl"}
+        found = {
+            "apt-get": "/usr/bin/apt-get", "python3": "/python3", "git": "/git",
+            "rg": "/rg", "jq": "/jq", "curl": "/curl", "fdfind": "/fdfind",
+            "shellcheck": "/shellcheck", "hyperfine": "/hyperfine", "strace": "/strace",
+        }
         result = plan("minimal", system="Linux", os_release={"ID": "ubuntu"}, found=found)
         self.assertIsNone(result["package_command_argv"])
         self.assertEqual(result["unmanaged_missing"], [])
+
+    def test_diagnostics_are_default_and_debug_is_a_compatibility_alias(self) -> None:
+        found = {"apt-get": "/usr/bin/apt-get"}
+        default = plan("minimal", system="Linux", os_release={"ID": "debian"}, found=found)
+        debug = plan("debug", system="Linux", os_release={"ID": "debian"}, found=found)
+        php = plan("php", system="Linux", os_release={"ID": "debian"}, found=found)
+        self.assertEqual(default["tools"], debug["tools"])
+        self.assertEqual(default["package_command_argv"], debug["package_command_argv"])
+        self.assertEqual([item["name"] for item in php["tools"]],
+                         [item["name"] for item in default["tools"]] + ["php", "composer"])
+        self.assertEqual(set(php["unmanaged_missing"]), {"php", "composer"})
+
+    def test_diagnostics_remain_optional_and_never_execute(self) -> None:
+        # The planner inspects paths only: missing debug binaries are recommendations.
+        found = {"apt-get": "/usr/bin/apt-get", "python3": "/python3", "git": "/git"}
+        report = plan("minimal", system="Linux", os_release={"ID": "debian"}, found=found)
+        self.assertTrue(all(item["version"] is None for item in report["tools"]))
+        self.assertTrue(report["package_command_requires_approval"])
+        self.assertIn("strace", report["package_command_argv"])
 
     def test_debug_includes_strace_only_on_supported_linux(self) -> None:
         found = {"apt-get": "/usr/bin/apt-get"}
         linux = plan("debug", system="Linux", os_release={"ID": "ubuntu"}, found=found)
         self.assertIn("strace", linux["package_command_argv"])
+        self.assertIn("strace", plan("minimal", system="Linux", os_release={"ID": "ubuntu"}, found=found)["package_command_argv"])
         mac = plan("debug", system="Darwin", os_release={}, found={"brew": "/opt/homebrew/bin/brew"})
         self.assertIn("strace", mac["unmanaged_missing"])
         self.assertNotIn("strace", mac["package_command_argv"])
@@ -47,15 +74,12 @@ class BootstrapPlanTest(unittest.TestCase):
         result = plan("php", system="Linux", os_release={"ID": "ubuntu"}, found={"apt-get": "/usr/bin/apt-get"})
         self.assertEqual(set(result["unmanaged_missing"]), {"php", "composer"})
 
-    def test_php_planner_and_diagnostic_names_agree(self) -> None:
-        profile_path = Path(__file__).resolve().parents[1] / "profiles" / "php.json"
-        profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    def test_php_planner_keeps_php_and_composer_project_managed(self) -> None:
         planner_names = {tool.name for tool in PHP}
-        diagnostic_names = set(profile["required_tools"]) | set(profile["optional_tools"])
         self.assertEqual(planner_names, {"php", "composer"})
-        self.assertTrue(planner_names.issubset(diagnostic_names))
-        self.assertIn("php", profile["required_tools"])
-        self.assertIn("composer", profile["optional_tools"])
+        result = plan("php", system="Linux", os_release={"ID": "debian"}, found={"apt-get": "/apt-get"})
+        self.assertEqual(set(result["unmanaged_missing"]), planner_names)
+        self.assertFalse(planner_names & set(result["package_command_argv"]))
 
     def test_fdfind_is_recognized(self) -> None:
         result = plan("debug", system="Linux", os_release={"ID": "debian"}, found={"apt-get": "/usr/bin/apt-get", "fdfind": "/usr/bin/fdfind"})

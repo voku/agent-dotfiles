@@ -94,6 +94,26 @@ class PortableSkillSyncTest(unittest.TestCase):
         self.assertEqual(self.sync()[0], 2)
         self.assertEqual(target.read_text(), "local change\n")
 
+    def test_sync_refuses_nested_or_parent_destination_without_mutation(self):
+        nested = self.source / "nested-consumer"
+        nested.mkdir()
+        original_destination = self.destination
+        before = {p.relative_to(self.source): p.read_bytes()
+                  for p in self.source.rglob("*") if p.is_file()}
+        try:
+            for destination in (nested, self.root):
+                with self.subTest(destination=destination):
+                    self.destination = destination
+                    status, report = self.sync()
+                    self.assertEqual(status, 2, report)
+                    self.assertFalse(report["ok"])
+                    self.assertIn("non-overlapping", report["error"])
+                    self.assertFalse((destination / "skills").exists())
+                    self.assertEqual(before, {p.relative_to(self.source): p.read_bytes()
+                                              for p in self.source.rglob("*") if p.is_file()})
+        finally:
+            self.destination = original_destination
+
     def test_sync_refuses_a_supplied_symlink_root(self):
         linked = self.root / "linked-source"
         linked.symlink_to(self.source, target_is_directory=True)
@@ -150,6 +170,27 @@ class PortableSkillSyncTest(unittest.TestCase):
         current.write_text("local change\n")
         self.assertEqual(self.sync("--replace")[0], 2)
         self.assertEqual(current.read_text(), "local change\n")
+
+    def test_replace_refuses_malformed_metadata_without_traceback_or_writes(self):
+        self.assertEqual(self.sync()[0], 0)
+        manifest_path = self.destination / "skills/portable-skills.json"
+        original = manifest_path.read_text()
+        for field in ("revision", "digest"):
+            for value in (None, 17, [], {}):
+                with self.subTest(field=field, value=value):
+                    manifest = json.loads(original)
+                    if field == "revision":
+                        manifest["source"]["revision"] = value
+                    else:
+                        manifest["skills"]["coding-simplicity"]["files"]["SKILL.md"] = value
+                    manifest_path.write_text(json.dumps(manifest))
+                    before = {p.relative_to(self.destination): p.read_bytes()
+                              for p in self.destination.rglob("*") if p.is_file()}
+                    status, report = self.sync("--replace")
+                    self.assertEqual(status, 2, report)
+                    self.assertFalse(report["ok"])
+                    self.assertEqual(before, {p.relative_to(self.destination): p.read_bytes()
+                                             for p in self.destination.rglob("*") if p.is_file()})
 
 
 if __name__ == "__main__":
