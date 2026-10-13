@@ -139,6 +139,9 @@ jobs:
           container_status=0
           docker run --rm \
             --env "EXPECTED_HEAD=$EXPECTED_HEAD" \
+            --env GIT_CONFIG_COUNT=1 \
+            --env GIT_CONFIG_KEY_0=safe.directory \
+            --env GIT_CONFIG_VALUE_0=/repo \
             --mount "type=bind,src=$GITHUB_WORKSPACE,dst=/repo,readonly" \
             --mount "type=bind,src=$evidence,dst=/evidence" \
             "${{ matrix.image }}" sh -ec '
