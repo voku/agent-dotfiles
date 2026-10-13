@@ -39,6 +39,11 @@ function run_shell() {
   STDERR="$(cat -- "$TEST_ROOT/stderr")"
 }
 
+# Prints present/absent; avoids `case` inside $( ), which Bash 3.2 mis-parses.
+function contains_word() {
+  if [[ "$2" == *"$1"* ]]; then printf present; else printf absent; fi
+}
+
 function available_shells() {
   command -v bash >/dev/null && printf 'bash\n'
   command -v zsh >/dev/null && printf 'zsh\n'
@@ -252,7 +257,7 @@ function test_agent_php_lint_reports_failures_and_skips_vendor() {
     assert_same '1' "$STATUS"
     assert_contains 'bad.php' "$STDOUT"
     assert_contains '1 ok, 1 with errors' "$STDOUT"
-    assert_same 'absent' "$(case "$STDOUT" in *skipped.php*) echo present ;; *) echo absent ;; esac)"
+    assert_same 'absent' "$(contains_word 'skipped.php' "$STDOUT")"
   done
 }
 
@@ -304,7 +309,7 @@ function test_agent_context_reports_php_project_facts_without_running_scripts() 
     assert_contains 'vendor/bin/phpunit' "$STDOUT"
     assert_contains 'Cannot run these checks: PHP is unavailable.' "$STDOUT"
     run_shell "$shell" '. "$1" || exit 10; cd "$2" && PATH="$3" agent_context' "$proj" "$TEST_ROOT/with-php"
-    assert_same 'absent' "$(case "$STDOUT" in *'PHP is unavailable'*) echo present ;; *) echo absent ;; esac)"
+    assert_same 'absent' "$(contains_word 'PHP is unavailable' "$STDOUT")"
     assert_same 'absent' "$([ -e "$TEST_ROOT/ran" ] && echo present || echo absent)"
   done
   printf '{invalid json\n' > "$proj/composer.json"
