@@ -363,7 +363,8 @@ function test_symlinked_profile_is_refused_cleanly() {
 }
 
 function test_bashrc_refuses_a_posix_shell_without_defining_anything() {
-  command -v dash >/dev/null || [ "$(readlink "$(command -v sh)" 2>/dev/null)" = dash ] || return 0
+  # macOS /bin/sh is Bash in POSIX mode and legitimately activates; only test a real non-Bash sh.
+  [ -z "$(env -i PATH="$PATH" sh -c 'printf %s "${BASH_VERSION-}"')" ] || return 0
   STATUS=0
   STDERR="$(env -i PATH="$PATH" HOME="$TEST_ROOT/user" sh -c '. "$1"; rc=$?; command -v agent_git >/dev/null && exit 11; exit "$rc"' x "$HOME_COPY/.bashrc" 2>&1 >/dev/null)" || STATUS=$?
   assert_same '2' "$STATUS"
