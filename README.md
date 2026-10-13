@@ -56,8 +56,11 @@ output as a quality improvement.
 The explicitly activated shell also provides a few small Bash/Zsh comforts:
 
 - `agent_context` prints the repository root, full short status, and staged and
-  unstaged diff summaries for orientation. It is not a substitute for reading
-  source or inspecting the full patch.
+  unstaged diff summaries. In Composer projects it also reports declared PHP
+  requirements, script commands, common project config files, and available
+  PHP/Composer/check executables. It only reads this information; it does not
+  run scripts or install dependencies. Read source and full patches before
+  making decisions.
 - `agent_root` moves to the repository root.
 - `agent_diff [PATH...]` shows the complete native patch with external diff
   drivers and text conversion disabled.

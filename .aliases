@@ -10,7 +10,53 @@ agent_context() {
     printf '\nUnstaged summary:\n'
     command git -C "$_agent_root" --no-pager -c color.ui=false diff --stat --no-ext-diff --no-textconv || return $?
     printf '\nStaged summary:\n'
-    command git -C "$_agent_root" --no-pager -c color.ui=false diff --cached --stat --no-ext-diff --no-textconv
+    command git -C "$_agent_root" --no-pager -c color.ui=false diff --cached --stat --no-ext-diff --no-textconv || return $?
+
+    if [ -f "$_agent_root/composer.json" ]; then
+        printf '\nPHP / Composer project:\n'
+        if ! command -v jq >/dev/null 2>&1; then
+            printf '%s\n' 'Cannot read composer.json: jq is not installed.' >&2
+            return 127
+        fi
+        command jq -e 'type == "object"' "$_agent_root/composer.json" >/dev/null || return $?
+        printf 'Package: '
+        command jq -r '.name // "(not declared)"' "$_agent_root/composer.json" || return $?
+        printf 'PHP constraint: '
+        command jq -r '.require.php // ."require-dev".php // "(not declared)"' "$_agent_root/composer.json" || return $?
+        printf 'Composer scripts:\n'
+        command jq -r '(.scripts // {}) | to_entries[] | "  \(.key): \(.value | if type == "array" then join(" && ") else tostring end)"' "$_agent_root/composer.json" || return $?
+        printf 'Project config files:\n'
+        local _agent_file _agent_found _agent_tool
+        _agent_found=0
+        for _agent_file in AGENTS.md CLAUDE.md .editorconfig phpunit.xml phpunit.xml.dist phpstan.neon phpstan.neon.dist psalm.xml psalm.xml.dist Makefile; do
+            if [ -f "$_agent_root/$_agent_file" ]; then
+                printf '  %s\n' "$_agent_file"
+                _agent_found=1
+            fi
+        done
+        if [ -d "$_agent_root/.github/workflows" ]; then
+            printf '  .github/workflows/\n'
+            _agent_found=1
+        fi
+        [ "$_agent_found" -eq 1 ] || printf '  (none found)\n'
+        printf 'Available executables:\n'
+        for _agent_tool in php composer; do
+            if command -v "$_agent_tool" >/dev/null 2>&1; then
+                printf '  %s: %s\n' "$_agent_tool" "$(command -v "$_agent_tool")"
+            else
+                printf '  %s: unavailable\n' "$_agent_tool"
+            fi
+        done
+        printf 'Installed project checks:\n'
+        _agent_found=0
+        for _agent_file in vendor/bin/phpunit vendor/bin/phpstan vendor/bin/psalm vendor/bin/php-cs-fixer vendor/bin/phpcs; do
+            if [ -x "$_agent_root/$_agent_file" ]; then
+                printf '  %s\n' "$_agent_file"
+                _agent_found=1
+            fi
+        done
+        [ "$_agent_found" -eq 1 ] || printf '  (none installed)\n'
+    fi
 }
 
 # Move to the current repository root without changing the shell's other state.
