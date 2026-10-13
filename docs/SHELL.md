@@ -83,7 +83,7 @@ and prints server responses. Wget only reads it through `WGETRC`, which would
 replace the user's own `~/.wgetrc`, so it is never exported for you:
 
 ```sh
-WGETRC=/absolute/path/to/agent-dotfiles/.redpill/config/wgetrc wget URL
+WGETRC="/absolute/path/to/agent-dotfiles/.redpill/config/wgetrc" wget URL
 ```
 
 ## Known behavior
@@ -114,11 +114,8 @@ agent_rg -c 'pattern' src                     # per-file counts, nothing cut
 - `agent_require TOOL [MIN]` – capability check: prints `tool<TAB>version<TAB>path`. Exit 1 missing, 2 too old, 3 version unreadable, 64 usage. Runs `TOOL --version`.
 - `agent_head [N]` – first N lines (default 100) of stdin, then `agent_head: TRUNCATED, showed N of M lines` on stdout. Use it instead of a bare `head`, which truncates silently.
 - `agent_usage [DIR]` – `du -h -d 1`.
-- `agent_os` – `key=value` host facts: kernel, arch, cpus, `wsl=1`, distro id/version.
-- `agent_ports`, `agent_free_port [START]` – listening TCP ports; first free port from START (default 20000). Another process can still claim it, so bind at once.
-- `agent_json [FILE...]` – color-free pretty-print (`jq`, else `python3 -m json.tool`); invalid JSON is an error.
 - `agent_codepoints STRING` – one `U+XXXX<TAB>char` line per character; invisible ones (control, format, space) show their category, to find zero-width characters and lookalike spaces.
-- `agent_php_lint [DIR]` – `php -l` over `*.php`, prints failures only plus a summary that names the skipped `.git`, `vendor`, `node_modules`; exit 1 on any error.
+- `agent_php_lint [DIR]` – parallel `php -l` over `*.php`, skipping `.git`, `vendor` and `node_modules`. Reports files with errors plus ok/error/unchecked counts; any error or unchecked file makes the command fail.
 - `agent_extract ARCHIVE DEST` – unpack tar(.gz/.bz2/.xz) or zip into a new or empty DEST. Keeps the archive, refuses absolute or `..` entries (exit 2). Entries are listed, not otherwise vetted: review untrusted archives before use.
 - `agent_context` – orientation for a task: repo root, `status --short --branch`, staged and unstaged `--stat`, and for a Composer project the package, PHP constraint, declared scripts, config files, available `php`/`composer` and installed `vendor/bin` checks. Reads `composer.json` with `jq`; never runs a script.
 - `agent_diff [ARGS]`, `agent_diff_check` – complete native patch with external diff drivers off; `git diff --check` for staged and unstaged changes.
