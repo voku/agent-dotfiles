@@ -1,6 +1,6 @@
 # ADR 0001: Separate runtime payload from maintainer tooling
 
-- Status: Accepted as a boundary; physical directory migration pending
+- Status: Accepted as a boundary; physical directory migration pending; Superseded in part by [ADR 0003](0003-shell-only.md)
 - Date: 2026-10-12
 - Context: [Redpill-inspired environment RFC #40](https://github.com/voku/agent-dotfiles/issues/40)
 

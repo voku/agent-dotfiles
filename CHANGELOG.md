@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.0
+
+- Become shell-only: remove the Python CLI, `tools/`, installer, first-install
+  planner, capability profiles and vendored skills ([ADR 0003](docs/decisions/0003-shell-only.md)).
+- Move `agent_git`/`agent_rg` from `.aliases` into `.functions`; drop `.aliases`.
+- Add `.redpill/config/agent.env`: per-tool variables that remove progress bars,
+  color, pagers, update nags and prompts (Git, Composer, npm, pip, Cargo, ...),
+  applied only when unset and removed exactly by `agent_deactivate`.
+- Add helpers `agent_curl`, `agent_require` (capability check), `agent_head`
+  (truncation that is always announced), `agent_usage`, `agent_os`, `agent_ports`,
+  `agent_free_port`, `agent_json`, `agent_codepoints`, `agent_php_lint` and `agent_extract`.
+- Derive the owned function namespace from `.functions` instead of two hand-kept lists.
+- Replace `.redpill/core` and `.redpill/modules` with `.redpill/lib` and `.redpill/config`.
+- Move `project-onboarding` to `voku/agent-skills`.
+
 ## 0.5.0
 
 - Establish one reviewed `.redpill/` Bash/Zsh runtime with explicit, reversible

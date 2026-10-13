@@ -1,6 +1,6 @@
 # ADR 0002: Fixed Redpill runtime and project memory
 
-- Status: Accepted
+- Status: Accepted; Superseded in part by [ADR 0003](0003-shell-only.md)
 - Date: 2026-10-12
 - Context: [Redpill-inspired environment RFC #40](https://github.com/voku/agent-dotfiles/issues/40)
 

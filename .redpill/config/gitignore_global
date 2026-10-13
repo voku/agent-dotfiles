@@ -1,0 +1,37 @@
+# Opt-in global ignore list for machines that run coding agents. Never applied
+# automatically; enable it yourself (this edits your Git config, so it is your call):
+#   git config --global core.excludesFile /absolute/path/to/agent-dotfiles/.redpill/config/gitignore_global
+# Editor and OS noise only. Do not add source, build output, archives, logs,
+# databases or agent state that an agent must be able to see in `git status`.
+# Migrated from voku/dotfiles .gitignore_global and .global_gitignore.
+
+# JetBrains / PhpStorm
+.idea/
+*.iml
+*.ipr
+*.iws
+*phpintel/
+
+# VS Code
+.vscode/
+
+# Vim / Emacs / editor backups
+*.swp
+*.sw?
+*~
+*.php~
+
+# macOS
+.DS_Store
+.DS_Store?
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/

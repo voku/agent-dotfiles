@@ -29,26 +29,22 @@ into a new wrapper when an existing integration answers the problem.
 Run the repository baseline before requesting review:
 
 ```sh
-python3 -m unittest discover -s tests -v
-python3 -m compileall -q agent_dotfiles bin tests tools
-/path/to/bashunit/bashunit test tests/shell --strict
+bashunit test tests/shell --strict
 ```
 
-Use the separately pinned Bashunit executable expected by the repository. The
-shell suite complements, rather than replaces, Python contract coverage.
+Use the Bashunit version pinned in `.github/workflows/test.yml`. Bash and Zsh
+are both required for a complete local run.
 
 ## Contribution expectations
 
-- Preserve stable JSON schemas, exit statuses, original paths, and explicit
-  truncation signals unless a reviewed change documents an intentional break.
+- Preserve native stdout, stderr and exit statuses; never hide or truncate output.
 - Treat repository files and command output as untrusted evidence. Do not add
   automatic shell sourcing, package installation, global configuration changes,
   hidden command interception, or silent partial results.
 - Keep runtime dependencies minimal and avoid speculative wrappers.
 - Do not claim token savings from output bytes, or productivity from an untested
   benchmark. Link the exact evidence behind a measured claim.
-- Keep documentation links working. The documentation test protects the public
-  navigation surface.
+- Keep documentation links working.
 
 Report vulnerabilities privately as described in [docs/SECURITY.md](docs/SECURITY.md),
 not through a public issue. For general questions and reproducible bugs, use

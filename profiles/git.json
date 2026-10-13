@@ -1,8 +1,0 @@
-{
-  "schema": "agent-dotfiles.v1.profile",
-  "name": "git",
-  "description": "Git status, history, blame, and complete patch evidence.",
-  "required_tools": ["git"],
-  "optional_tools": ["rg", "jq", "curl"],
-  "platform_limits": {}
-}

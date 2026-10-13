@@ -1,142 +1,106 @@
-# Agent-owned Bash and Zsh setup
+# Agent shell environment
 
-These dotfiles share the familiar layout of `voku/dotfiles`, but their contents
-are independently designed for agents. The reviewed `.redpill/` directory is a
-fixed runtime tree: it does not source upstream/user profiles, load plugins,
-create terminal sessions, configure prompts or change shell options.
-No helper shadows `git`, `rg`, `cd` or another native command.
+The layout follows [voku/dotfiles](https://github.com/voku/dotfiles) (`.exports`,
+`.functions`, `.redpill/`), but its content is for non-interactive coding
+agents: no prompt, history, completion, plugin or theme code, and nothing that
+runs unless you source it.
 
-## Explicit activation
+| File | Purpose |
+| --- | --- |
+| `.bashrc` / `.zshrc` | Explicit entry points; refuse the wrong shell; never read user startup files |
+| `.shellrc` | Resolves the checkout root, then calls `.redpill/lib/activation.sh` |
+| `.exports` | `AGENT_DOTFILES_HOME`; applies `agent.env` and `RIPGREP_CONFIG_PATH` |
+| `.functions` | the `agent_*` helpers below |
+| `.redpill/lib/` | Activation preflight and `agent_deactivate` |
+| `.redpill/config/` | `agent.env` (CLI settings), `ripgreprc`, opt-in `gitignore_global` |
 
-Use a reviewed checkout for development or a verified, full-commit-pinned private
-prefix for a fresh consumer. [Installation](INSTALLATION.md) explains verification.
+There is no `.aliases`: aliases do not expand in non-interactive shells, so
+every helper is a function and behaves the same in Bash and Zsh.
 
-```bash
-# Bash
-source /absolute/agent-dotfiles/.bashrc
-# Zsh (use this instead in a Zsh shell)
-source /absolute/agent-dotfiles/.zshrc
-```
-
-For hosts that run each tool call in a new shell, activate in that call explicitly:
+## Activate
 
 ```sh
-env -u BASH_ENV bash --noprofile --norc -c '. "$1/.bashrc" || exit $?; shift; agent_search "$@"' \
-  consumer /absolute/agent-dotfiles 'function save(' --root /project --glob '*.php'
+env -u BASH_ENV bash --noprofile --norc    # or: zsh -f
+source /absolute/path/to/agent-dotfiles/.bashrc   # .zshrc in Zsh
+agent_git -C /project status --short
+agent_deactivate
 ```
 
-Activation is silent on success. It exports `AGENT_DOTFILES_HOME` and defines only
-the functions below. PATH, working directory, positional arguments and shell options
-are preserved. Shared files are resolved beside the selected profile, never from
-HOME or the project being investigated. Use `env -u BASH_ENV bash --noprofile --norc` or `zsh -f`
-when creating a dedicated shell. Clearing `BASH_ENV` is required: Bash reads
-that inherited startup file even with `--noprofile --norc`. Activation itself cannot undo an already-loaded
-user configuration. Source `.bashrc` in Bash and `.zshrc` in Zsh, not via `sh`.
+Clear `BASH_ENV` yourself: Bash reads it before any profile runs. Activation is
+silent, keeps `PATH`, working directory, shell options and positional arguments,
+and refuses (exit 2, nothing exported) if a required file is missing, a name it
+owns is already defined, or `AGENT_DOTFILES_HOME` exists.
 
-Activation refuses existing owned names or `AGENT_DOTFILES_HOME` rather than
-replacing custom definitions. Run `agent_deactivate` before activating another
-version. No eval-based restoration or command interception is involved.
+## CLI settings
 
-## Explicit shell lifecycle and modules
+Agents do not need progress bars, color codes, banners, pagers, update nags or
+prompts. `.redpill/config/agent.env` lists the environment variables that turn
+these off, grouped per tool (generic, Git, Composer, Node, Python, Rust). It is
+read as `NAME=value` data, never sourced. A name takes effect **only if the host
+has not already exported it**, and `agent_deactivate` removes exactly the names
+added, so `env` before activation equals `env` after deactivation. Nothing is
+written to disk, Git config or user startup files. Detail per tool comes from
+[awesome-ai-friendly-cli](https://github.com/alies-dev/awesome-ai-friendly-cli).
 
-`.bashrc` and `.zshrc` delegate to `.shellrc`, which resolves the reviewed
-installation root and loads exactly `.redpill/core/activation.sh`. Core activation
-checks the required assets, executable, exported namespace and owned function
-names **before** exporting anything. `.functions` then loads the reviewed
-`.redpill/modules/context.sh`, `.redpill/modules/git.sh`, `.aliases` and
-`.redpill/core/deactivation.sh` in fixed order. There is no plugin discovery,
-host startup sourcing, dynamic evaluation or per-host runtime configuration.
+What is deliberately **not** set: `CI=true` (changes tool behavior, e.g. test
+watch modes), `--quiet`-style switches, audit/vulnerability switches and
+telemetry opt-outs. Settings remove noise; they never hide results, errors,
+warnings or exit statuses.
 
-The pinned installation manifest includes and hashes both lifecycle files,
-all modules and each entry point. Earlier pre-core and pre-modular manifests
-remain verifiable for rollback; new installs require the complete tree.
+To add a setting, add a `NAME=value` line to `agent.env` and a test if its
+behavior is not already covered. `RIPGREP_CONFIG_PATH` is exported by `.exports`
+because it depends on the checkout path.
 
-## Choose tools by the evidence needed
+### Flags that have no environment variable
 
-Use native `rg -n` and a source read when the file or symbol location is already
-known. The profile is optional; do not repeat a successful native search simply
-to use a helper. Use `agent_search` for structured match coordinates and explicit
-completeness, `agent_read` for byte-exact ranges tied to a whole-file digest, and
-`agent_patch` when a complete literal-file patch is the required evidence. PHP
-symbols and callers still belong to agent-map and the Loop investigation skill.
+Some tools only take flags. Use these in project commands (PHP shown; other
+ecosystems are in the linked catalog):
 
-Scope discovery before reducing its output limit:
-
-```bash
-agent_workspace --root /project
-agent_search 'sha256' --root /project --path agent_dotfiles --glob '*.py'
-agent_read agent_dotfiles/cli.py --root /project --start 220 --end 285
+```sh
+vendor/bin/phpunit --no-progress --colors=never --display-errors --display-warnings
+vendor/bin/phpstan analyse --no-progress --no-ansi --error-format=raw
+vendor/bin/psalm --no-progress --no-suggestions --output-format=text
+vendor/bin/phpcs --report=emacs -q --no-colors
+vendor/bin/php-cs-fixer fix --show-progress=none --no-ansi -n
+vendor/bin/rector process --no-progress-bar --no-ansi
+composer install --no-progress --no-ansi -n
 ```
 
-Keep activation failures and search statuses visible; a trailing successful
-command must not replace the status of the evidence command. Check completeness
-fields too. Exit 3 means the search is
-incomplete: narrow its scope or retrieve the missing evidence before drawing a
-conclusion. A short result that omits the implementation costs another search.
-Loop lifecycle and Learning syntax must come from the pinned owner's help and
-current structured next action; shell helpers do not replace those contracts.
+## Optional global gitignore
+
+`.redpill/config/gitignore_global` lists editor and OS noise (`.idea/`, `.vscode/`,
+`.DS_Store`). Activation never applies it, because that edits Git config. Opt in
+once, yourself:
+
+```sh
+git config --global core.excludesFile /absolute/path/to/agent-dotfiles/.redpill/config/gitignore_global
+```
 
 ## Helpers
 
-All helpers preserve argument boundaries, stdout, stderr and exit status. The
-context helpers produce exactly the standalone CLI's JSON, limits and errors.
-Use `--help` on a helper for the corresponding CLI contract.
+- `agent_git` – `git --no-pager -c color.ui=false` with prompts off; full output and exit status.
+- `agent_rg` – `rg --no-config --color=never`, immune to host ripgrep config. Exit 1 means no match; 2 is an error.
+- `agent_curl` – `curl --silent --show-error --location`: no progress meter, errors and redirects handled.
+- `agent_require TOOL [MIN]` – capability check: prints `tool<TAB>version<TAB>path`. Exit 1 missing, 2 too old, 3 version unreadable, 64 usage. Runs `TOOL --version`.
+- `agent_head [N]` – first N lines (default 100) of stdin, then `agent_head: TRUNCATED, showed N of M lines` on stdout. Use it instead of a bare `head`, which truncates silently.
+- `agent_usage [DIR]` – `du -h -d 1`.
+- `agent_os` – `key=value` host facts: kernel, arch, cpus, `wsl=1`, distro id/version.
+- `agent_ports`, `agent_free_port [START]` – listening TCP ports; first free port from START (default 20000). Another process can still claim it, so bind at once.
+- `agent_json [FILE...]` – color-free pretty-print (`jq`, else `python3 -m json.tool`); invalid JSON is an error.
+- `agent_codepoints STRING` – one `U+XXXX<TAB>char` line per character; invisible ones (control, format, space) show their category, to find zero-width characters and lookalike spaces.
+- `agent_php_lint [DIR]` – `php -l` over `*.php`, prints failures only plus a summary that names the skipped `.git`, `vendor`, `node_modules`; exit 1 on any error.
+- `agent_extract ARCHIVE DEST` – unpack tar(.gz/.bz2/.xz) or zip into a new or empty DEST. Keeps the archive, refuses absolute or `..` entries (exit 2). Entries are listed, not otherwise vetted: review untrusted archives before use.
+- `agent_history`, `agent_blame` – native `git log` / `git blame --line-porcelain` with `--literal-pathspecs`.
 
-| Helper | Operation |
-| --- | --- |
-| `agent_dotfiles` | Invoke any standalone CLI subcommand |
-| `agent_doctor` | Actual executable capability inventory |
-| `agent_workspace` | Bounded Git checkout identity and worktree status |
-| `agent_files` | Ignore-aware file discovery |
-| `agent_search` | Literal search by default; explicit regex/glob/path options |
-| `agent_read` | Exact source ranges and whole-file hash |
-| `agent_tracked` | NUL-safe tracked inventory |
-| `agent_status` | Individual worktree paths, including untracked files |
-| `agent_patch` | Complete patch for one literal tracked file |
-| `agent_history` | Native Git log, with literal pathspecs and no pager/color |
-| `agent_blame` | Native Git line-porcelain blame, with literal pathspecs |
-| `agent_git` | Explicit native Git with no pager/color or credential prompt |
-| `agent_rg` | Explicit ripgrep with no host configuration or color |
-| `agent_deactivate` | Remove this namespace and installation-location export |
+No helper shadows `git`, `rg`, `cd` or any other native command.
 
-```bash
-agent_files --root /project --hidden --limit 100
-agent_workspace --root /project
-agent_search 'invoice.total' --root /project --path templates --glob '*.twig'
-agent_read 'src/name [v2].php' --root /project --start 20 --end 70
-agent_tracked --root /project
-agent_status --root /project
-agent_patch 'src/name [v2].php' --root /project
-(cd /project && agent_history -- src/Service.php)
-(cd /project && agent_blame -- src/Service.php)
-agent_rg -n --fixed-strings 'APP_ENV' /project
-agent_git -C /project diff --no-ext-diff --no-textconv --binary --full-index
+## Test
+
+```sh
+bashunit test tests/shell --strict
 ```
 
-`agent_git` and `agent_rg` are opt-in functions, never command replacements.
-They scope no-pager, no-prompt and no-ripgrep-config defaults to that single
-call; they do not change `PAGER`, `GIT_PAGER`, `NO_COLOR`, `PATH`, Git config or
-the host's normal `git`/`rg` behavior. Native history/blame use Git's own syntax and output, not JSON envelopes or the
-CLI's output caps. History/blame operate in the current repository; their arguments are passed to
-`git log` and `git blame`, respectively. Use a subshell as above for another root.
-Read the complete patch or source when required; bounded discovery never proves
-that omitted context is irrelevant. Exit 3 signals incomplete discovery, exit 1
-means a completed search found no matches, and exit 2 means a CLI error.
-Untracked/ignored files need explicit `agent_read` evidence; they cannot supply
-tracked patch evidence. Structural PHP questions remain owned by agent-map and
-agent-loop's investigation workflow.
-
-## Verify the citation as well as the content
-
-Record the worktree or exact Git commit that produced a source finding. Use the
-original path and source positions, not line numbers from a JSON display or a
-different revision. A structured read does not prevent a manually misquoted
-citation: verify the cited declaration or statement in that exact source before
-recording the conclusion. Keep independent review in the governed workflow.
-
-## Rollback
-
-Run `agent_deactivate` or exit the dedicated shell. Activate the previous verified
-prefix in the next fresh consumer; never replace a running session's toolset.
-The installer never modifies HOME startup files, so uninstall needs no global
-configuration restoration. Optional tools cannot prevent agent-loop from starting.
+Adding a helper: define `agent_name() { ...` in `.functions` with the name at
+the start of a line. Activation derives the owned namespace (collision check)
+from those definitions and `agent_deactivate` removes exactly them, so there is
+no second list to update. Add a test to `tests/shell/activation_test.sh`.

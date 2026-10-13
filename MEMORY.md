@@ -1,22 +1,14 @@
 # Repository memory
 
-This is short, reviewed project knowledge for `voku/agent-dotfiles` maintainers
-using agent-loop. It indexes executable and documented truth; raw observations,
-sessions, Recall receipts and Learning state belong under local `.agent-loop/`
-and are intentionally not committed or installed for consumers.
-
-## Durable repository rules
+Short, reviewed project knowledge for `voku/agent-dotfiles` maintainers using
+agent-loop. Raw observations, sessions and Recall receipts stay in local,
+untracked `.agent-loop/`.
 
 | Subject | Durable rule | Canonical home |
 | --- | --- | --- |
-| Consumer boundary | The pinned installer projects only the audited runtime and selected skills. Project documentation, decisions, MEMORY and raw workflow state never enter a consumer prefix. | `tools/install.py`, `tests/test_repository_ownership.py`, `docs/REPOSITORY_LAYOUT.md` |
-| Shell runtime | `.redpill/` is the one fixed Bash and Zsh runtime tree. Entry points and fixed loaders may source only reviewed files beneath the selected tool home. | `.shellrc`, `.functions`, `.redpill/`, `tests/test_shell_profiles.py` |
-| Agent defaults | Keep deterministic Git and ripgrep settings inside explicit `agent_git` and `agent_rg` calls. Do not override native commands or export global pager, color, PATH or Git settings. | `.aliases`, `docs/SHELL.md` |
-| Profiles | `profiles/*.json` is the sole diagnostic capability catalog. It describes `doctor` readiness and never activates shell behavior, installs tools or loads local configuration. | `profiles/`, `agent_dotfiles/cli.py`, `docs/REPOSITORY_LAYOUT.md` |
-| Evaluation claims | A green CLI or installation CI run does not prove better coding-agent outcomes. Claims require the held-out, warm-task protocol with agent-loop, model and task conditions held constant. | `docs/STEADY_STATE_EVALUATION.md`, issue #12 |
-
-## Archived task learning
-
-| Archived on | Task | Summary | Archive reason | Durable lesson candidate | Promoted to |
-| --- | --- | --- | --- | --- | --- |
-| 2026-10-12 | `DOTFILES-52` | Runtime layout and project-memory boundary are being consolidated through a governed change. | The stable rule is recorded above; implementation still needs independent validation and review. | Use a single reviewed runtime tree and keep consumer payload separate from project workflow knowledge. | `MEMORY.md` |
+| Scope | Shell-only: `.exports`, `.functions`, `.redpill/` and Bash/Zsh entry points. No Python CLI, installer, profiles or bundled skills. | `docs/decisions/0003-shell-only.md` |
+| Skills | Owned by `voku/agent-skills`; never vendor copies here. | `docs/REPOSITORY_LAYOUT.md` |
+| Activation | Explicit sourcing only; refuse on missing asset or name collision; set an env default only if the host has not; `agent_deactivate` removes exactly what was added. | `.redpill/lib/`, `.exports`, `tests/shell/activation_test.sh` |
+| Helpers | One `agent_*() {` per helper in `.functions`; the owned namespace is derived from it. Helpers are read-only or write only to an explicit destination, never page, color or truncate silently (`agent_head` announces cuts). | `.functions`, `docs/SHELL.md` |
+| CLI settings | `.redpill/config/agent.env` removes noise (progress, color, pagers, prompts) only; never CI=true, quiet/audit switches or anything that hides results. | `.redpill/config/agent.env`, `docs/SHELL.md` |
+| Evaluation claims | A green CI run does not prove better agent outcomes; claims need the controlled comparison in issue #12. | issue #12 |
