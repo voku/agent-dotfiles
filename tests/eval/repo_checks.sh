@@ -32,29 +32,3 @@ if git rev-parse -q --verify HEAD~1 >/dev/null 2>&1; then
 else
     say PASS diff-insulated "single-commit repo, skipped"
 fi
-
-# 4. agent_php_lint covers exactly the PHP files an independent find sees.
-if command -v php >/dev/null 2>&1; then
-    expected=$(find . \( -name .git -o -name vendor -o -name node_modules \) -prune -o -type f -name '*.php' -print0 | tr -cd '\0' | wc -c | tr -d ' ')
-    out=$(agent_php_lint . 2>&1); rc=$?
-    covered=$(printf '%s\n' "$out" | sed -n 's/^agent_php_lint: \([0-9]*\) ok, \([0-9]*\) with errors.*/\1 \2/p' | awk '{print $1+$2}')
-    if [ "$expected" = "${covered:-x}" ]; then say PASS php-lint-coverage "$expected files, rc=$rc"; else say FAIL php-lint-coverage "find=$expected lint=${covered:-none}"; fi
-fi
-
-# 5. agent_context reports the package name composer.json declares.
-if [ -f composer.json ] && command -v jq >/dev/null 2>&1; then
-    want=$(jq -r '.name // "(not declared)"' composer.json)
-    got=$(agent_context 2>/dev/null | sed -n 's/^Package: //p')
-    if [ "$want" = "$got" ]; then say PASS context-package "$want"; else say FAIL context-package "want=$want got=$got"; fi
-fi
-
-# 6. agent_head never truncates silently: shown + announced == total.
-total=$(command rg --no-config -c --no-filename 'function ' . 2>/dev/null | awk '{s+=$1} END {print s+0}')
-if [ "$total" -gt 25 ]; then
-    command rg --no-config -n --no-heading 'function ' . 2>/dev/null | agent_head 25 > "$EVAL_TMP/head.out"
-    announced=$(sed -n 's/^agent_head: TRUNCATED, showed 25 of \([0-9]*\) lines$/\1/p' "$EVAL_TMP/head.out")
-    lines=$(grep -vc '^agent_head: TRUNCATED' "$EVAL_TMP/head.out")
-    if [ "$announced" = "$total" ] && [ "$lines" = 25 ]; then say PASS head-announces "25 of $total"; else say FAIL head-announces "announced=${announced:-none} total=$total shown=$lines"; fi
-else
-    say PASS head-announces "fewer than 26 lines, skipped"
-fi

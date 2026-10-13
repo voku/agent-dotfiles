@@ -1,6 +1,6 @@
 # ADR 0003: Shell-only environment; skills live in agent-skills
 
-- Status: Accepted; supersedes the Python CLI, installer, profile and bundled-skill parts of ADR 0001 and ADR 0002
+- Status: Accepted; supersedes the Python CLI, installer, profile and bundled-skill parts of ADR 0001 and ADR 0002; helper set narrowed by [ADR 0004](0004-environment-vs-task-strategy.md)
 - Date: 2026-10-13
 
 ## Decision

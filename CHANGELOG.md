@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+Boundary cleanup ([ADR 0004](docs/decisions/0004-environment-vs-task-strategy.md)), from the #69 pilot and #70. No new behavior.
+
+- Remove `agent_head`, `agent_php_lint`, `agent_context`, `agent_extract`,
+  `agent_require`, `agent_curl`, `agent_history`, `agent_blame`,
+  `agent_diff_check`, `agent_root`, `agent_mkcd`, `agent_usage`,
+  `agent_codepoints`: task strategy or convenience without outcome evidence.
+  Recoverable from v0.7.0. Kept: `agent_git`, `agent_rg`, `agent_diff`.
+- Remove `PYTHONIOENCODING` from `agent.env` (changes codec behavior).
+- `agent_rg` unchanged and documented as native ripgrep: no default `--binary`;
+  the NUL-file regression test stays as evidence of the limitation (#70).
+
 ## 0.7.0
 
 Hardening and evidence release. It does **not** recommend default activation:

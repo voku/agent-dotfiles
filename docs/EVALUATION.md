@@ -8,7 +8,7 @@ productivity.
 
 | Layer | Question | Status (0.7.0) |
 | --- | --- | --- |
-| A. Corpus check | Does each helper give the same evidence as clean native commands on real code, in Bash and Zsh? | Run, repeatable: `tests/eval/corpus_check.sh` |
+| A. Corpus check | Does each remaining helper give the same evidence as clean native commands on real code, in Bash and Zsh? | Run, repeatable: `tests/eval/corpus_check.sh` |
 | B. Friction log | Which shell habits do agents really have, and so which helpers earn a place? | Done once, 12,121 calls (below) |
 | C. Agent trial | Do agents with the environment finish real tasks at least as correctly, with at least as complete evidence? | **Protocol only, not run** |
 
@@ -22,9 +22,6 @@ profile in a fresh shell and, per repository, checks:
 | `rg-insulated`, `rg-exit-status` | `agent_rg` under a hostile `RIPGREP_CONFIG_PATH` (column limit, glob, max-count, color) returns the same lines and exit status as clean `rg --no-config` |
 | `rg-plain-no-hidden-matches` | plain `rg` with the activated config returns the same lines as clean native `rg` |
 | `diff-insulated` | `agent_diff HEAD~1 HEAD` under a hostile global gitconfig (forced color, broken external driver, pager) is byte-identical to a clean native diff |
-| `php-lint-coverage` | `agent_php_lint` accounts for exactly the files an independent `find` sees |
-| `context-package` | `agent_context` reports the package name in `composer.json` |
-| `head-announces` | `agent_head 25` shows 25 lines and announces the true total |
 
 Output order of `rg` differs between identical runs (parallel walk), so `rg`
 results are compared as sorted line sets. The script reads repositories and
@@ -43,6 +40,12 @@ What it found and fixed before release:
   each report is now written in one piece and a file php never reports on
   fails the run. Both are covered by regression tests.
 - `rg` ordering is nondeterministic; documented, not changed.
+
+After [ADR 0004](decisions/0004-environment-vs-task-strategy.md) the corpus
+check covers only `agent_rg`, `agent_diff` and activated plain `rg`. Checks for
+the removed helpers (`php-lint-coverage`, `context-package`, `head-announces`)
+were deleted with them. The 2026-10-13 result above was recorded at 0.7.0 with
+those checks.
 
 ## B. Friction log
 
@@ -64,11 +67,32 @@ developer, PHP-heavy work). Commands were counted, never stored or quoted.
 | `json.tool` | 4 | Dropped `agent_json` |
 | `uname`/`lsb_release` | 3 | Dropped `agent_os` |
 
+Several "Consequence" entries name helpers removed by ADR 0004; frequency of a
+habit was never proof that a wrapper helps.
+
 A helper only helps if the agent calls it. The habit data says the guidance
 ("never a bare `| head`") matters more than another wrapper; that guidance is
 in [SHELL.md](SHELL.md) and belongs in the `agent-skills` onboarding skill.
 Limits: one developer, one stack, and counts show use, not whether the output
 was complete.
+
+### Pilot #69 (one triplet, closed)
+
+Final answers were identical and correct in all arms; the guided arm used more
+calls and time; treatment isolation and activation were not proven, so there
+is no valid comparative effect. It exposed the `agent_rg` NUL limitation (#70).
+Raw transcripts are local and not part of this repository.
+
+Open hypotheses, each small and testable under a new protocol with isolation
+and an activation proof, none a feature request:
+
+- H1: with the profile active and no guidance, agents truncate or miss
+  evidence no more often than native (regression check only).
+- H2: guidance about cross-checking inventories (agent-skills) reduces
+  incomplete answers more than any shell helper does.
+- H3: removing the 13 helpers (ADR 0004) changes no task outcome relative to
+  0.7.0; if it does, name the helper and the task, and re-add only that.
+- H4: `PYTHONIOENCODING` removal matters for no scored task.
 
 ## C. Agent trial protocol (not yet run)
 

@@ -9,6 +9,6 @@ untracked `.agent-loop/`.
 | Scope | Shell-only: `.exports`, `.functions`, `.redpill/` and Bash/Zsh entry points. No Python CLI, installer, profiles or bundled skills. | `docs/decisions/0003-shell-only.md` |
 | Skills | Owned by `voku/agent-skills`; never vendor copies here. | `docs/REPOSITORY_LAYOUT.md` |
 | Activation | Explicit sourcing only; refuse on missing asset or name collision; set an env default only if the host has not; `agent_deactivate` removes exactly what was added. | `.redpill/lib/`, `.exports`, `tests/shell/activation_test.sh` |
-| Helpers | One `agent_*() {` per helper in `.functions`; the owned namespace is derived from it. Helpers are read-only or write only to an explicit destination, never page, color or truncate silently (`agent_head` announces cuts). | `.functions`, `docs/SHELL.md` |
+| Helpers | Only `agent_git`, `agent_rg`, `agent_diff`: the native command with host-config bleed removed, nothing more. Task strategy (search choice, completeness, output bounds, linting) is guidance for agent-skills. `agent_rg` is not a completeness tool (#70). A helper needs outcome evidence from #12 to be added. | `docs/decisions/0004-environment-vs-task-strategy.md`, `.functions` |
 | CLI settings | `.redpill/config/agent.env` removes noise (progress, color, pagers, prompts) only; never CI=true, quiet/audit switches or anything that hides results. | `.redpill/config/agent.env`, `docs/SHELL.md` |
 | Evaluation claims | A green CI run does not prove better agent outcomes; claims need the controlled comparison in issue #12. | issue #12 |
