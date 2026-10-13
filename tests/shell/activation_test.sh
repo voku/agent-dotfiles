@@ -110,7 +110,7 @@ function test_missing_or_directory_assets_refuse_activation() {
   for asset in .exports .functions .redpill/lib/deactivation.sh .redpill/config/agent.env .redpill/config/ripgreprc; do
     mv -- "$HOME_COPY/$asset" "$HOME_COPY/$asset.saved"
     for shell in $(available_shells); do
-      run_shell "$shell" '. "$1"; status=$?; [ "${AGENT_DOTFILES_HOME+x}" != x ] || exit 99; exit $status' x
+      run_shell "$shell" '. "$1"; rc=$?; [ "${AGENT_DOTFILES_HOME+x}" != x ] || exit 99; exit $rc' x
       assert_same '2' "$STATUS"
       assert_contains "$asset" "$STDERR"
     done
