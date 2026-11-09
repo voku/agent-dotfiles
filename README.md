@@ -30,6 +30,9 @@ agent_deactivate
 | `.redpill/lib/` | Activation preflight and `agent_deactivate` |
 | `.redpill/config/` | Tool configuration files (`agent.env`, `ripgreprc`, opt-in `gitignore_global`) |
 | `tests/shell/` | Bashunit contracts run against real Bash and Zsh |
+| `AGENTS.md` | Repository-specific safety and contribution boundary; not a shell startup file |
+| `MEMORY.md` | Reviewed project guidance for contributors; not automatically sourced or installed |
+| `UPSTREAM.md` | Origin and provenance of the adapted dotfiles |
 | `docs/` | [Shell contract](docs/SHELL.md), [layout](docs/REPOSITORY_LAYOUT.md), [agent-loop boundary](docs/AGENT_LOOP.md), [decisions](docs/decisions/) |
 
 No progress bars, color, pagers, update nags or prompts: `agent.env` sets the
